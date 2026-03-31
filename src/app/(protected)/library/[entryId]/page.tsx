@@ -28,9 +28,14 @@ export default async function EntryPage({ params }: PageProps) {
 
   return (
     <div className="space-y-4">
-      <Link href="/library" className="text-sm text-muted-foreground hover:text-foreground">
-        ← Back to library
-      </Link>
+      <div className="mx-auto max-w-[860px]">
+        <Link
+          href="/library"
+          className="inline-flex items-center gap-1 text-[13px] text-muted-foreground transition-colors hover:text-foreground"
+        >
+          ← Library
+        </Link>
+      </div>
       <EntryDetail
         entryId={entry.id}
         initial={{

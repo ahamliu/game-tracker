@@ -1,14 +1,24 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMemo, useState, useCallback } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState, useCallback, useRef } from "react";
+import {
+  Star,
+  PencilSimple,
+  Trash,
+  ImageSquare,
+  Plus,
+  SealCheck,
+  DotsThree,
+  X,
+  UploadSimple,
+  NotePencil,
+} from "@phosphor-icons/react";
+import { StatusDropdown, StatusIcon } from "@/components/status-controls";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import type { EntryStatus } from "@/lib/status";
-import { STATUS_OPTIONS, statusLabel } from "@/lib/status";
+import { statusLabel, STATUS_OPTIONS } from "@/lib/status";
+import { cn } from "@/lib/utils";
 
 type Game = {
   id: string;
@@ -43,70 +53,71 @@ export function EntryDetail({
   };
 }) {
   const router = useRouter();
-  const [status, setStatus] = useState<EntryStatus>(initial.status);
-  const [rating, setRating] = useState(initial.rating?.toString() ?? "");
   const [notes, setNotes] = useState(initial.notes ?? "");
   const [progressPercent, setProgressPercent] = useState(initial.progressPercent?.toString() ?? "");
   const [progressNote, setProgressNote] = useState(initial.progressNote ?? "");
-  const [saving, setSaving] = useState(false);
-  const [msg, setMsg] = useState<string | null>(null);
-
-  const [routeName, setRouteName] = useState("");
-  const [routeStatus, setRouteStatus] = useState<EntryStatus>("planning");
-  const [routeRating, setRouteRating] = useState("");
-  const [routeNotes, setRouteNotes] = useState("");
+  const [rating, setRating] = useState(initial.rating);
   const [routes, setRoutes] = useState(initial.routes);
   const [uploading, setUploading] = useState<string | null>(null);
+  const [addingRoute, setAddingRoute] = useState(false);
+  const [newRouteName, setNewRouteName] = useState("");
+  const [overflowOpen, setOverflowOpen] = useState(false);
+  const overflowRef = useRef<HTMLDivElement>(null);
+  const [editingNotes, setEditingNotes] = useState(false);
+  const [editingProgress, setEditingProgress] = useState(false);
 
-  const routeWarning = useMemo(() => routes.length >= 48, [routes.length]);
-
-  async function saveEntry(e: React.FormEvent) {
-    e.preventDefault();
-    setSaving(true);
-    setMsg(null);
-    const res = await fetch(`/api/me/library/${entryId}`, {
+  const patchEntry = useCallback(async (data: Record<string, unknown>) => {
+    await fetch(`/api/me/library/${entryId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        status,
-        rating: rating === "" ? null : Number(rating),
-        notes: notes || null,
-        progressPercent: progressPercent === "" ? null : Number(progressPercent),
-        progressNote: progressNote || null,
-      }),
+      body: JSON.stringify(data),
     });
-    setSaving(false);
-    if (!res.ok) {
-      setMsg("Could not save.");
-      return;
-    }
-    setMsg("Saved.");
     router.refresh();
+  }, [entryId, router]);
+
+  function handleNotesBlur() {
+    setEditingNotes(false);
+    const val = notes.trim() || null;
+    if (val !== initial.notes) {
+      void patchEntry({ notes: val });
+    }
   }
 
-  async function addRoute(e: React.FormEvent) {
-    e.preventDefault();
-    setMsg(null);
+  function handleProgressBlur() {
+    setEditingProgress(false);
+    const pct = progressPercent === "" ? null : Number(progressPercent);
+    const note = progressNote.trim() || null;
+    if (pct !== initial.progressPercent || note !== initial.progressNote) {
+      void patchEntry({ progressPercent: pct, progressNote: note });
+    }
+  }
+
+  function handleRatingSelect(value: number | null) {
+    setRating(value);
+    void patchEntry({ rating: value });
+  }
+
+  async function removeFromLibrary() {
+    if (!confirm("Remove this game from your library? Routes will be deleted.")) return;
+    const res = await fetch(`/api/me/library/${entryId}`, { method: "DELETE" });
+    if (res.ok) router.push("/library");
+  }
+
+  async function addRoute() {
+    const name = newRouteName.trim();
+    if (!name) return;
     const res = await fetch(`/api/me/library/${entryId}/routes`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: routeName,
-        status: routeStatus,
-        rating: routeRating === "" ? null : Number(routeRating),
-        notes: routeNotes || null,
-      }),
+      body: JSON.stringify({ name, status: "planning" }),
     });
     const data = await res.json();
-    if (!res.ok) {
-      setMsg(data?.error?.message ?? "Could not add route");
-      return;
+    if (res.ok && data.route) {
+      setRoutes((r) => [...r, data.route]);
+      setNewRouteName("");
+      setAddingRoute(false);
+      router.refresh();
     }
-    if (data.route) setRoutes((r) => [...r, data.route]);
-    setRouteName("");
-    setRouteRating("");
-    setRouteNotes("");
-    router.refresh();
   }
 
   async function deleteRoute(routeId: string) {
@@ -131,180 +142,276 @@ export function EntryDetail({
     }
   }
 
-  async function removeFromLibrary() {
-    if (!confirm("Remove this game from your library? Routes will be deleted.")) return;
-    const res = await fetch(`/api/me/library/${entryId}`, { method: "DELETE" });
-    if (res.ok) router.push("/library");
-  }
+  const completedCount = routes.filter((r) => r.status === "completed").length;
+  const progressValue = progressPercent ? Number(progressPercent) : 0;
 
   return (
-    <div className="space-y-8">
-      <div className="flex flex-wrap gap-6">
-        <div className="relative h-48 w-32 shrink-0 overflow-hidden rounded-lg bg-muted sm:h-56 sm:w-40">
+    <div className="mx-auto max-w-[860px] space-y-8 py-2">
+      {/* Hero */}
+      <div className="flex gap-6">
+        <div className="relative h-[220px] w-[160px] shrink-0 overflow-hidden rounded-xl bg-muted shadow-md">
           {initial.game.coverUrl ? (
-            <img
-              src={initial.game.coverUrl}
-              alt=""
-              className="h-full w-full object-cover"
-            />
+            <img src={initial.game.coverUrl} alt="" className="h-full w-full object-cover" />
           ) : (
-            <div className="flex h-full items-center justify-center p-2 text-center text-xs text-muted-foreground">
+            <div className="flex h-full items-center justify-center p-4 text-center text-xs text-muted-foreground">
               No cover
             </div>
           )}
         </div>
-        <div className="min-w-0 flex-1 space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight">{initial.game.title}</h1>
-          {initial.game.summary && (
-            <p className="max-w-3xl text-sm text-muted-foreground line-clamp-4">{initial.game.summary}</p>
-          )}
-          <Button type="button" variant="destructive" size="sm" onClick={removeFromLibrary}>
-            Remove from library
-          </Button>
-        </div>
-      </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Your progress</CardTitle>
-          <CardDescription>Status, rating, and notes apply to the whole title.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={saveEntry} className="space-y-4">
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="status">Status</Label>
-                <select
-                  id="status"
-                  className="flex h-10 w-full rounded-md border border-border bg-card px-3 text-sm"
-                  value={status}
-                  onChange={(e) => setStatus(e.target.value as EntryStatus)}
+        <div className="flex min-w-0 flex-1 flex-col justify-between">
+          <div>
+            <div className="flex items-start justify-between gap-4">
+              <h1 className="text-[28px] font-bold leading-tight text-[#646373]">
+                {initial.game.title}
+              </h1>
+              <div ref={overflowRef} className="relative shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setOverflowOpen((v) => !v)}
+                  className="flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:bg-[#E8E8E8] dark:hover:bg-[#2a2a35]"
                 >
-                  {STATUS_OPTIONS.map((o) => (
-                    <option key={o.value} value={o.value}>
-                      {o.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="rating">Rating (0–10)</Label>
-                <Input
-                  id="rating"
-                  type="number"
-                  min={0}
-                  max={10}
-                  value={rating}
-                  onChange={(e) => setRating(e.target.value)}
-                />
+                  <DotsThree size={20} weight="bold" />
+                </button>
+                {overflowOpen && (
+                  <div className="absolute right-0 top-full z-50 mt-1 w-48 rounded-lg border border-border bg-card py-1">
+                    <button
+                      type="button"
+                      className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-[#822B34] hover:bg-muted"
+                      onClick={() => { setOverflowOpen(false); void removeFromLibrary(); }}
+                    >
+                      <Trash size={14} weight="bold" />
+                      Remove from library
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="progressPercent">Progress %</Label>
+
+            {initial.game.summary && (
+              <p className="mt-2 max-w-2xl text-[14px] leading-relaxed text-muted-foreground line-clamp-3">
+                {initial.game.summary}
+              </p>
+            )}
+
+            <div className="mt-4 flex flex-wrap items-center gap-3">
+              <StatusDropdown entryId={entryId} status={initial.status} showRemove={false} />
+              <InlineRating value={rating} onChange={handleRatingSelect} />
+            </div>
+          </div>
+
+          {/* Progress bar */}
+          <div className="mt-4">
+            {editingProgress ? (
+              <div className="flex items-center gap-3">
                 <Input
-                  id="progressPercent"
                   type="number"
                   min={0}
                   max={100}
+                  placeholder="0"
                   value={progressPercent}
                   onChange={(e) => setProgressPercent(e.target.value)}
+                  onBlur={handleProgressBlur}
+                  onKeyDown={(e) => { if (e.key === "Enter") handleProgressBlur(); }}
+                  className="h-8 w-20 text-sm"
+                  autoFocus
                 />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="progressNote">Progress note</Label>
+                <span className="text-sm text-muted-foreground">%</span>
                 <Input
-                  id="progressNote"
-                  placeholder="Chapter, label…"
+                  placeholder="Chapter, label..."
                   value={progressNote}
                   onChange={(e) => setProgressNote(e.target.value)}
+                  onBlur={handleProgressBlur}
+                  onKeyDown={(e) => { if (e.key === "Enter") handleProgressBlur(); }}
+                  className="h-8 flex-1 text-sm"
                 />
               </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="notes">Notes</Label>
-              <textarea
-                id="notes"
-                className="min-h-[100px] w-full rounded-md border border-border bg-card px-3 py-2 text-sm"
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-              />
-            </div>
-            {msg && <p className="text-sm text-muted-foreground">{msg}</p>}
-            <Button type="submit" disabled={saving}>
-              {saving ? "Saving…" : "Save changes"}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+            ) : (
+              <button
+                type="button"
+                className="group flex w-full items-center gap-3"
+                onClick={() => setEditingProgress(true)}
+              >
+                <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted">
+                  <div
+                    className="h-full rounded-full bg-[#656379] transition-all"
+                    style={{ width: `${Math.min(progressValue, 100)}%` }}
+                  />
+                </div>
+                <span className="shrink-0 text-[12px] font-medium text-muted-foreground">
+                  {progressPercent ? `${progressPercent}%` : "0%"}
+                  {progressNote && ` · ${progressNote}`}
+                </span>
+                <PencilSimple size={14} className="shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Character routes</CardTitle>
-          <CardDescription>
-            Track each route separately. Completing a route does not complete the whole game unless you set it above.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {routeWarning && (
-            <p className="text-sm text-amber-900">
-              You have {routes.length} routes (soft cap 50). Consider archiving notes elsewhere for huge catalogs.
-            </p>
+      {/* Notes */}
+      <section>
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="text-[16px] font-bold text-[#646373]">Notes</h2>
+          {!editingNotes && (
+            <button
+              type="button"
+              onClick={() => setEditingNotes(true)}
+              className="flex items-center gap-1 text-[12px] text-muted-foreground hover:text-foreground"
+            >
+              <PencilSimple size={14} />
+              Edit
+            </button>
           )}
-          <form onSubmit={addRoute} className="space-y-3 rounded-lg border border-border p-4">
-            <p className="text-sm font-medium">Add route</p>
-            <div className="grid gap-3 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label>Name</Label>
-                <Input value={routeName} onChange={(e) => setRouteName(e.target.value)} required />
-              </div>
-              <div className="space-y-2">
-                <Label>Status</Label>
-                <select
-                  className="flex h-10 w-full rounded-md border border-border bg-card px-3 text-sm"
-                  value={routeStatus}
-                  onChange={(e) => setRouteStatus(e.target.value as EntryStatus)}
-                >
-                  {STATUS_OPTIONS.map((o) => (
-                    <option key={o.value} value={o.value}>
-                      {o.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-            <div className="grid gap-3 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label>Rating (0–10)</Label>
-                <Input value={routeRating} onChange={(e) => setRouteRating(e.target.value)} type="number" min={0} max={10} />
-              </div>
-              <div className="space-y-2 sm:col-span-2">
-                <Label>Notes</Label>
-                <textarea
-                  className="min-h-[72px] w-full rounded-md border border-border bg-card px-3 py-2 text-sm"
-                  value={routeNotes}
-                  onChange={(e) => setRouteNotes(e.target.value)}
-                />
-              </div>
-            </div>
-            <Button type="submit">Add route</Button>
-          </form>
+        </div>
+        {editingNotes ? (
+          <textarea
+            className="min-h-[120px] w-full rounded-lg border border-border bg-card px-4 py-3 text-[14px] leading-relaxed focus:outline-none focus:ring-2 focus:ring-[#656379]/30"
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            onBlur={handleNotesBlur}
+            autoFocus
+            placeholder="Add notes about this game..."
+          />
+        ) : (
+          <div
+            className="min-h-[60px] cursor-pointer rounded-lg bg-card px-4 py-3 text-[14px] leading-relaxed text-muted-foreground transition-colors hover:bg-muted/50"
+            onClick={() => setEditingNotes(true)}
+          >
+            {notes ? (
+              <p className="whitespace-pre-wrap text-foreground">{notes}</p>
+            ) : (
+              <p className="italic">Click to add notes...</p>
+            )}
+          </div>
+        )}
+      </section>
 
-          <ul className="space-y-4">
-            {routes.map((r) => (
-              <RouteItem
-                key={r.id}
-                route={r}
-                entryId={entryId}
-                uploading={uploading === r.id}
-                onUpload={(file) => uploadRouteImage(r.id, file)}
-                onUpdate={(updated) => setRoutes((prev) => prev.map((x) => x.id === r.id ? { ...x, ...updated } : x))}
-                onDelete={() => deleteRoute(r.id)}
+      {/* Character Routes */}
+      <section>
+        <div className="mb-3 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <h2 className="text-[16px] font-bold text-[#646373]">Character Routes</h2>
+            {routes.length > 0 && (
+              <span className="text-[12px] text-muted-foreground">
+                {completedCount}/{routes.length} completed
+              </span>
+            )}
+          </div>
+          <button
+            type="button"
+            onClick={() => setAddingRoute(true)}
+            className="flex items-center gap-1 text-[12px] font-semibold text-[#656379] hover:opacity-80"
+          >
+            <Plus size={14} weight="bold" />
+            Add
+          </button>
+        </div>
+
+        <div className="space-y-2">
+          {routes.map((r) => (
+            <RouteItem
+              key={r.id}
+              route={r}
+              entryId={entryId}
+              uploading={uploading === r.id}
+              onUpload={(file) => uploadRouteImage(r.id, file)}
+              onUpdate={(updated) => setRoutes((prev) => prev.map((x) => x.id === r.id ? { ...x, ...updated } : x))}
+              onDelete={() => deleteRoute(r.id)}
+            />
+          ))}
+
+          {addingRoute && (
+            <div className="flex items-center gap-2 rounded-lg bg-card px-4 py-3">
+              <Input
+                value={newRouteName}
+                onChange={(e) => setNewRouteName(e.target.value)}
+                placeholder="Route name..."
+                className="h-8 flex-1 border-0 bg-transparent p-0 text-[14px] shadow-none focus-visible:ring-0"
+                autoFocus
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") void addRoute();
+                  if (e.key === "Escape") { setAddingRoute(false); setNewRouteName(""); }
+                }}
               />
-            ))}
-          </ul>
-        </CardContent>
-      </Card>
+              <button
+                type="button"
+                onClick={() => void addRoute()}
+                disabled={!newRouteName.trim()}
+                className="text-[12px] font-semibold text-[#656379] hover:opacity-80 disabled:opacity-40"
+              >
+                Add
+              </button>
+              <button
+                type="button"
+                onClick={() => { setAddingRoute(false); setNewRouteName(""); }}
+                className="text-muted-foreground hover:text-foreground"
+              >
+                <X size={14} />
+              </button>
+            </div>
+          )}
+
+          {routes.length === 0 && !addingRoute && (
+            <div
+              className="cursor-pointer rounded-lg border border-dashed border-border bg-card/50 px-4 py-8 text-center transition-colors hover:bg-card"
+              onClick={() => setAddingRoute(true)}
+            >
+              <p className="text-[13px] text-muted-foreground">
+                No routes yet. Click to add your first character route.
+              </p>
+            </div>
+          )}
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function InlineRating({ value, onChange }: { value: number | null; onChange: (v: number | null) => void }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        className="flex items-center gap-1.5 rounded-lg px-2 py-1 text-[13px] font-medium text-muted-foreground hover:bg-muted"
+        onClick={() => setOpen((v) => !v)}
+        onBlur={(e) => {
+          if (!ref.current?.contains(e.relatedTarget as Node)) setOpen(false);
+        }}
+      >
+        <Star size={16} weight={value != null ? "fill" : "regular"} className={value != null ? "text-[#F5A623]" : ""} />
+        {value != null ? `${value}/10` : "Rate"}
+      </button>
+      {open && (
+        <div className="absolute left-0 top-full z-50 mt-1 flex items-center gap-1 rounded-lg border border-border bg-card px-2 py-1.5">
+          <button
+            type="button"
+            className={cn(
+              "flex h-7 w-7 items-center justify-center rounded text-[12px] text-foreground",
+              value == null ? "bg-muted" : "hover:bg-muted"
+            )}
+            onClick={() => { onChange(null); setOpen(false); }}
+          >
+            —
+          </button>
+          {Array.from({ length: 10 }, (_, i) => i + 1).map((v) => (
+            <button
+              key={v}
+              type="button"
+              className={cn(
+                "flex h-7 w-7 items-center justify-center rounded text-[12px] text-foreground",
+                value === v ? "bg-muted font-bold" : "hover:bg-muted"
+              )}
+              onClick={() => { onChange(v); setOpen(false); }}
+            >
+              {v}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -326,6 +433,10 @@ function RouteItem({
 }) {
   const [editingName, setEditingName] = useState(false);
   const [name, setName] = useState(route.name);
+  const [editingNotes, setEditingNotes] = useState(false);
+  const [routeNotes, setRouteNotes] = useState(route.notes ?? "");
+  const [hovered, setHovered] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
 
   const patchRoute = useCallback(async (data: Record<string, unknown>) => {
     const res = await fetch(`/api/me/library/${entryId}/routes/${route.id}`, {
@@ -355,82 +466,158 @@ function RouteItem({
     void patchRoute({ status: newStatus });
   }
 
+  function handleNotesBlur() {
+    setEditingNotes(false);
+    const val = routeNotes.trim() || null;
+    if (val !== route.notes) {
+      onUpdate({ notes: val });
+      void patchRoute({ notes: val });
+    }
+  }
+
   async function removeImage() {
     onUpdate({ imageUrl: null });
     await patchRoute({ imageUrl: null });
   }
 
   return (
-    <li className="flex flex-col gap-3 rounded-lg border border-border p-4 sm:flex-row sm:items-start">
-      <div className="relative h-28 w-20 shrink-0 overflow-hidden rounded-md bg-muted">
-        {route.imageUrl ? (
-          <img src={route.imageUrl} alt="" className="h-full w-full object-cover" />
-        ) : (
-          <div className="flex h-full items-center justify-center text-[10px] text-muted-foreground">No image</div>
+    <div
+      className="group flex items-start gap-3 rounded-lg bg-card px-4 py-3 transition-colors hover:bg-card/80"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      {/* Avatar / image */}
+      <div className="relative shrink-0">
+        <div
+          className={cn(
+            "flex h-[48px] w-[48px] cursor-pointer items-center justify-center overflow-hidden rounded-full border-2 bg-muted transition-colors",
+            route.status === "completed" ? "border-success" : "border-[#646373]"
+          )}
+          onClick={() => fileRef.current?.click()}
+          title={route.imageUrl ? "Change image" : "Upload image"}
+        >
+          {route.imageUrl ? (
+            <img src={route.imageUrl} alt="" className="h-full w-full object-cover" />
+          ) : (
+            <span className="text-[14px] font-medium text-muted-foreground">
+              {route.name.charAt(0).toUpperCase()}
+            </span>
+          )}
+          <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 transition-opacity hover:opacity-100">
+            <UploadSimple size={16} className="text-white" />
+          </div>
+        </div>
+        {route.status === "completed" && (
+          <span className="absolute -right-0.5 -top-0.5 flex h-[18px] w-[18px] items-center justify-center rounded-full bg-white dark:bg-[hsl(240,5%,13%)]">
+            <SealCheck size={18} weight="fill" className="text-success" />
+          </span>
         )}
+        <input
+          ref={fileRef}
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          className="hidden"
+          disabled={uploading}
+          onChange={(e) => onUpload(e.target.files?.[0] ?? null)}
+        />
       </div>
-      <div className="min-w-0 flex-1 space-y-1">
-        {editingName ? (
-          <form
-            onSubmit={(e) => { e.preventDefault(); handleNameSubmit(); }}
-            className="flex items-center gap-2"
-          >
-            <Input
+
+      {/* Content */}
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-2">
+          {editingName ? (
+            <input
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="h-8 text-sm"
-              autoFocus
               onBlur={handleNameSubmit}
+              onKeyDown={(e) => { if (e.key === "Enter") handleNameSubmit(); if (e.key === "Escape") { setName(route.name); setEditingName(false); } }}
+              className="h-6 border-0 bg-transparent p-0 text-[14px] font-medium text-foreground outline-none focus:ring-0"
+              autoFocus
             />
-          </form>
-        ) : (
-          <button
-            type="button"
-            className="font-medium hover:underline"
-            onClick={() => setEditingName(true)}
-            title="Click to rename"
-          >
-            {route.name}
-          </button>
-        )}
-        <div className="flex items-center gap-2">
+          ) : (
+            <button
+              type="button"
+              className="text-[14px] font-medium text-foreground hover:underline"
+              onClick={() => setEditingName(true)}
+            >
+              {route.name}
+            </button>
+          )}
+
           <select
-            className="rounded-md border border-border bg-card px-2 py-1 text-sm"
+            className="rounded-md border border-border bg-transparent px-1.5 py-0.5 text-[11px] font-medium text-muted-foreground"
             value={route.status}
             onChange={(e) => handleStatusChange(e.target.value as EntryStatus)}
           >
             {STATUS_OPTIONS.map((o) => (
-              <option key={o.value} value={o.value}>
-                {o.label}
-              </option>
+              <option key={o.value} value={o.value}>{o.label}</option>
             ))}
           </select>
+
           {route.rating != null && (
-            <span className="text-sm text-muted-foreground">{route.rating}/10</span>
+            <span className="flex items-center gap-0.5 text-[12px] text-muted-foreground">
+              <Star size={12} weight="fill" className="text-[#F5A623]" />
+              {route.rating}/10
+            </span>
           )}
         </div>
-        {route.notes && <p className="text-sm text-muted-foreground whitespace-pre-wrap">{route.notes}</p>}
-        <div className="flex flex-wrap gap-2 pt-2">
-          <label className="text-xs text-muted-foreground">
-            <span className="mr-2">Reference image</span>
-            <input
-              type="file"
-              accept="image/jpeg,image/png,image/webp"
-              className="text-xs"
-              disabled={uploading}
-              onChange={(e) => onUpload(e.target.files?.[0] ?? null)}
-            />
-          </label>
-          {route.imageUrl && (
-            <Button type="button" variant="secondary" size="sm" onClick={removeImage}>
-              Remove image
-            </Button>
-          )}
-          <Button type="button" variant="destructive" size="sm" onClick={onDelete}>
-            Delete
-          </Button>
-        </div>
+
+        {/* Notes */}
+        {editingNotes ? (
+          <textarea
+            className="mt-1 w-full resize-none rounded border border-border bg-transparent px-2 py-1 text-[13px] leading-relaxed text-foreground outline-none focus:ring-1 focus:ring-[#656379]/30"
+            value={routeNotes}
+            onChange={(e) => setRouteNotes(e.target.value)}
+            onBlur={handleNotesBlur}
+            onKeyDown={(e) => { if (e.key === "Escape") { setRouteNotes(route.notes ?? ""); setEditingNotes(false); } }}
+            autoFocus
+            rows={2}
+            placeholder="Add notes..."
+          />
+        ) : route.notes ? (
+          <p
+            className="mt-1 cursor-pointer text-[13px] leading-relaxed text-muted-foreground hover:text-foreground"
+            onClick={() => setEditingNotes(true)}
+          >
+            {route.notes}
+          </p>
+        ) : null}
       </div>
-    </li>
+
+      {/* Actions (hover-reveal) */}
+      <div className={cn(
+        "flex shrink-0 items-center gap-1 transition-opacity",
+        hovered ? "opacity-100" : "opacity-0"
+      )}>
+        {!route.notes && !editingNotes && (
+          <button
+            type="button"
+            onClick={() => setEditingNotes(true)}
+            className="flex h-7 w-7 items-center justify-center rounded text-muted-foreground hover:bg-muted hover:text-foreground"
+            title="Add notes"
+          >
+            <NotePencil size={14} />
+          </button>
+        )}
+        {route.imageUrl && (
+          <button
+            type="button"
+            onClick={removeImage}
+            className="flex h-7 w-7 items-center justify-center rounded text-muted-foreground hover:bg-muted hover:text-foreground"
+            title="Remove image"
+          >
+            <ImageSquare size={14} />
+          </button>
+        )}
+        <button
+          type="button"
+          onClick={onDelete}
+          className="flex h-7 w-7 items-center justify-center rounded text-muted-foreground hover:bg-destructive/10 hover:text-[#822B34]"
+          title="Delete route"
+        >
+          <Trash size={14} />
+        </button>
+      </div>
+    </div>
   );
 }

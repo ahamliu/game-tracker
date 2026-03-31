@@ -38,8 +38,47 @@
   --status-on-hold-border: 38 92% 50%;
 }
 
+.dark {
+  --background: 240 6% 10%;
+  --foreground: 0 0% 90%;
+  --card: 240 5% 13%;
+  --card-foreground: 0 0% 90%;
+  --muted: 240 4% 18%;
+  --muted-foreground: 0 0% 55%;
+  --border: 240 4% 22%;
+  --primary: 248 20% 60%;
+  --primary-foreground: 0 0% 100%;
+  --accent: 248 20% 60%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 354 56% 50%;
+  --destructive-foreground: 0 0% 100%;
+
+  --success: 134 30% 48%;
+  --success-foreground: 0 0% 100%;
+
+  --status-playing-bg: 220 40% 22%;
+  --status-playing-fg: 220 60% 75%;
+  --status-playing-border: 220 40% 35%;
+  --status-completed-bg: 134 25% 22%;
+  --status-completed-fg: 134 40% 65%;
+  --status-completed-border: 134 25% 35%;
+  --status-planning-bg: 240 4% 20%;
+  --status-planning-fg: 0 0% 60%;
+  --status-planning-border: 240 4% 30%;
+  --status-dropped-bg: 354 30% 22%;
+  --status-dropped-fg: 354 50% 65%;
+  --status-dropped-border: 354 30% 35%;
+  --status-on-hold-bg: 38 40% 22%;
+  --status-on-hold-fg: 38 70% 65%;
+  --status-on-hold-border: 38 40% 35%;
+}
+
 html {
   color-scheme: light;
+}
+
+html.dark {
+  color-scheme: dark;
 }
 
 body {

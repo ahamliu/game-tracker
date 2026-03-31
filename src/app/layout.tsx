@@ -38,7 +38,7 @@ export default async function RootLayout({
   const session = await auth();
 
   return (
-    <html lang="en" className={`${poppins.variable} ${ibmPlexMono.variable} ${gerdox.variable}`}>
+    <html lang="en" suppressHydrationWarning className={`${poppins.variable} ${ibmPlexMono.variable} ${gerdox.variable}`}>
       <body className={`min-h-screen bg-background font-sans antialiased ${poppins.className}`}>
         <Providers>
           <SiteHeader session={session} />

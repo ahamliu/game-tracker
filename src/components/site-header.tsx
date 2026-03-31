@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Session } from "next-auth";
 import { UserMenu } from "@/components/user-menu";
 import { NavSearch } from "@/components/nav-search";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { Ghost } from "@phosphor-icons/react/dist/ssr";
 
 export function SiteHeader({ session }: { session: Session | null }) {
@@ -19,7 +20,8 @@ export function SiteHeader({ session }: { session: Session | null }) {
           <NavSearch />
         </div>
 
-        <nav className="flex shrink-0 items-center">
+        <nav className="flex shrink-0 items-center gap-2">
+          <ThemeToggle />
           {session ? (
             <UserMenu user={session.user} />
           ) : (
@@ -28,7 +30,7 @@ export function SiteHeader({ session }: { session: Session | null }) {
               className="flex h-9 w-9 items-center justify-center rounded-full"
               style={{ backgroundColor: "hsl(248,11%,43%)" }}
             >
-                    <Ghost size={18} className="text-white" weight="fill" />
+              <Ghost size={18} className="text-white" weight="fill" />
             </Link>
           )}
         </nav>
