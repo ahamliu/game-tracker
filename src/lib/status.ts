@@ -18,7 +18,7 @@ const colors: Record<EntryStatus, string> = {
   dropped:
     "bg-[#EBC6C6] text-[#822B34] border border-[#822B34]",
   on_hold:
-    "bg-[#F5A623] text-white border border-[#F5A623]",
+    "bg-[#FFF3D6] text-[#B8860B] border border-[#E8C860]",
 };
 
 export function statusLabel(s: EntryStatus) {
