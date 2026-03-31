@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import Image from "next/image";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { Ghost } from "@phosphor-icons/react";
@@ -28,10 +29,10 @@ export function UserMenu({
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="flex h-9 w-9 items-center justify-center rounded-full bg-[#656379]"
+        className="relative flex h-9 w-9 items-center justify-center rounded-full bg-[#656379] overflow-hidden"
       >
         {user.image ? (
-          <img src={user.image} alt="" className="h-full w-full rounded-full object-cover" />
+          <Image src={user.image} alt="" fill unoptimized className="rounded-full object-cover" />
         ) : (
           <Ghost size={18} className="text-white" />
         )}

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useCallback, useRef, useState } from "react";
 import { MagnifyingGlass, X } from "@phosphor-icons/react";
@@ -168,9 +169,9 @@ export function NavSearch() {
                     onClick={() => addGame(r)}
                     disabled={loading}
                   >
-                    <div className="h-12 w-8 shrink-0 overflow-hidden rounded bg-muted">
+                    <div className="relative h-12 w-8 shrink-0 overflow-hidden rounded bg-muted">
                       {r.coverUrl ? (
-                        <img src={r.coverUrl} alt="" className="h-full w-full object-cover" />
+                        <Image src={r.coverUrl} alt="" fill className="object-cover" />
                       ) : (
                         <div className="flex h-full items-center justify-center text-[9px] text-muted-foreground">—</div>
                       )}

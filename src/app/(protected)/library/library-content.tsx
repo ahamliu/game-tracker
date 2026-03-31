@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useMemo, useState, useRef, useEffect } from "react";
 import {
@@ -70,8 +70,10 @@ export function LibraryContent({
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
-      if (statusRef.current && !statusRef.current.contains(e.target as Node)) setStatusOpen(false);
-      if (sortRef.current && !sortRef.current.contains(e.target as Node)) setSortOpen(false);
+      if (statusRef.current && !statusRef.current.contains(e.target as Node))
+        setStatusOpen(false);
+      if (sortRef.current && !sortRef.current.contains(e.target as Node))
+        setSortOpen(false);
     }
     document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
@@ -91,7 +93,9 @@ export function LibraryContent({
 
     result = [...result].sort((a, b) => {
       if (sort === "recent") {
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        return (
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
       }
       if (sort === "title") {
         return a.game.title.localeCompare(b.game.title);
@@ -118,19 +122,31 @@ export function LibraryContent({
       {/* User header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[hsl(248,11%,43%)] text-white">
+          <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-[hsl(248,11%,43%)] text-white overflow-hidden">
             {user.avatarUrl ? (
-              <img src={user.avatarUrl} alt="" className="h-full w-full rounded-full object-cover" />
+              <Image
+                src={user.avatarUrl}
+                alt=""
+                fill
+                unoptimized
+                className="rounded-full object-cover"
+              />
             ) : (
               <Ghost size={28} />
             )}
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="font-display text-[28px] leading-none text-[#646373]">{user.displayName}</h1>
-              <span className="relative -top-[2px] text-[14px] font-normal text-muted-foreground">@{user.handle}</span>
+              <h1 className="font-display text-[28px] leading-none text-[#646373]">
+                {user.displayName}
+              </h1>
+              <span className="relative -top-[2px] text-[14px] font-normal text-muted-foreground">
+                @{user.handle}
+              </span>
             </div>
-            <p className="mt-0.5 text-[13px] font-normal text-muted-foreground">Joined {joinDate}</p>
+            <p className="mt-0.5 text-[13px] font-normal text-muted-foreground">
+              Joined {joinDate}
+            </p>
           </div>
         </div>
         <button
@@ -146,7 +162,10 @@ export function LibraryContent({
       <div className="space-y-3">
         <div className="flex items-center gap-3">
           <div className="relative flex-1">
-            <MagnifyingGlass size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#646373]" />
+            <MagnifyingGlass
+              size={20}
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-[#646373]"
+            />
             <Input
               type="search"
               placeholder="Search..."
@@ -161,7 +180,7 @@ export function LibraryContent({
               onClick={() => setView("card")}
               className={cn(
                 "flex h-9 w-9 items-center justify-center rounded-md text-[#646373]",
-                view === "card" ? "bg-[#D7D7D7]" : "hover:bg-[#E8E8E8]"
+                view === "card" ? "bg-[#D7D7D7]" : "hover:bg-[#E8E8E8]",
               )}
             >
               <SquaresFour size={20} weight="fill" />
@@ -171,7 +190,7 @@ export function LibraryContent({
               onClick={() => setView("table")}
               className={cn(
                 "flex h-9 w-9 items-center justify-center rounded-md text-[#646373]",
-                view === "table" ? "bg-[#D7D7D7]" : "hover:bg-[#E8E8E8]"
+                view === "table" ? "bg-[#D7D7D7]" : "hover:bg-[#E8E8E8]",
               )}
             >
               <ListBullets size={20} weight="bold" />
@@ -180,29 +199,42 @@ export function LibraryContent({
         </div>
 
         <div className="flex flex-wrap items-center justify-between gap-4 text-[14px]">
-          <p className="font-normal text-muted-foreground">{filtered.length} items</p>
+          <p className="font-normal text-muted-foreground">
+            {filtered.length} items
+          </p>
           <div className="flex items-center gap-4">
             <div ref={statusRef} className="relative flex items-center gap-1">
               <span className="font-normal text-muted-foreground">Status:</span>
               <button
                 type="button"
                 className="flex cursor-pointer items-center gap-1 font-normal text-[#8B8B8B]"
-                onClick={() => { setStatusOpen((v) => !v); setSortOpen(false); }}
+                onClick={() => {
+                  setStatusOpen((v) => !v);
+                  setSortOpen(false);
+                }}
               >
                 {statusFilter === "all" ? "Any" : statusLabel(statusFilter)}
                 <CaretDown size={12} />
               </button>
               {statusOpen && (
                 <div className="absolute right-0 top-full z-50 mt-2 w-40 rounded-lg border border-border bg-card py-1">
-                  {[{ value: "all" as const, label: "Any" }, ...STATUS_OPTIONS].map((o) => (
+                  {[
+                    { value: "all" as const, label: "Any" },
+                    ...STATUS_OPTIONS,
+                  ].map((o) => (
                     <button
                       key={o.value}
                       type="button"
                       className={cn(
                         "block w-full px-4 py-2 text-left text-sm text-foreground",
-                        statusFilter === o.value ? "bg-muted" : "hover:bg-muted"
+                        statusFilter === o.value
+                          ? "bg-muted"
+                          : "hover:bg-muted",
                       )}
-                      onClick={() => { setStatusFilter(o.value); setStatusOpen(false); }}
+                      onClick={() => {
+                        setStatusFilter(o.value);
+                        setStatusOpen(false);
+                      }}
                     >
                       {o.label}
                     </button>
@@ -211,30 +243,44 @@ export function LibraryContent({
               )}
             </div>
             <div ref={sortRef} className="relative flex items-center gap-1">
-              <span className="font-normal text-muted-foreground">Sort by:</span>
+              <span className="font-normal text-muted-foreground">
+                Sort by:
+              </span>
               <button
                 type="button"
                 className="flex cursor-pointer items-center gap-1 font-normal text-[#8B8B8B]"
-                onClick={() => { setSortOpen((v) => !v); setStatusOpen(false); }}
+                onClick={() => {
+                  setSortOpen((v) => !v);
+                  setStatusOpen(false);
+                }}
               >
-                {sort === "recent" ? "Last added" : sort === "title" ? "Title" : "Rating"}
+                {sort === "recent"
+                  ? "Last added"
+                  : sort === "title"
+                    ? "Title"
+                    : "Rating"}
                 <CaretDown size={12} />
               </button>
               {sortOpen && (
                 <div className="absolute right-0 top-full z-50 mt-2 w-40 rounded-lg border border-border bg-card py-1">
-                  {([
-                    { value: "recent" as const, label: "Last added" },
-                    { value: "title" as const, label: "Title" },
-                    { value: "rating" as const, label: "Rating" },
-                  ] as const).map((o) => (
+                  {(
+                    [
+                      { value: "recent" as const, label: "Last added" },
+                      { value: "title" as const, label: "Title" },
+                      { value: "rating" as const, label: "Rating" },
+                    ] as const
+                  ).map((o) => (
                     <button
                       key={o.value}
                       type="button"
                       className={cn(
                         "block w-full px-4 py-2 text-left text-sm text-foreground",
-                        sort === o.value ? "bg-muted" : "hover:bg-muted"
+                        sort === o.value ? "bg-muted" : "hover:bg-muted",
                       )}
-                      onClick={() => { setSort(o.value); setSortOpen(false); }}
+                      onClick={() => {
+                        setSort(o.value);
+                        setSortOpen(false);
+                      }}
                     >
                       {o.label}
                     </button>
@@ -259,10 +305,18 @@ export function LibraryContent({
         <ul className="space-y-3">
           {filtered.map((entry) => (
             <li key={entry.id}>
-              <CardLink href={`/library/${entry.id}`} className="flex min-h-[150px] gap-4 rounded-[10px] border border-transparent bg-card p-4 select-text transition-all hover:border-[#646373] hover:shadow-[0_1px_1px_0_rgba(0,0,0,0.25)] cursor-pointer">
-                <div className="h-[118px] w-[90px] shrink-0 overflow-hidden rounded-md bg-muted">
+              <CardLink
+                href={`/library/${entry.id}`}
+                className="flex min-h-[150px] gap-4 rounded-[10px] border border-transparent bg-card p-4 select-text transition-all hover:border-[#646373] hover:shadow-[0_1px_1px_0_rgba(0,0,0,0.25)] cursor-pointer"
+              >
+                <div className="relative h-[118px] w-[90px] shrink-0 overflow-hidden rounded-md bg-muted">
                   {entry.game.coverUrl ? (
-                    <img src={entry.game.coverUrl} alt="" className="h-full w-full object-cover" />
+                    <Image
+                      src={entry.game.coverUrl}
+                      alt=""
+                      fill
+                      className="object-cover"
+                    />
                   ) : (
                     <div className="flex h-full items-center justify-center text-xs text-muted-foreground">
                       No art
@@ -273,7 +327,9 @@ export function LibraryContent({
                 {/* Info */}
                 <div className="flex min-w-0 flex-1 flex-col justify-between py-0.5">
                   <div>
-                    <h3 className="text-[20px] font-bold leading-tight text-[#646373]">{entry.game.title}</h3>
+                    <h3 className="text-[20px] font-bold leading-tight text-[#646373]">
+                      {entry.game.title}
+                    </h3>
                     <p className="mt-1 flex items-center gap-2 text-[12px] font-medium uppercase text-muted-foreground">
                       {entry.game.developerName && (
                         <span>{entry.game.developerName}</span>
@@ -281,7 +337,9 @@ export function LibraryContent({
                       {entry.game.releaseDate && (
                         <>
                           {entry.game.developerName && <span>·</span>}
-                          <span>{new Date(entry.game.releaseDate).getFullYear()}</span>
+                          <span>
+                            {new Date(entry.game.releaseDate).getFullYear()}
+                          </span>
                         </>
                       )}
                       {entry.game.savedCount > 0 && (
@@ -296,38 +354,46 @@ export function LibraryContent({
                   {/* Routes */}
                   {entry.routes.length > 0 && (
                     <div className="mt-2 flex flex-wrap gap-1.5">
-                      {sortedRoutes(entry.routes).slice(0, 8).map((r) => (
-                        <div key={r.id} className="group/route relative">
-                          <div
-                            className={cn(
-                              "h-[42px] w-[42px] overflow-hidden rounded-full border-2 bg-muted",
-                              r.status === "completed"
-                                ? "border-success"
-                                : "border-[#646373] grayscale"
+                      {sortedRoutes(entry.routes)
+                        .slice(0, 8)
+                        .map((r) => (
+                          <div key={r.id} className="group/route relative">
+                            <div
+                              className={cn(
+                                "relative h-[42px] w-[42px] overflow-hidden rounded-full border-2 bg-muted",
+                                r.status === "completed"
+                                  ? "border-success"
+                                  : "border-[#646373] grayscale",
+                              )}
+                            >
+                              {r.imageUrl ? (
+                                <Image
+                                  src={r.imageUrl}
+                                  alt=""
+                                  fill
+                                  unoptimized
+                                  className="object-cover"
+                                />
+                              ) : (
+                                <div className="flex h-full items-center justify-center text-[10px] font-medium text-muted-foreground">
+                                  {r.name.charAt(0).toUpperCase()}
+                                </div>
+                              )}
+                            </div>
+                            {r.status === "completed" && (
+                              <span className="absolute -top-0.5 -right-0.5 flex h-[18px] w-[18px] items-center justify-center rounded-full bg-white">
+                                <SealCheck
+                                  size={18}
+                                  weight="fill"
+                                  className="text-success"
+                                />
+                              </span>
                             )}
-                          >
-                            {r.imageUrl ? (
-                              <img src={r.imageUrl} alt="" className="h-full w-full object-cover" />
-                            ) : (
-                              <div className="flex h-full items-center justify-center text-[10px] font-medium text-muted-foreground">
-                                {r.name.charAt(0).toUpperCase()}
-                              </div>
-                            )}
-                          </div>
-                          {r.status === "completed" && (
-                            <span className="absolute -top-0.5 -right-0.5 flex h-[18px] w-[18px] items-center justify-center rounded-full bg-white">
-                              <SealCheck
-                                size={18}
-                                weight="fill"
-                                className="text-success"
-                              />
+                            <span className="pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-foreground px-2 py-1 text-[11px] text-white opacity-0 transition-opacity group-hover/route:opacity-100">
+                              {r.name}
                             </span>
-                          )}
-                          <span className="pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-foreground px-2 py-1 text-[11px] text-white opacity-0 transition-opacity group-hover/route:opacity-100">
-                            {r.name}
-                          </span>
-                        </div>
-                      ))}
+                          </div>
+                        ))}
                       {entry.routes.length > 8 && (
                         <span className="flex h-[42px] w-[42px] items-center justify-center rounded-full border border-dashed border-border text-xs text-muted-foreground">
                           +{entry.routes.length - 8}
@@ -340,10 +406,7 @@ export function LibraryContent({
                 {/* Right side: rating, status, actions */}
                 <div className="flex shrink-0 flex-col items-end justify-between py-0.5">
                   <div className="flex items-center gap-4">
-                    <RatingDropdown
-                      entryId={entry.id}
-                      rating={entry.rating}
-                    />
+                    <RatingDropdown entryId={entry.id} rating={entry.rating} />
                     <StatusDropdown entryId={entry.id} status={entry.status} />
                   </div>
                   <p className="font-mono text-xs text-muted-foreground">
@@ -374,20 +437,35 @@ export function LibraryContent({
                 >
                   <td className="py-3 pl-4 pr-2">
                     <div className="flex items-center gap-3">
-                      <div className="h-10 w-8 shrink-0 overflow-hidden rounded bg-muted">
+                      <div className="relative h-10 w-8 shrink-0 overflow-hidden rounded bg-muted">
                         {entry.game.coverUrl ? (
-                          <img src={entry.game.coverUrl} alt="" className="h-full w-full object-cover" />
+                          <Image
+                            src={entry.game.coverUrl}
+                            alt=""
+                            fill
+                            className="object-cover"
+                          />
                         ) : (
-                          <div className="flex h-full items-center justify-center text-[8px] text-muted-foreground">—</div>
+                          <div className="flex h-full items-center justify-center text-[8px] text-muted-foreground">
+                            —
+                          </div>
                         )}
                       </div>
-                      <span className="truncate font-medium text-[#646373]">{entry.game.title}</span>
+                      <span className="truncate font-medium text-[#646373]">
+                        {entry.game.title}
+                      </span>
                     </div>
                   </td>
-                  <td className="px-2 py-3" onClick={(e) => e.stopPropagation()}>
+                  <td
+                    className="px-2 py-3"
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     <RatingDropdown entryId={entry.id} rating={entry.rating} />
                   </td>
-                  <td className="px-2 py-3" onClick={(e) => e.stopPropagation()}>
+                  <td
+                    className="px-2 py-3"
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     <StatusDropdown entryId={entry.id} status={entry.status} />
                   </td>
                   <td className="px-2 py-3 font-mono text-[12px] text-muted-foreground">
@@ -403,7 +481,15 @@ export function LibraryContent({
   );
 }
 
-function CardLink({ href, className, children }: { href: string; className?: string; children: React.ReactNode }) {
+function CardLink({
+  href,
+  className,
+  children,
+}: {
+  href: string;
+  className?: string;
+  children: React.ReactNode;
+}) {
   const router = useRouter();
 
   function handleClick(e: React.MouseEvent) {
@@ -418,7 +504,6 @@ function CardLink({ href, className, children }: { href: string; className?: str
     </div>
   );
 }
-
 
 function sortedRoutes(routes: RouteData[]): RouteData[] {
   return [...routes].sort((a, b) => {

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { Bookmark, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -33,7 +34,7 @@ export function ExploreLibraryCarousel({ entries }: { entries: CarouselEntry[] }
           >
             <div className="relative mx-auto aspect-[2/3] w-full max-w-[120px] overflow-hidden rounded-lg bg-muted">
               {e.coverUrl ? (
-                <img src={e.coverUrl} alt="" className="h-full w-full object-cover" />
+                <Image src={e.coverUrl} alt="" fill className="object-cover" />
               ) : (
                 <div className="flex h-full items-center justify-center text-xs text-muted-foreground">No cover</div>
               )}
@@ -52,12 +53,12 @@ export function ExploreLibraryCarousel({ entries }: { entries: CarouselEntry[] }
                     }
                   >
                     <div
-                      className={`h-9 w-9 overflow-hidden rounded-full border border-border bg-muted ${
+                      className={`relative h-9 w-9 overflow-hidden rounded-full border border-border bg-muted ${
                         r.cleared ? "" : "grayscale"
                       }`}
                     >
                       {r.imageUrl ? (
-                        <img src={r.imageUrl} alt="" className="h-full w-full object-cover" />
+                        <Image src={r.imageUrl} alt="" fill unoptimized className="object-cover" />
                       ) : (
                         <div className="flex h-full items-center justify-center text-[10px] font-medium text-muted-foreground">
                           {r.name.slice(0, 1).toUpperCase()}
