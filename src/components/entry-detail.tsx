@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState, useCallback, useRef } from "react";
@@ -16,10 +15,10 @@ import {
   UploadSimple,
   NotePencil,
 } from "@phosphor-icons/react";
-import { StatusDropdown, StatusIcon } from "@/components/status-controls";
+import { StatusDropdown } from "@/components/status-controls";
 import { Input } from "@/components/ui/input";
 import type { EntryStatus } from "@/lib/status";
-import { statusLabel, STATUS_OPTIONS } from "@/lib/status";
+import { STATUS_OPTIONS } from "@/lib/status";
 import { cn } from "@/lib/utils";
 
 type Game = {
@@ -56,7 +55,9 @@ export function EntryDetail({
 }) {
   const router = useRouter();
   const [notes, setNotes] = useState(initial.notes ?? "");
-  const [progressPercent, setProgressPercent] = useState(initial.progressPercent?.toString() ?? "");
+  const [progressPercent, setProgressPercent] = useState(
+    initial.progressPercent?.toString() ?? "",
+  );
   const [progressNote, setProgressNote] = useState(initial.progressNote ?? "");
   const [rating, setRating] = useState(initial.rating);
   const [routes, setRoutes] = useState(initial.routes);
@@ -68,14 +69,17 @@ export function EntryDetail({
   const [editingNotes, setEditingNotes] = useState(false);
   const [editingProgress, setEditingProgress] = useState(false);
 
-  const patchEntry = useCallback(async (data: Record<string, unknown>) => {
-    await fetch(`/api/me/library/${entryId}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
-    router.refresh();
-  }, [entryId, router]);
+  const patchEntry = useCallback(
+    async (data: Record<string, unknown>) => {
+      await fetch(`/api/me/library/${entryId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      router.refresh();
+    },
+    [entryId, router],
+  );
 
   function handleNotesBlur() {
     setEditingNotes(false);
@@ -100,7 +104,8 @@ export function EntryDetail({
   }
 
   async function removeFromLibrary() {
-    if (!confirm("Remove this game from your library? Routes will be deleted.")) return;
+    if (!confirm("Remove this game from your library? Routes will be deleted."))
+      return;
     const res = await fetch(`/api/me/library/${entryId}`, { method: "DELETE" });
     if (res.ok) router.push("/library");
   }
@@ -124,7 +129,9 @@ export function EntryDetail({
 
   async function deleteRoute(routeId: string) {
     if (!confirm("Delete this route?")) return;
-    const res = await fetch(`/api/me/library/${entryId}/routes/${routeId}`, { method: "DELETE" });
+    const res = await fetch(`/api/me/library/${entryId}/routes/${routeId}`, {
+      method: "DELETE",
+    });
     if (res.ok) setRoutes((r) => r.filter((x) => x.id !== routeId));
   }
 
@@ -133,14 +140,21 @@ export function EntryDetail({
     setUploading(routeId);
     const fd = new FormData();
     fd.append("file", file);
-    const res = await fetch(`/api/me/library/${entryId}/routes/${routeId}/image`, {
-      method: "POST",
-      body: fd,
-    });
+    const res = await fetch(
+      `/api/me/library/${entryId}/routes/${routeId}/image`,
+      {
+        method: "POST",
+        body: fd,
+      },
+    );
     setUploading(null);
     const data = await res.json();
     if (res.ok && data.imageUrl) {
-      setRoutes((r) => r.map((x) => (x.id === routeId ? { ...x, imageUrl: data.imageUrl } : x)));
+      setRoutes((r) =>
+        r.map((x) =>
+          x.id === routeId ? { ...x, imageUrl: data.imageUrl } : x,
+        ),
+      );
     }
   }
 
@@ -185,7 +199,10 @@ export function EntryDetail({
                     <button
                       type="button"
                       className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-[#822B34] hover:bg-muted"
-                      onClick={() => { setOverflowOpen(false); void removeFromLibrary(); }}
+                      onClick={() => {
+                        setOverflowOpen(false);
+                        void removeFromLibrary();
+                      }}
                     >
                       <Trash size={14} weight="bold" />
                       Remove from library
@@ -202,7 +219,11 @@ export function EntryDetail({
             )}
 
             <div className="mt-4 flex flex-wrap items-center gap-3">
-              <StatusDropdown entryId={entryId} status={initial.status} showRemove={false} />
+              <StatusDropdown
+                entryId={entryId}
+                status={initial.status}
+                showRemove={false}
+              />
               <InlineRating value={rating} onChange={handleRatingSelect} />
             </div>
           </div>
@@ -219,7 +240,9 @@ export function EntryDetail({
                   value={progressPercent}
                   onChange={(e) => setProgressPercent(e.target.value)}
                   onBlur={handleProgressBlur}
-                  onKeyDown={(e) => { if (e.key === "Enter") handleProgressBlur(); }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleProgressBlur();
+                  }}
                   className="h-8 w-20 text-sm"
                   autoFocus
                 />
@@ -229,7 +252,9 @@ export function EntryDetail({
                   value={progressNote}
                   onChange={(e) => setProgressNote(e.target.value)}
                   onBlur={handleProgressBlur}
-                  onKeyDown={(e) => { if (e.key === "Enter") handleProgressBlur(); }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleProgressBlur();
+                  }}
                   className="h-8 flex-1 text-sm"
                 />
               </div>
@@ -249,7 +274,10 @@ export function EntryDetail({
                   {progressPercent ? `${progressPercent}%` : "0%"}
                   {progressNote && ` · ${progressNote}`}
                 </span>
-                <PencilSimple size={14} className="shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
+                <PencilSimple
+                  size={14}
+                  className="shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100"
+                />
               </button>
             )}
           </div>
@@ -298,7 +326,9 @@ export function EntryDetail({
       <section>
         <div className="mb-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <h2 className="text-[16px] font-bold text-[#646373]">Character Routes</h2>
+            <h2 className="text-[16px] font-bold text-[#646373]">
+              Character Routes
+            </h2>
             {routes.length > 0 && (
               <span className="text-[12px] text-muted-foreground">
                 {completedCount}/{routes.length} completed
@@ -323,7 +353,11 @@ export function EntryDetail({
               entryId={entryId}
               uploading={uploading === r.id}
               onUpload={(file) => uploadRouteImage(r.id, file)}
-              onUpdate={(updated) => setRoutes((prev) => prev.map((x) => x.id === r.id ? { ...x, ...updated } : x))}
+              onUpdate={(updated) =>
+                setRoutes((prev) =>
+                  prev.map((x) => (x.id === r.id ? { ...x, ...updated } : x)),
+                )
+              }
               onDelete={() => deleteRoute(r.id)}
             />
           ))}
@@ -338,7 +372,10 @@ export function EntryDetail({
                 autoFocus
                 onKeyDown={(e) => {
                   if (e.key === "Enter") void addRoute();
-                  if (e.key === "Escape") { setAddingRoute(false); setNewRouteName(""); }
+                  if (e.key === "Escape") {
+                    setAddingRoute(false);
+                    setNewRouteName("");
+                  }
                 }}
               />
               <button
@@ -351,7 +388,10 @@ export function EntryDetail({
               </button>
               <button
                 type="button"
-                onClick={() => { setAddingRoute(false); setNewRouteName(""); }}
+                onClick={() => {
+                  setAddingRoute(false);
+                  setNewRouteName("");
+                }}
                 className="text-muted-foreground hover:text-foreground"
               >
                 <X size={14} />
@@ -375,7 +415,13 @@ export function EntryDetail({
   );
 }
 
-function InlineRating({ value, onChange }: { value: number | null; onChange: (v: number | null) => void }) {
+function InlineRating({
+  value,
+  onChange,
+}: {
+  value: number | null;
+  onChange: (v: number | null) => void;
+}) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -389,7 +435,11 @@ function InlineRating({ value, onChange }: { value: number | null; onChange: (v:
           if (!ref.current?.contains(e.relatedTarget as Node)) setOpen(false);
         }}
       >
-        <Star size={16} weight={value != null ? "fill" : "regular"} className={value != null ? "text-[#F5A623]" : ""} />
+        <Star
+          size={16}
+          weight={value != null ? "fill" : "regular"}
+          className={value != null ? "text-[#F5A623]" : ""}
+        />
         {value != null ? `${value}/10` : "Rate"}
       </button>
       {open && (
@@ -398,9 +448,12 @@ function InlineRating({ value, onChange }: { value: number | null; onChange: (v:
             type="button"
             className={cn(
               "flex h-7 w-7 items-center justify-center rounded text-[12px] text-foreground",
-              value == null ? "bg-muted" : "hover:bg-muted"
+              value == null ? "bg-muted" : "hover:bg-muted",
             )}
-            onClick={() => { onChange(null); setOpen(false); }}
+            onClick={() => {
+              onChange(null);
+              setOpen(false);
+            }}
           >
             —
           </button>
@@ -410,9 +463,12 @@ function InlineRating({ value, onChange }: { value: number | null; onChange: (v:
               type="button"
               className={cn(
                 "flex h-7 w-7 items-center justify-center rounded text-[12px] text-foreground",
-                value === v ? "bg-muted font-bold" : "hover:bg-muted"
+                value === v ? "bg-muted font-bold" : "hover:bg-muted",
               )}
-              onClick={() => { onChange(v); setOpen(false); }}
+              onClick={() => {
+                onChange(v);
+                setOpen(false);
+              }}
             >
               {v}
             </button>
@@ -445,17 +501,20 @@ function RouteItem({
   const [hovered, setHovered] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const patchRoute = useCallback(async (data: Record<string, unknown>) => {
-    const res = await fetch(`/api/me/library/${entryId}/routes/${route.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
-    if (res.ok) {
-      const json = await res.json();
-      if (json.route) onUpdate(json.route);
-    }
-  }, [entryId, route.id, onUpdate]);
+  const patchRoute = useCallback(
+    async (data: Record<string, unknown>) => {
+      const res = await fetch(`/api/me/library/${entryId}/routes/${route.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.route) onUpdate(json.route);
+      }
+    },
+    [entryId, route.id, onUpdate],
+  );
 
   function handleNameSubmit() {
     const trimmed = name.trim();
@@ -498,13 +557,19 @@ function RouteItem({
         <div
           className={cn(
             "flex h-[48px] w-[48px] cursor-pointer items-center justify-center overflow-hidden rounded-full border-2 bg-muted transition-colors",
-            route.status === "completed" ? "border-success" : "border-[#646373]"
+            route.status === "completed"
+              ? "border-success"
+              : "border-[#646373]",
           )}
           onClick={() => fileRef.current?.click()}
           title={route.imageUrl ? "Change image" : "Upload image"}
         >
           {route.imageUrl ? (
-            <img src={route.imageUrl} alt="" className="h-full w-full object-cover" />
+            <img
+              src={route.imageUrl}
+              alt=""
+              className="h-full w-full object-cover"
+            />
           ) : (
             <span className="text-[14px] font-medium text-muted-foreground">
               {route.name.charAt(0).toUpperCase()}
@@ -537,7 +602,13 @@ function RouteItem({
               value={name}
               onChange={(e) => setName(e.target.value)}
               onBlur={handleNameSubmit}
-              onKeyDown={(e) => { if (e.key === "Enter") handleNameSubmit(); if (e.key === "Escape") { setName(route.name); setEditingName(false); } }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleNameSubmit();
+                if (e.key === "Escape") {
+                  setName(route.name);
+                  setEditingName(false);
+                }
+              }}
               className="h-6 border-0 bg-transparent p-0 text-[14px] font-medium text-foreground outline-none focus:ring-0"
               autoFocus
             />
@@ -557,7 +628,9 @@ function RouteItem({
             onChange={(e) => handleStatusChange(e.target.value as EntryStatus)}
           >
             {STATUS_OPTIONS.map((o) => (
-              <option key={o.value} value={o.value}>{o.label}</option>
+              <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
             ))}
           </select>
 
@@ -576,7 +649,12 @@ function RouteItem({
             value={routeNotes}
             onChange={(e) => setRouteNotes(e.target.value)}
             onBlur={handleNotesBlur}
-            onKeyDown={(e) => { if (e.key === "Escape") { setRouteNotes(route.notes ?? ""); setEditingNotes(false); } }}
+            onKeyDown={(e) => {
+              if (e.key === "Escape") {
+                setRouteNotes(route.notes ?? "");
+                setEditingNotes(false);
+              }
+            }}
             autoFocus
             rows={2}
             placeholder="Add notes..."
@@ -592,10 +670,12 @@ function RouteItem({
       </div>
 
       {/* Actions (hover-reveal) */}
-      <div className={cn(
-        "flex shrink-0 items-center gap-1 transition-opacity",
-        hovered ? "opacity-100" : "opacity-0"
-      )}>
+      <div
+        className={cn(
+          "flex shrink-0 items-center gap-1 transition-opacity",
+          hovered ? "opacity-100" : "opacity-0",
+        )}
+      >
         {!route.notes && !editingNotes && (
           <button
             type="button"
