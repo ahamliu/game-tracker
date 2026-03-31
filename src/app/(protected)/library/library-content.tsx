@@ -222,7 +222,7 @@ export function LibraryContent({
                 <CaretDown size={12} />
               </button>
               {statusOpen && (
-                <div className="absolute right-0 top-full z-50 mt-2 w-40 rounded-lg border border-border bg-card py-1">
+                <div className="absolute right-0 top-full z-50 mt-1 w-36 rounded-lg border border-border bg-card py-1">
                   {[
                     { value: "all" as const, label: "Any" },
                     ...STATUS_OPTIONS,
@@ -231,7 +231,7 @@ export function LibraryContent({
                       key={o.value}
                       type="button"
                       className={cn(
-                        "block w-full px-4 py-2 text-left text-sm text-foreground",
+                        "block w-full px-3 py-1.5 text-left text-[12px] text-foreground",
                         statusFilter === o.value
                           ? "bg-muted"
                           : "hover:bg-muted",
@@ -267,7 +267,7 @@ export function LibraryContent({
                 <CaretDown size={12} />
               </button>
               {sortOpen && (
-                <div className="absolute right-0 top-full z-50 mt-2 w-40 rounded-lg border border-border bg-card py-1">
+                <div className="absolute right-0 top-full z-50 mt-1 w-36 rounded-lg border border-border bg-card py-1">
                   {(
                     [
                       { value: "recent" as const, label: "Last added" },
@@ -279,7 +279,7 @@ export function LibraryContent({
                       key={o.value}
                       type="button"
                       className={cn(
-                        "block w-full px-4 py-2 text-left text-sm text-foreground",
+                        "block w-full px-3 py-1.5 text-left text-[12px] text-foreground",
                         sort === o.value ? "bg-muted" : "hover:bg-muted",
                       )}
                       onClick={() => {
@@ -394,7 +394,7 @@ export function LibraryContent({
                                 />
                               </span>
                             )}
-                            <span className="pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-foreground px-2 py-1 text-[11px] text-white opacity-0 transition-opacity group-hover/route:opacity-100">
+                            <span className="pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-[#333] px-2 py-1 text-[11px] text-white opacity-0 shadow transition-opacity group-hover/route:opacity-100 dark:bg-[#e5e5e5] dark:text-[#1a1a1a]">
                               {r.name}
                             </span>
                           </div>

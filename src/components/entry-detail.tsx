@@ -6,19 +6,16 @@ import { useState, useCallback, useRef } from "react";
 import {
   Star,
   PencilSimple,
-  Trash,
-  ImageSquare,
   Plus,
-  SealCheck,
-  DotsThree,
   X,
-  UploadSimple,
-  NotePencil,
+  CaretDown,
+  BookmarkSimple,
 } from "@phosphor-icons/react";
-import { StatusDropdown } from "@/components/status-controls";
+import { StatusDropdown, StatusIcon } from "@/components/status-controls";
+import { ConfirmDialog } from "@/components/confirm-dialog";
 import { Input } from "@/components/ui/input";
 import type { EntryStatus } from "@/lib/status";
-import { STATUS_OPTIONS } from "@/lib/status";
+import { statusLabel, statusColor, STATUS_OPTIONS } from "@/lib/status";
 import { cn } from "@/lib/utils";
 
 type Game = {
@@ -26,6 +23,11 @@ type Game = {
   title: string;
   coverUrl: string | null;
   summary: string | null;
+  developerName: string | null;
+  releaseDate: Date | null;
+  savedCount: number;
+  aggregatedRating: number | null;
+  source: "igdb" | "user";
 };
 
 type RouteRow = {
@@ -61,13 +63,18 @@ export function EntryDetail({
   const [progressNote, setProgressNote] = useState(initial.progressNote ?? "");
   const [rating, setRating] = useState(initial.rating);
   const [routes, setRoutes] = useState(initial.routes);
-  const [uploading, setUploading] = useState<string | null>(null);
   const [addingRoute, setAddingRoute] = useState(false);
   const [newRouteName, setNewRouteName] = useState("");
-  const [overflowOpen, setOverflowOpen] = useState(false);
-  const overflowRef = useRef<HTMLDivElement>(null);
   const [editingNotes, setEditingNotes] = useState(false);
   const [editingProgress, setEditingProgress] = useState(false);
+  const [gameTitle, setGameTitle] = useState(initial.game.title);
+  const [editingTitle, setEditingTitle] = useState(false);
+  const [titleInput, setTitleInput] = useState(initial.game.title);
+  const [coverUrl, setCoverUrl] = useState(initial.game.coverUrl);
+  const [editingCover, setEditingCover] = useState(false);
+  const [coverInput, setCoverInput] = useState("");
+  const [coverError, setCoverError] = useState<string | null>(null);
+  const [coverSaving, setCoverSaving] = useState(false);
 
   const patchEntry = useCallback(
     async (data: Record<string, unknown>) => {
@@ -103,11 +110,67 @@ export function EntryDetail({
     void patchEntry({ rating: value });
   }
 
-  async function removeFromLibrary() {
-    if (!confirm("Remove this game from your library? Routes will be deleted."))
+  async function saveTitle() {
+    const trimmed = titleInput.trim();
+    if (!trimmed || trimmed === gameTitle) {
+      setTitleInput(gameTitle);
+      setEditingTitle(false);
       return;
-    const res = await fetch(`/api/me/library/${entryId}`, { method: "DELETE" });
-    if (res.ok) router.push("/library");
+    }
+    setGameTitle(trimmed);
+    setEditingTitle(false);
+    await fetch(`/api/games/${initial.game.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title: trimmed }),
+    });
+    router.refresh();
+  }
+
+  async function saveCoverUrl() {
+    const url = coverInput.trim() || null;
+    if (url && !/^https?:\/\/.+\..+/.test(url)) {
+      setCoverError("Please enter a valid URL");
+      return;
+    }
+    setCoverSaving(true);
+    setCoverError(null);
+    try {
+      const res = await fetch(`/api/games/${initial.game.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ coverUrl: url }),
+      });
+      if (res.ok) {
+        setCoverUrl(url);
+        setEditingCover(false);
+        setCoverInput("");
+        router.refresh();
+      } else {
+        setCoverError("Failed to update cover");
+      }
+    } catch {
+      setCoverError("Network error");
+    } finally {
+      setCoverSaving(false);
+    }
+  }
+
+  async function removeCover() {
+    setCoverSaving(true);
+    try {
+      const res = await fetch(`/api/games/${initial.game.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ coverUrl: null }),
+      });
+      if (res.ok) {
+        setCoverUrl(null);
+        router.refresh();
+      }
+    } finally {
+      setCoverSaving(false);
+    }
   }
 
   async function addRoute() {
@@ -128,89 +191,182 @@ export function EntryDetail({
   }
 
   async function deleteRoute(routeId: string) {
-    if (!confirm("Delete this route?")) return;
     const res = await fetch(`/api/me/library/${entryId}/routes/${routeId}`, {
       method: "DELETE",
     });
     if (res.ok) setRoutes((r) => r.filter((x) => x.id !== routeId));
   }
 
-  async function uploadRouteImage(routeId: string, file: File | null) {
-    if (!file) return;
-    setUploading(routeId);
-    const fd = new FormData();
-    fd.append("file", file);
-    const res = await fetch(
-      `/api/me/library/${entryId}/routes/${routeId}/image`,
-      {
-        method: "POST",
-        body: fd,
-      },
-    );
-    setUploading(null);
-    const data = await res.json();
-    if (res.ok && data.imageUrl) {
-      setRoutes((r) =>
-        r.map((x) =>
-          x.id === routeId ? { ...x, imageUrl: data.imageUrl } : x,
-        ),
-      );
-    }
-  }
-
   const completedCount = routes.filter((r) => r.status === "completed").length;
   const progressValue = progressPercent ? Number(progressPercent) : 0;
+  const canEditCover = initial.game.source === "user" || !initial.game.coverUrl;
 
   return (
     <div className="mx-auto max-w-[860px] space-y-8 py-2">
       {/* Hero */}
       <div className="flex gap-6">
-        <div className="relative h-[220px] w-[160px] shrink-0 overflow-hidden rounded-xl bg-muted shadow-md">
-          {initial.game.coverUrl ? (
-            <Image
-              src={initial.game.coverUrl}
-              alt=""
-              fill
-              className="object-cover"
-            />
-          ) : (
-            <div className="flex h-full items-center justify-center p-4 text-center text-xs text-muted-foreground">
-              No cover
+        <div className="relative w-[160px] shrink-0">
+          <div className="group/cover relative h-[220px] w-[160px] overflow-hidden rounded-xl bg-muted shadow-md">
+            {coverUrl ? (
+              <Image
+                src={coverUrl}
+                alt=""
+                fill
+                className="object-cover"
+              />
+            ) : (
+              <div className="flex h-full items-center justify-center p-4 text-center text-xs text-muted-foreground">
+                No cover
+              </div>
+            )}
+            {/* Hover overlay -- only for user-submitted games or IGDB games missing a cover */}
+            {canEditCover && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/50 opacity-0 transition-opacity group-hover/cover:opacity-100">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCoverInput(coverUrl ?? "");
+                    setCoverError(null);
+                    setEditingCover(true);
+                  }}
+                  className="flex items-center gap-1.5 rounded-lg bg-white/20 px-3 py-1.5 text-[11px] font-medium text-white hover:bg-white/30"
+                >
+                  <PencilSimple size={12} />
+                  {coverUrl ? "Change" : "Add cover"}
+                </button>
+                {coverUrl && (
+                  <button
+                    type="button"
+                    onClick={() => void removeCover()}
+                    disabled={coverSaving}
+                    className="flex items-center gap-1.5 rounded-lg bg-white/20 px-3 py-1.5 text-[11px] font-medium text-white hover:bg-red-400/60 disabled:opacity-50"
+                  >
+                    <X size={12} weight="bold" />
+                    Remove
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* URL input popover -- outside overflow-hidden container */}
+          {canEditCover && editingCover && (
+            <div
+              className="absolute left-0 top-full z-50 mt-2 w-[280px] rounded-lg border border-border bg-card p-3 shadow-xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <p className="mb-2 text-[12px] font-medium text-[#646373]">Cover Image URL</p>
+              <Input
+                type="url"
+                placeholder="https://..."
+                value={coverInput}
+                onChange={(e) => { setCoverInput(e.target.value); setCoverError(null); }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") void saveCoverUrl();
+                  if (e.key === "Escape") setEditingCover(false);
+                }}
+                className="h-9 text-[13px]"
+                autoFocus
+              />
+              {coverInput && /^https?:\/\/.+\..+/.test(coverInput.trim()) && (
+                <div className="mt-2 flex items-center gap-2 rounded bg-muted/50 p-2">
+                  <div className="relative h-10 w-7 shrink-0 overflow-hidden rounded bg-muted">
+                    { }
+                    <img
+                      src={coverInput.trim()}
+                      alt="Preview"
+                      className="h-full w-full object-cover"
+                      onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                    />
+                  </div>
+                  <span className="text-[10px] text-muted-foreground">Preview</span>
+                </div>
+              )}
+              {coverError && (
+                <p className="mt-1 text-[11px] text-[#822B34]">{coverError}</p>
+              )}
+              <div className="mt-2 flex items-center justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setEditingCover(false)}
+                  className="rounded px-2 py-1 text-[11px] text-muted-foreground hover:bg-muted"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void saveCoverUrl()}
+                  disabled={coverSaving}
+                  className="rounded bg-[#656379] px-3 py-1 text-[11px] font-semibold text-white hover:opacity-90 disabled:opacity-50"
+                >
+                  {coverSaving ? "Saving..." : "Save"}
+                </button>
+              </div>
             </div>
           )}
         </div>
 
         <div className="flex min-w-0 flex-1 flex-col justify-between">
           <div>
-            <div className="flex items-start justify-between gap-4">
-              <h1 className="text-[28px] font-bold leading-tight text-[#646373]">
-                {initial.game.title}
-              </h1>
-              <div ref={overflowRef} className="relative shrink-0">
-                <button
-                  type="button"
-                  onClick={() => setOverflowOpen((v) => !v)}
-                  className="flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:bg-[#E8E8E8] dark:hover:bg-[#2a2a35]"
-                >
-                  <DotsThree size={20} weight="bold" />
-                </button>
-                {overflowOpen && (
-                  <div className="absolute right-0 top-full z-50 mt-1 w-48 rounded-lg border border-border bg-card py-1">
-                    <button
-                      type="button"
-                      className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-[#822B34] hover:bg-muted"
-                      onClick={() => {
-                        setOverflowOpen(false);
-                        void removeFromLibrary();
-                      }}
-                    >
-                      <Trash size={14} weight="bold" />
-                      Remove from library
-                    </button>
-                  </div>
+            {editingTitle ? (
+              <input
+                value={titleInput}
+                onChange={(e) => setTitleInput(e.target.value)}
+                onBlur={() => void saveTitle()}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") void saveTitle();
+                  if (e.key === "Escape") {
+                    setTitleInput(gameTitle);
+                    setEditingTitle(false);
+                  }
+                }}
+                className="block w-full border-0 bg-transparent p-0 text-[28px] font-bold leading-tight text-[#646373] outline-none focus:ring-0"
+                autoFocus
+              />
+            ) : (
+              <h1
+                className={cn(
+                  "text-[28px] font-bold leading-tight text-[#646373]",
+                  initial.game.source === "user" && "group/title"
                 )}
-              </div>
-            </div>
+              >
+                <span>{gameTitle}</span>
+                {initial.game.source === "user" && (
+                  <button
+                    type="button"
+                    onClick={() => setEditingTitle(true)}
+                    className="ml-2 inline-flex items-center gap-0.5 align-middle text-[12px] font-medium text-muted-foreground opacity-0 transition-opacity hover:text-foreground group-hover/title:opacity-100"
+                  >
+                    <PencilSimple size={12} />
+                    Edit
+                  </button>
+                )}
+              </h1>
+            )}
+
+            <p className="mt-1 flex items-center gap-2 text-[12px] font-medium uppercase text-muted-foreground">
+              {initial.game.developerName && (
+                <span>{initial.game.developerName}</span>
+              )}
+              {initial.game.releaseDate && (
+                <>
+                  {initial.game.developerName && <span>·</span>}
+                  <span>{new Date(initial.game.releaseDate).getFullYear()}</span>
+                </>
+              )}
+              {initial.game.savedCount > 0 && (
+                <span className="inline-flex items-center gap-0.5">
+                  <BookmarkSimple size={12} weight="fill" />
+                  {initial.game.savedCount.toLocaleString()}
+                </span>
+              )}
+              {initial.game.aggregatedRating != null && (
+                <span className="inline-flex items-center gap-0.5">
+                  <Star size={12} weight="fill" />
+                  {(initial.game.aggregatedRating / 10).toFixed(1)}
+                </span>
+              )}
+            </p>
 
             {initial.game.summary && (
               <p className="mt-2 max-w-2xl text-[14px] leading-relaxed text-muted-foreground line-clamp-3">
@@ -218,13 +374,13 @@ export function EntryDetail({
               </p>
             )}
 
-            <div className="mt-4 flex flex-wrap items-center gap-3">
+            <div className="mt-4 flex flex-wrap items-center gap-4">
+              <RouteRating value={rating} onChange={handleRatingSelect} />
               <StatusDropdown
                 entryId={entryId}
                 status={initial.status}
-                showRemove={false}
+                onRemove={() => router.push("/library")}
               />
-              <InlineRating value={rating} onChange={handleRatingSelect} />
             </div>
           </div>
 
@@ -351,8 +507,6 @@ export function EntryDetail({
               key={r.id}
               route={r}
               entryId={entryId}
-              uploading={uploading === r.id}
-              onUpload={(file) => uploadRouteImage(r.id, file)}
               onUpdate={(updated) =>
                 setRoutes((prev) =>
                   prev.map((x) => (x.id === r.id ? { ...x, ...updated } : x)),
@@ -415,82 +569,14 @@ export function EntryDetail({
   );
 }
 
-function InlineRating({
-  value,
-  onChange,
-}: {
-  value: number | null;
-  onChange: (v: number | null) => void;
-}) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  return (
-    <div ref={ref} className="relative">
-      <button
-        type="button"
-        className="flex items-center gap-1.5 rounded-lg px-2 py-1 text-[13px] font-medium text-muted-foreground hover:bg-muted"
-        onClick={() => setOpen((v) => !v)}
-        onBlur={(e) => {
-          if (!ref.current?.contains(e.relatedTarget as Node)) setOpen(false);
-        }}
-      >
-        <Star
-          size={16}
-          weight={value != null ? "fill" : "regular"}
-          className={value != null ? "text-[#F5A623]" : ""}
-        />
-        {value != null ? `${value}/10` : "Rate"}
-      </button>
-      {open && (
-        <div className="absolute left-0 top-full z-50 mt-1 flex items-center gap-1 rounded-lg border border-border bg-card px-2 py-1.5">
-          <button
-            type="button"
-            className={cn(
-              "flex h-7 w-7 items-center justify-center rounded text-[12px] text-foreground",
-              value == null ? "bg-muted" : "hover:bg-muted",
-            )}
-            onClick={() => {
-              onChange(null);
-              setOpen(false);
-            }}
-          >
-            —
-          </button>
-          {Array.from({ length: 10 }, (_, i) => i + 1).map((v) => (
-            <button
-              key={v}
-              type="button"
-              className={cn(
-                "flex h-7 w-7 items-center justify-center rounded text-[12px] text-foreground",
-                value === v ? "bg-muted font-bold" : "hover:bg-muted",
-              )}
-              onClick={() => {
-                onChange(v);
-                setOpen(false);
-              }}
-            >
-              {v}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
 function RouteItem({
   route,
   entryId,
-  uploading,
-  onUpload,
   onUpdate,
   onDelete,
 }: {
   route: RouteRow;
   entryId: string;
-  uploading: boolean;
-  onUpload: (file: File | null) => void;
   onUpdate: (updated: Partial<RouteRow>) => void;
   onDelete: () => void;
 }) {
@@ -498,8 +584,10 @@ function RouteItem({
   const [name, setName] = useState(route.name);
   const [editingNotes, setEditingNotes] = useState(false);
   const [routeNotes, setRouteNotes] = useState(route.notes ?? "");
-  const [hovered, setHovered] = useState(false);
-  const fileRef = useRef<HTMLInputElement>(null);
+  const [editingImage, setEditingImage] = useState(false);
+  const [imageInput, setImageInput] = useState("");
+  const [imageError, setImageError] = useState<string | null>(null);
+  const [imageSaving, setImageSaving] = useState(false);
 
   const patchRoute = useCallback(
     async (data: Record<string, unknown>) => {
@@ -541,6 +629,26 @@ function RouteItem({
     }
   }
 
+  async function saveImageUrl() {
+    const url = imageInput.trim() || null;
+    if (url && !/^https?:\/\/.+\..+/.test(url)) {
+      setImageError("Please enter a valid URL");
+      return;
+    }
+    setImageSaving(true);
+    setImageError(null);
+    try {
+      await patchRoute({ imageUrl: url });
+      onUpdate({ imageUrl: url });
+      setEditingImage(false);
+      setImageInput("");
+    } catch {
+      setImageError("Failed to update image");
+    } finally {
+      setImageSaving(false);
+    }
+  }
+
   async function removeImage() {
     onUpdate({ imageUrl: null });
     await patchRoute({ imageUrl: null });
@@ -548,21 +656,20 @@ function RouteItem({
 
   return (
     <div
-      className="group flex items-start gap-3 rounded-lg bg-card px-4 py-3 transition-colors hover:bg-card/80"
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+      className="group flex items-start gap-4 rounded-[10px] border border-transparent bg-card p-4 transition-all hover:border-[#646373] hover:shadow-[0_1px_1px_0_rgba(0,0,0,0.25)]"
     >
       {/* Avatar / image */}
       <div className="relative shrink-0">
         <div
-          className={cn(
-            "flex h-[48px] w-[48px] cursor-pointer items-center justify-center overflow-hidden rounded-full border-2 bg-muted transition-colors",
-            route.status === "completed"
-              ? "border-success"
-              : "border-[#646373]",
-          )}
-          onClick={() => fileRef.current?.click()}
-          title={route.imageUrl ? "Change image" : "Upload image"}
+          className="group/avatar flex h-[75px] w-[75px] cursor-pointer items-center justify-center overflow-hidden rounded-full border-2 border-[#646373] bg-muted transition-colors"
+          onClick={() => {
+            if (!route.imageUrl) {
+              setImageInput("");
+              setImageError(null);
+              setEditingImage(true);
+            }
+          }}
+          title={route.imageUrl ? undefined : "Set image URL"}
         >
           {route.imageUrl ? (
             <img
@@ -575,71 +682,138 @@ function RouteItem({
               {route.name.charAt(0).toUpperCase()}
             </span>
           )}
-          <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 transition-opacity hover:opacity-100">
-            <UploadSimple size={16} className="text-white" />
-          </div>
+          {route.imageUrl ? (
+            <div className="absolute inset-0 flex items-center justify-center gap-1 rounded-full bg-black/50 opacity-0 transition-opacity group-hover/avatar:opacity-100">
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setImageInput(route.imageUrl ?? "");
+                  setImageError(null);
+                  setEditingImage(true);
+                }}
+                className="flex h-7 w-7 items-center justify-center rounded-full bg-white/20 text-white hover:bg-white/30"
+                title="Change image"
+              >
+                <PencilSimple size={14} />
+              </button>
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); void removeImage(); }}
+                className="flex h-7 w-7 items-center justify-center rounded-full bg-white/20 text-white hover:bg-red-400/60"
+                title="Remove image"
+              >
+                <X size={14} weight="bold" />
+              </button>
+            </div>
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 transition-opacity hover:opacity-100">
+              <PencilSimple size={16} className="text-white" />
+            </div>
+          )}
         </div>
-        {route.status === "completed" && (
-          <span className="absolute -right-0.5 -top-0.5 flex h-[18px] w-[18px] items-center justify-center rounded-full bg-white dark:bg-[hsl(240,5%,13%)]">
-            <SealCheck size={18} weight="fill" className="text-success" />
-          </span>
+
+        {/* URL input popover */}
+        {editingImage && (
+          <div
+            className="absolute left-0 top-full z-50 mt-2 w-[260px] rounded-lg border border-border bg-card p-3 shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <p className="mb-2 text-[12px] font-medium text-[#646373]">Image URL</p>
+            <Input
+              type="url"
+              placeholder="https://..."
+              value={imageInput}
+              onChange={(e) => { setImageInput(e.target.value); setImageError(null); }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") void saveImageUrl();
+                if (e.key === "Escape") setEditingImage(false);
+              }}
+              className="h-9 text-[13px]"
+              autoFocus
+            />
+            {imageInput && /^https?:\/\/.+\..+/.test(imageInput.trim()) && (
+              <div className="mt-2 flex items-center gap-2 rounded bg-muted/50 p-2">
+                <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full bg-muted">
+                  { }
+                  <img
+                    src={imageInput.trim()}
+                    alt="Preview"
+                    className="h-full w-full object-cover"
+                    onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                  />
+                </div>
+                <span className="text-[10px] text-muted-foreground">Preview</span>
+              </div>
+            )}
+            {imageError && (
+              <p className="mt-1 text-[11px] text-[#822B34]">{imageError}</p>
+            )}
+            <div className="mt-2 flex items-center justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setEditingImage(false)}
+                className="rounded px-2 py-1 text-[11px] text-muted-foreground hover:bg-muted"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => void saveImageUrl()}
+                disabled={imageSaving}
+                className="rounded bg-[#656379] px-3 py-1 text-[11px] font-semibold text-white hover:opacity-90 disabled:opacity-50"
+              >
+                {imageSaving ? "Saving..." : "Save"}
+              </button>
+            </div>
+          </div>
         )}
-        <input
-          ref={fileRef}
-          type="file"
-          accept="image/jpeg,image/png,image/webp"
-          className="hidden"
-          disabled={uploading}
-          onChange={(e) => onUpload(e.target.files?.[0] ?? null)}
-        />
       </div>
 
       {/* Content */}
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
-          {editingName ? (
-            <input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              onBlur={handleNameSubmit}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") handleNameSubmit();
-                if (e.key === "Escape") {
-                  setName(route.name);
-                  setEditingName(false);
-                }
+          <div className="min-w-0 flex-1">
+            {editingName ? (
+              <input
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                onBlur={handleNameSubmit}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleNameSubmit();
+                  if (e.key === "Escape") {
+                    setName(route.name);
+                    setEditingName(false);
+                  }
+                }}
+                className="h-6 w-full border-0 bg-transparent p-0 text-[14px] font-medium text-foreground outline-none focus:ring-0"
+                autoFocus
+              />
+            ) : (
+              <button
+                type="button"
+                className="group/name flex items-center gap-2 truncate text-[14px] font-medium text-foreground"
+                onClick={() => setEditingName(true)}
+              >
+                <span className="truncate">{route.name}</span>
+                <span className="flex shrink-0 items-center gap-0.5 text-[12px] text-muted-foreground opacity-0 transition-opacity group-hover/name:opacity-100">
+                  <PencilSimple size={12} />
+                  Edit
+                </span>
+              </button>
+            )}
+          </div>
+
+          <div className="flex shrink-0 items-center gap-4">
+            <RouteRating
+              value={route.rating}
+              onChange={(v) => {
+                onUpdate({ rating: v });
+                void patchRoute({ rating: v });
               }}
-              className="h-6 border-0 bg-transparent p-0 text-[14px] font-medium text-foreground outline-none focus:ring-0"
-              autoFocus
             />
-          ) : (
-            <button
-              type="button"
-              className="text-[14px] font-medium text-foreground hover:underline"
-              onClick={() => setEditingName(true)}
-            >
-              {route.name}
-            </button>
-          )}
-
-          <select
-            className="rounded-md border border-border bg-transparent px-1.5 py-0.5 text-[11px] font-medium text-muted-foreground"
-            value={route.status}
-            onChange={(e) => handleStatusChange(e.target.value as EntryStatus)}
-          >
-            {STATUS_OPTIONS.map((o) => (
-              <option key={o.value} value={o.value}>
-                {o.label}
-              </option>
-            ))}
-          </select>
-
-          {route.rating != null && (
-            <span className="flex items-center gap-0.5 text-[12px] text-muted-foreground">
-              <Star size={12} weight="fill" className="text-[#F5A623]" />
-              {route.rating}/10
-            </span>
-          )}
+            <RouteStatusPill status={route.status} onChange={handleStatusChange} onRemove={onDelete} />
+          </div>
         </div>
 
         {/* Notes */}
@@ -659,52 +833,132 @@ function RouteItem({
             rows={2}
             placeholder="Add notes..."
           />
-        ) : route.notes ? (
+        ) : (
           <p
             className="mt-1 cursor-pointer text-[13px] leading-relaxed text-muted-foreground hover:text-foreground"
             onClick={() => setEditingNotes(true)}
           >
-            {route.notes}
+            {route.notes || <span className="italic opacity-0 transition-opacity group-hover:opacity-100">Add notes...</span>}
           </p>
-        ) : null}
+        )}
       </div>
 
-      {/* Actions (hover-reveal) */}
-      <div
+    </div>
+  );
+}
+
+function RouteStatusPill({ status, onChange, onRemove }: { status: EntryStatus; onChange: (s: EntryStatus) => void; onRemove?: () => void }) {
+  const [open, setOpen] = useState(false);
+  const [confirmRemove, setConfirmRemove] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
         className={cn(
-          "flex shrink-0 items-center gap-1 transition-opacity",
-          hovered ? "opacity-100" : "opacity-0",
+          "inline-flex cursor-pointer items-center gap-1.5 rounded-full px-3 py-1 font-mono text-[11px] font-bold",
+          statusColor(status)
         )}
+        onClick={() => setOpen((v) => !v)}
+        onBlur={(e) => {
+          if (!ref.current?.contains(e.relatedTarget as Node)) setOpen(false);
+        }}
       >
-        {!route.notes && !editingNotes && (
+        <StatusIcon status={status} />
+        {statusLabel(status).toUpperCase()}
+        <CaretDown size={10} />
+      </button>
+      {open && (
+        <div className="absolute left-0 top-full z-50 mt-1 w-36 rounded-lg border border-border bg-card py-1">
+          {STATUS_OPTIONS.map((o) => (
+            <button
+              key={o.value}
+              type="button"
+              className={cn(
+                "flex w-full items-center gap-2 px-3 py-1.5 text-left text-[12px] text-foreground",
+                status === o.value ? "bg-muted" : "hover:bg-muted"
+              )}
+              onClick={() => { onChange(o.value); setOpen(false); }}
+            >
+              <StatusIcon status={o.value} />
+              {o.label}
+            </button>
+          ))}
+          {onRemove && (
+            <>
+              <div className="my-1 border-t border-border" />
+              <button
+                type="button"
+                className="flex w-full items-center gap-2 px-3 py-1.5 text-left text-[12px] text-[#822B34] hover:bg-muted"
+                onClick={() => { setOpen(false); setConfirmRemove(true); }}
+              >
+                <X size={12} weight="bold" />
+                Remove
+              </button>
+            </>
+          )}
+        </div>
+      )}
+      <ConfirmDialog
+        open={confirmRemove}
+        title="Remove route"
+        description="This route and its notes will be permanently deleted."
+        confirmLabel="Remove"
+        onConfirm={() => { setConfirmRemove(false); onRemove?.(); }}
+        onCancel={() => setConfirmRemove(false)}
+      />
+    </div>
+  );
+}
+
+function RouteRating({ value, onChange }: { value: number | null; onChange: (v: number | null) => void }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        className="flex items-center gap-1 text-[12px] font-medium text-muted-foreground"
+        onClick={() => setOpen((v) => !v)}
+        onBlur={(e) => {
+          if (!ref.current?.contains(e.relatedTarget as Node)) setOpen(false);
+        }}
+      >
+        <Star size={14} weight="fill" className={value != null ? "text-[#F5A623]" : ""} />
+        Rating: {value != null ? `${value}/10` : "-/-"}
+        <CaretDown size={10} />
+      </button>
+      {open && (
+        <div className="absolute right-0 top-full z-50 mt-1 w-24 rounded-lg border border-border bg-card px-2 py-1.5">
           <button
             type="button"
-            onClick={() => setEditingNotes(true)}
-            className="flex h-7 w-7 items-center justify-center rounded text-muted-foreground hover:bg-muted hover:text-foreground"
-            title="Add notes"
+            className={cn(
+              "mb-1 block w-full rounded py-1 text-center text-[12px] text-foreground",
+              value == null ? "bg-muted" : "hover:bg-muted"
+            )}
+            onClick={() => { onChange(null); setOpen(false); }}
           >
-            <NotePencil size={14} />
+            -
           </button>
-        )}
-        {route.imageUrl && (
-          <button
-            type="button"
-            onClick={removeImage}
-            className="flex h-7 w-7 items-center justify-center rounded text-muted-foreground hover:bg-muted hover:text-foreground"
-            title="Remove image"
-          >
-            <ImageSquare size={14} />
-          </button>
-        )}
-        <button
-          type="button"
-          onClick={onDelete}
-          className="flex h-7 w-7 items-center justify-center rounded text-muted-foreground hover:bg-destructive/10 hover:text-[#822B34]"
-          title="Delete route"
-        >
-          <Trash size={14} />
-        </button>
-      </div>
+          <div className="grid grid-cols-2 gap-1">
+            {Array.from({ length: 10 }, (_, i) => i + 1).map((v) => (
+              <button
+                key={v}
+                type="button"
+                className={cn(
+                  "rounded py-1 text-center text-[12px] text-foreground",
+                  value === v ? "bg-muted" : "hover:bg-muted"
+                )}
+                onClick={() => { onChange(v); setOpen(false); }}
+              >
+                {v}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

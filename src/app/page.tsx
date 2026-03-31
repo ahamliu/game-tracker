@@ -6,7 +6,14 @@ import {
 } from "@/components/explore/explore-library-carousel";
 import { ExplorePagination } from "@/components/explore/explore-pagination";
 import { ExplorePopularGrid } from "@/components/explore/explore-popular-grid";
-import { getCarouselForUser, getDistinctGenres, getExplorePopular, type ExploreSort } from "@/lib/explore";
+import { ExploreRecentlyAdded } from "@/components/explore/explore-recently-added";
+import {
+  getCarouselForUser,
+  getDistinctGenres,
+  getExplorePopular,
+  getRecentlyAdded,
+  type ExploreSort,
+} from "@/lib/explore";
 
 const PAGE_SIZE = 24;
 
@@ -38,53 +45,50 @@ export default async function HomePage({
 
   const session = await auth();
 
-  const [{ rows, total }, genreOptions, carousel] = await Promise.all([
-    getExplorePopular({
-      page,
-      pageSize: PAGE_SIZE,
-      q: q || undefined,
-      genreIds,
-      sort,
-    }),
+  const [{ rows, total }, genreOptions, carousel, recentlyAdded] = await Promise.all([
+    getExplorePopular({ page, pageSize: PAGE_SIZE, q: q || undefined, genreIds, sort }),
     getDistinctGenres(),
     session?.user?.id ? getCarouselForUser(session.user.id) : Promise.resolve(null),
+    getRecentlyAdded(12),
   ]);
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
   const genresCsv = genreIds.length ? genreIds.join(",") : "";
 
   return (
-    <div className="space-y-10">
-      <header className="space-y-1">
-        <p className="text-sm font-medium uppercase tracking-widest text-primary">Explore</p>
-        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Discover games &amp; track your library</h1>
-        <p className="text-muted-foreground">
-          Browse what the community is playing, then save titles to your shelf with routes and ratings.
-        </p>
-      </header>
-
-      <ExploreFiltersForm
-        initialQ={q}
-        initialSort={sort}
-        initialGenreIds={genreIds}
-        genres={genreOptions}
-      />
-
-      <section className="space-y-3" aria-label="Your library">
-        {session?.user?.id ? (
-          <ExploreLibraryCarousel entries={carousel ?? []} />
-        ) : (
-          <ExploreSignedOutCarousel />
-        )}
+    <div className="mx-auto max-w-[1100px] space-y-8 py-2">
+      {/* Search and filters */}
+      <section>
+        <ExploreFiltersForm
+          initialQ={q}
+          initialSort={sort}
+          initialGenreIds={genreIds}
+          genres={genreOptions}
+        />
       </section>
 
-      <section className="space-y-4" aria-labelledby="popular-heading">
-        <h2 id="popular-heading" className="text-lg font-semibold tracking-tight">
-          Popular on GameShelf
-        </h2>
-        <p className="text-sm text-muted-foreground">
-          Ranked by how many members have added each game to their library.
-        </p>
+      {/* Library + Recently Added side by side */}
+      <section className="grid gap-6 lg:grid-cols-[1fr_280px]">
+        <div>
+          {session?.user?.id ? (
+            <ExploreLibraryCarousel entries={carousel ?? []} />
+          ) : (
+            <ExploreSignedOutCarousel />
+          )}
+        </div>
+        <div className="hidden lg:block">
+          <ExploreRecentlyAdded entries={recentlyAdded} />
+        </div>
+      </section>
+
+      {/* Popular games */}
+      <section className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h2 className="text-[16px] font-bold text-[#646373]">Popular Games</h2>
+          <span className="text-[12px] text-muted-foreground">
+            {total.toLocaleString()} {total === 1 ? "game" : "games"}
+          </span>
+        </div>
         <ExplorePopularGrid rows={rows} />
         <ExplorePagination
           page={page}
@@ -93,6 +97,11 @@ export default async function HomePage({
           sort={sort}
           genresCsv={genresCsv}
         />
+      </section>
+
+      {/* Recently Added on mobile (below popular) */}
+      <section className="lg:hidden">
+        <ExploreRecentlyAdded entries={recentlyAdded} />
       </section>
     </div>
   );

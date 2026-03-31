@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { UserPlus, UserMinus } from "@phosphor-icons/react";
 
 export function ProfileFollowButton({
   handle,
@@ -27,8 +27,27 @@ export function ProfileFollowButton({
   }
 
   return (
-    <Button type="button" variant={following ? "secondary" : "default"} disabled={busy} onClick={() => void toggle()}>
-      {following ? "Following" : "Follow"}
-    </Button>
+    <button
+      type="button"
+      disabled={busy}
+      onClick={() => void toggle()}
+      className={`flex items-center gap-1.5 rounded-lg px-4 py-2 font-mono text-[12px] font-semibold uppercase transition-colors disabled:opacity-50 ${
+        following
+          ? "border border-border bg-card text-[#646373] hover:border-[#822B34] hover:bg-[#822B34]/5 hover:text-[#822B34]"
+          : "bg-[#656379] text-white hover:opacity-90"
+      }`}
+    >
+      {following ? (
+        <>
+          <UserMinus size={14} weight="bold" />
+          Following
+        </>
+      ) : (
+        <>
+          <UserPlus size={14} weight="bold" />
+          Follow
+        </>
+      )}
+    </button>
   );
 }

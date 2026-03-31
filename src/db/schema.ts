@@ -44,6 +44,7 @@ export const users = pgTable(
     displayName: varchar("display_name", { length: 100 }).notNull(),
     avatarUrl: text("avatar_url"),
     bio: text("bio"),
+    favoriteGameIds: jsonb("favorite_game_ids").$type<string[]>().default([]),
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
   },

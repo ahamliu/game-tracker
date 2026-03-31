@@ -339,12 +339,11 @@ export function AddGameModal({ open, onClose }: { open: boolean; onClose: () => 
               {manualCover && (
                 <div className="flex items-center gap-3 rounded-lg bg-muted/50 p-3">
                   <div className="relative h-16 w-12 shrink-0 overflow-hidden rounded bg-muted">
-                    <Image
+                    { }
+                    <img
                       src={manualCover}
                       alt="Preview"
-                      fill
-                      className="object-cover"
-                      sizes="48px"
+                      className="h-full w-full object-cover"
                       onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                     />
                   </div>

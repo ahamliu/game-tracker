@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CaretLeft, CaretRight } from "@phosphor-icons/react/dist/ssr";
 
 export function ExplorePagination({
   page,
@@ -26,25 +27,33 @@ export function ExplorePagination({
   }
 
   return (
-    <nav className="flex flex-wrap items-center justify-center gap-2 pt-8" aria-label="Pagination">
-      {page > 1 && (
+    <nav className="flex items-center justify-center gap-3 pt-4" aria-label="Pagination">
+      {page > 1 ? (
         <Link
-          className="rounded-md border border-border bg-card px-3 py-1.5 text-sm hover:bg-accent"
+          className="flex h-8 w-8 items-center justify-center rounded-lg text-[#646373] hover:bg-[#E8E8E8] dark:hover:bg-[#2a2a35]"
           href={hrefFor(page - 1)}
         >
-          Previous
+          <CaretLeft size={16} weight="bold" />
         </Link>
+      ) : (
+        <span className="flex h-8 w-8 items-center justify-center text-muted-foreground/30">
+          <CaretLeft size={16} weight="bold" />
+        </span>
       )}
-      <span className="text-sm text-muted-foreground">
-        Page {page} of {totalPages}
+      <span className="text-[13px] text-muted-foreground">
+        {page} / {totalPages}
       </span>
-      {page < totalPages && (
+      {page < totalPages ? (
         <Link
-          className="rounded-md border border-border bg-card px-3 py-1.5 text-sm hover:bg-accent"
+          className="flex h-8 w-8 items-center justify-center rounded-lg text-[#646373] hover:bg-[#E8E8E8] dark:hover:bg-[#2a2a35]"
           href={hrefFor(page + 1)}
         >
-          Next
+          <CaretRight size={16} weight="bold" />
         </Link>
+      ) : (
+        <span className="flex h-8 w-8 items-center justify-center text-muted-foreground/30">
+          <CaretRight size={16} weight="bold" />
+        </span>
       )}
     </nav>
   );

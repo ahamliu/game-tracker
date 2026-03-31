@@ -176,6 +176,30 @@ export async function getExplorePopular(params: {
   return { rows, total };
 }
 
+export type RecentEntry = {
+  entryId: string;
+  title: string;
+  coverUrl: string | null;
+  developerName: string | null;
+  addedAt: Date;
+};
+
+export async function getRecentlyAdded(limit = 12): Promise<RecentEntry[]> {
+  const entries = await db.query.libraryEntries.findMany({
+    with: { game: true },
+    orderBy: [desc(libraryEntries.createdAt)],
+    limit,
+  });
+
+  return entries.map((e) => ({
+    entryId: e.id,
+    title: e.game.title,
+    coverUrl: e.game.coverUrl,
+    developerName: e.game.developerName,
+    addedAt: e.createdAt,
+  }));
+}
+
 export async function getDistinctGenres(): Promise<{ id: number; name: string }[]> {
   const all = await db.query.games.findMany({
     columns: { genres: true },

@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { auth } from "@/auth";
@@ -26,6 +26,12 @@ export default async function EntryPage({ params }: PageProps) {
 
   if (!entry) notFound();
 
+  const savedCountResult = await db
+    .select({ count: sql<number>`count(distinct ${libraryEntries.userId})` })
+    .from(libraryEntries)
+    .where(eq(libraryEntries.gameId, entry.gameId));
+  const savedCount = Number(savedCountResult[0]?.count ?? 0);
+
   return (
     <div className="space-y-4">
       <div className="mx-auto max-w-[860px]">
@@ -49,6 +55,11 @@ export default async function EntryPage({ params }: PageProps) {
             title: entry.game.title,
             coverUrl: entry.game.coverUrl,
             summary: entry.game.summary,
+            developerName: entry.game.developerName,
+            releaseDate: entry.game.releaseDate,
+            savedCount,
+            aggregatedRating: entry.game.aggregatedRating,
+            source: entry.game.source,
           },
           routes: entry.routes.map((r) => ({
             id: r.id,

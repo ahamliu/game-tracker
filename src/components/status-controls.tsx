@@ -11,6 +11,7 @@ import {
   Trash,
   X,
 } from "@phosphor-icons/react";
+import { ConfirmDialog } from "@/components/confirm-dialog";
 import type { EntryStatus } from "@/lib/status";
 import { statusLabel, statusColor, STATUS_OPTIONS } from "@/lib/status";
 import { cn } from "@/lib/utils";
@@ -53,11 +54,11 @@ export function RatingDropdown({ entryId, rating }: { entryId: string; rating: n
         <CaretDown size={12} />
       </button>
       {open && (
-        <div className="absolute right-0 top-full z-50 mt-2 w-24 rounded-lg border border-border bg-card py-2 px-2">
+        <div className="absolute right-0 top-full z-50 mt-1 w-24 rounded-lg border border-border bg-card px-2 py-1.5">
           <button
             type="button"
             className={cn(
-              "mb-1 block w-full rounded py-1.5 text-center text-sm text-foreground",
+              "mb-1 block w-full rounded py-1 text-center text-[12px] text-foreground",
               optimistic == null ? "bg-muted" : "hover:bg-muted"
             )}
             onClick={(e) => { e.preventDefault(); void updateRating(null); }}
@@ -70,7 +71,7 @@ export function RatingDropdown({ entryId, rating }: { entryId: string; rating: n
                 key={v}
                 type="button"
                 className={cn(
-                  "rounded py-1.5 text-center text-sm text-foreground",
+                  "rounded py-1 text-center text-[12px] text-foreground",
                   optimistic === v ? "bg-muted" : "hover:bg-muted"
                 )}
                 onClick={(e) => { e.preventDefault(); void updateRating(v); }}
@@ -85,10 +86,11 @@ export function RatingDropdown({ entryId, rating }: { entryId: string; rating: n
   );
 }
 
-export function StatusDropdown({ entryId, status, showRemove = true }: { entryId: string; status: EntryStatus; showRemove?: boolean }) {
+export function StatusDropdown({ entryId, status, showRemove = true, onRemove }: { entryId: string; status: EntryStatus; showRemove?: boolean; onRemove?: () => void }) {
   const router = useRouter();
   const [optimistic, setOptimistic] = useState(status);
   const [open, setOpen] = useState(false);
+  const [confirmRemove, setConfirmRemove] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => { setOptimistic(status); }, [status]);
@@ -112,10 +114,15 @@ export function StatusDropdown({ entryId, status, showRemove = true }: { entryId
   }, [entryId, router]);
 
   const removeEntry = useCallback(async () => {
+    setConfirmRemove(false);
     setOpen(false);
-    fetch(`/api/me/library/${entryId}`, { method: "DELETE" })
-      .then(() => router.refresh());
-  }, [entryId, router]);
+    await fetch(`/api/me/library/${entryId}`, { method: "DELETE" });
+    if (onRemove) {
+      onRemove();
+    } else {
+      router.refresh();
+    }
+  }, [entryId, router, onRemove]);
 
   return (
     <div ref={ref} className="relative">
@@ -132,13 +139,13 @@ export function StatusDropdown({ entryId, status, showRemove = true }: { entryId
         <CaretDown size={10} />
       </button>
       {open && (
-        <div className="absolute right-0 top-full z-50 mt-2 w-40 rounded-lg border border-border bg-card py-1">
+        <div className="absolute right-0 top-full z-50 mt-1 w-36 rounded-lg border border-border bg-card py-1">
           {STATUS_OPTIONS.map((o) => (
             <button
               key={o.value}
               type="button"
               className={cn(
-                "flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-foreground",
+                "flex w-full items-center gap-2 px-3 py-1.5 text-left text-[12px] text-foreground",
                 optimistic === o.value ? "bg-muted" : "hover:bg-muted"
               )}
               onClick={(e) => { e.preventDefault(); void updateStatus(o.value); }}
@@ -152,8 +159,8 @@ export function StatusDropdown({ entryId, status, showRemove = true }: { entryId
               <div className="my-1 border-t border-border" />
               <button
                 type="button"
-                className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-[#822B34] hover:bg-muted"
-                onClick={(e) => { e.preventDefault(); void removeEntry(); }}
+                className="flex w-full items-center gap-2 px-3 py-1.5 text-left text-[12px] text-[#822B34] hover:bg-muted"
+                onClick={(e) => { e.preventDefault(); setOpen(false); setConfirmRemove(true); }}
               >
                 <X size={14} weight="bold" />
                 Remove
@@ -162,6 +169,14 @@ export function StatusDropdown({ entryId, status, showRemove = true }: { entryId
           )}
         </div>
       )}
+      <ConfirmDialog
+        open={confirmRemove}
+        title="Remove from library"
+        description="This game and all its routes will be permanently removed from your library."
+        confirmLabel="Remove"
+        onConfirm={() => void removeEntry()}
+        onCancel={() => setConfirmRemove(false)}
+      />
     </div>
   );
 }
