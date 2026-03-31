@@ -76,7 +76,7 @@ export async function searchIgdb(query: string, limit = 20): Promise<IgdbGameHit
   if (cached && Date.now() - cached.at < SEARCH_TTL_MS) return cached.hits;
 
   const body = `search "${q.replace(/"/g, '\\"')}";
-fields name,summary,first_release_date,cover.url,platforms.name,genres.name,aggregated_rating;
+fields name,summary,first_release_date,cover.url,platforms.name,genres.name,aggregated_rating,involved_companies.developer,involved_companies.company.name;
 limit ${limit};
 `;
 

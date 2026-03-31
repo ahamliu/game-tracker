@@ -20,6 +20,7 @@ type SearchHit = {
   igdbId?: number;
   title: string;
   coverUrl?: string | null;
+  developerName?: string | null;
 };
 
 export function AddGameModal({ open, onClose }: { open: boolean; onClose: () => void }) {
@@ -282,9 +283,11 @@ export function AddGameModal({ open, onClose }: { open: boolean; onClose: () => 
                           </div>
                           <div className="min-w-0 flex-1">
                             <p className="truncate text-[14px] font-medium text-foreground">{r.title}</p>
-                            <p className="text-[11px] text-muted-foreground">
-                              {r.kind === "igdb" ? "IGDB" : "Your catalog"}
-                            </p>
+                            {r.developerName && (
+                              <p className="truncate text-[11px] font-medium uppercase text-muted-foreground">
+                                {r.developerName}
+                              </p>
+                            )}
                           </div>
                           {adding === r.id ? (
                             <SpinnerGap size={16} className="shrink-0 animate-spin text-muted-foreground" />

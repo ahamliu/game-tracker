@@ -97,6 +97,7 @@ export async function searchCatalog(query: string, limit = 20) {
     title: string;
     coverUrl?: string | null;
     summary?: string | null;
+    developerName?: string | null;
   }[] = [];
 
   for (const g of local) {
@@ -106,6 +107,7 @@ export async function searchCatalog(query: string, limit = 20) {
       title: g.title,
       coverUrl: g.coverUrl,
       summary: g.summary,
+      developerName: g.developerName,
     });
   }
 
@@ -117,6 +119,7 @@ export async function searchCatalog(query: string, limit = 20) {
       title: h.name,
       coverUrl: coverUrlFromIgdb(h.cover),
       summary: h.summary,
+      developerName: developerFromIgdb(h.involved_companies),
     });
   }
 
