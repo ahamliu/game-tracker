@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { Bookmark, Star } from "lucide-react";
 import type { PopularRow } from "@/lib/explore";
 
@@ -18,7 +19,7 @@ export function ExplorePopularGrid({ rows }: { rows: PopularRow[] }) {
             <div className="flex gap-3 p-3">
               <div className="relative h-28 w-20 shrink-0 overflow-hidden rounded-lg bg-muted">
                 {game.coverUrl ? (
-                  <img src={game.coverUrl} alt="" className="h-full w-full object-cover" />
+                  <Image src={game.coverUrl} alt="" fill className="object-cover" />
                 ) : (
                   <div className="flex h-full items-center justify-center text-[10px] text-muted-foreground">
                     —
