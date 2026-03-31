@@ -1,0 +1,18 @@
+-- Optional repair if `npm run db:push` fails with PostgreSQL 42P16 / primary key errors
+-- related to the `follows` table. BACK UP YOUR DATA FIRST.
+--
+-- Symptom: follows was created with a composite PRIMARY KEY (follower_id, following_id)
+-- and Drizzle needs a surrogate `id` column + UNIQUE on the pair.
+--
+-- 1) Inspect constraints (in psql): \d follows
+--
+-- 2) If you see a composite primary key and NO `id` column, run:
+--
+-- ALTER TABLE follows ADD COLUMN IF NOT EXISTS id uuid DEFAULT gen_random_uuid();
+-- UPDATE follows SET id = gen_random_uuid() WHERE id IS NULL;
+-- ALTER TABLE follows ALTER COLUMN id SET NOT NULL;
+-- ALTER TABLE follows DROP CONSTRAINT follows_pkey;  -- rename if your PK has another name
+-- ALTER TABLE follows ADD PRIMARY KEY (id);
+-- CREATE UNIQUE INDEX IF NOT EXISTS follows_unique ON follows (follower_id, following_id);
+--
+-- 3) Then run: npm run db:push

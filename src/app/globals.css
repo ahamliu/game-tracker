@@ -1,0 +1,107 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 0 0% 95.7%;
+  --foreground: 249 7% 16%;
+  --card: 0 0% 100%;
+  --card-foreground: 249 7% 16%;
+  --muted: 0 0% 95.7%;
+  --muted-foreground: 0 0% 54.6%;
+  --border: 0 0% 87.8%;
+  --primary: 248 11% 43%;
+  --primary-foreground: 0 0% 100%;
+  --accent: 248 11% 43%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 354 56% 34%;
+  --destructive-foreground: 0 0% 100%;
+  --radius: 0.5rem;
+
+  --success: 134 30% 53%;
+  --success-foreground: 0 0% 100%;
+
+  --status-playing-bg: 213 88% 91%;
+  --status-playing-fg: 235 40% 48%;
+  --status-playing-border: 235 40% 48%;
+  --status-completed-bg: 134 30% 53%;
+  --status-completed-fg: 0 0% 100%;
+  --status-completed-border: 134 30% 53%;
+  --status-planning-bg: 0 0% 96%;
+  --status-planning-fg: 249 4% 42%;
+  --status-planning-border: 0 0% 88%;
+  --status-dropped-bg: 0 52% 85%;
+  --status-dropped-fg: 352 52% 34%;
+  --status-dropped-border: 352 52% 34%;
+  --status-on-hold-bg: 38 92% 50%;
+  --status-on-hold-fg: 0 0% 100%;
+  --status-on-hold-border: 38 92% 50%;
+}
+
+html {
+  color-scheme: light;
+}
+
+body {
+  @apply bg-background text-foreground antialiased min-h-screen;
+}
+
+@layer utilities {
+  .bg-background {
+    background-color: hsl(var(--background));
+  }
+  .text-foreground {
+    color: hsl(var(--foreground));
+  }
+  .bg-card {
+    background-color: hsl(var(--card));
+  }
+  .text-card-foreground {
+    color: hsl(var(--card-foreground));
+  }
+  .bg-muted {
+    background-color: hsl(var(--muted));
+  }
+  .text-muted-foreground {
+    color: hsl(var(--muted-foreground));
+  }
+  .border-border {
+    border-color: hsl(var(--border));
+  }
+  .bg-primary {
+    background-color: hsl(var(--primary));
+  }
+  .text-primary-foreground {
+    color: hsl(var(--primary-foreground));
+  }
+  .bg-accent {
+    background-color: hsl(var(--accent));
+  }
+  .text-accent-foreground {
+    color: hsl(var(--accent-foreground));
+  }
+  .bg-destructive {
+    background-color: hsl(var(--destructive));
+  }
+  .text-destructive-foreground {
+    color: hsl(var(--destructive-foreground));
+  }
+  .bg-success {
+    background-color: hsl(var(--success));
+  }
+  .text-success {
+    color: hsl(var(--success));
+  }
+  .text-success-foreground {
+    color: hsl(var(--success-foreground));
+  }
+  .border-success {
+    border-color: hsl(var(--success));
+  }
+}
+
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-decoration {
+  -webkit-appearance: none;
+  appearance: none;
+}
