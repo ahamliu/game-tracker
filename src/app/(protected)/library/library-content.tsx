@@ -15,6 +15,7 @@ import {
 } from "@phosphor-icons/react";
 import { Input } from "@/components/ui/input";
 import { RatingDropdown, StatusDropdown } from "@/components/status-controls";
+import { AddGameModal } from "@/components/add-game-modal";
 import type { EntryStatus } from "@/lib/status";
 import { statusLabel, STATUS_OPTIONS } from "@/lib/status";
 import { cn } from "@/lib/utils";
@@ -65,6 +66,7 @@ export function LibraryContent({
   const [view, setView] = useState<"card" | "table">("card");
   const [statusOpen, setStatusOpen] = useState(false);
   const [sortOpen, setSortOpen] = useState(false);
+  const [addModalOpen, setAddModalOpen] = useState(false);
   const statusRef = useRef<HTMLDivElement>(null);
   const sortRef = useRef<HTMLDivElement>(null);
 
@@ -151,12 +153,15 @@ export function LibraryContent({
         </div>
         <button
           type="button"
+          onClick={() => setAddModalOpen(true)}
           className="flex h-10 items-center gap-1.5 rounded-lg bg-[#656379] px-5 font-mono text-[14px] font-semibold uppercase tracking-wider text-white hover:opacity-90"
         >
           <Plus size={14} weight="bold" />
           Add Game
         </button>
       </div>
+
+      <AddGameModal open={addModalOpen} onClose={() => setAddModalOpen(false)} />
 
       {/* Search and filters bar */}
       <div className="space-y-3">

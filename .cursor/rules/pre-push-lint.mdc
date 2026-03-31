@@ -1,0 +1,8 @@
+---
+description: Always run npm run lint before committing and pushing changes to the repository
+alwaysApply: true
+---
+
+# Pre-push lint check
+
+Before every `git commit` and `git push`, run `npm run lint` in the project root and fix any errors before proceeding. Do not push code that fails linting.
