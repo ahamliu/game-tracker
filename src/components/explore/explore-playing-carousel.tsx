@@ -6,7 +6,6 @@ import { useRef, useState, useCallback, useEffect } from "react";
 import { CaretLeft, CaretRight, SealCheck } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import type { PlayingEntry } from "@/lib/explore";
-import { StatusDropdown } from "@/components/status-controls";
 
 export function ExplorePlayingCarousel({ entries }: { entries: PlayingEntry[] }) {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -113,12 +112,6 @@ export function ExplorePlayingCarousel({ entries }: { entries: PlayingEntry[] })
               </div>
               <div className="flex min-w-0 flex-1 flex-col">
                 <h3 className="text-[13px] font-bold leading-snug text-[#646373] line-clamp-2">{e.title}</h3>
-                <div
-                  className="mt-1"
-                  onClick={(ev) => { ev.preventDefault(); ev.stopPropagation(); }}
-                >
-                  <StatusDropdown entryId={e.entryId} status={e.status} gameTitle={e.title} showRemove={false} compact />
-                </div>
                 {e.notes && (
                   <p className="mt-1 line-clamp-2 text-[11px] leading-snug text-muted-foreground">
                     {e.notes}
