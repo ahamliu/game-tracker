@@ -178,7 +178,7 @@ export function AddGameModal({ open, onClose, initialManualTitle }: { open: bool
   return (
     <div
       ref={overlayRef}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      className="fixed inset-0 z-50 flex items-start justify-center bg-black/50 pt-[10vh]"
       onClick={(e) => { if (e.target === overlayRef.current) onClose(); }}
     >
       <div className="w-full max-w-[520px] overflow-hidden rounded-xl border border-border bg-card shadow-xl">
