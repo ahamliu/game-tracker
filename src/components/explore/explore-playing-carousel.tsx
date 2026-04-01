@@ -46,7 +46,6 @@ export function ExplorePlayingCarousel({ entries }: { entries: PlayingEntry[] })
     if (!el) return;
     setIsDragging(true);
     dragState.current = { startX: e.clientX, scrollLeft: el.scrollLeft, moved: false };
-    el.setPointerCapture(e.pointerId);
   }
 
   function handlePointerMove(e: React.PointerEvent) {
@@ -56,9 +55,8 @@ export function ExplorePlayingCarousel({ entries }: { entries: PlayingEntry[] })
     scrollRef.current!.scrollLeft = dragState.current.scrollLeft - dx;
   }
 
-  function handlePointerUp(e: React.PointerEvent) {
+  function handlePointerUp() {
     setIsDragging(false);
-    scrollRef.current?.releasePointerCapture(e.pointerId);
   }
 
   if (entries.length === 0) return null;
