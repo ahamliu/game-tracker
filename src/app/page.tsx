@@ -15,6 +15,7 @@ import {
   getCarouselForUser,
   getDistinctGenres,
   getExplorePopular,
+  getFriendUpdates,
   getPlayingForUser,
   getRecentlyAdded,
   getStatsForUser,
@@ -52,7 +53,7 @@ export default async function HomePage({
 
   const session = await auth();
 
-  const [{ rows, total }, genreOptions, carousel, playing, recentlyAdded, libraryGameIds, statsData] = await Promise.all([
+  const [{ rows, total }, genreOptions, carousel, playing, recentlyAdded, libraryGameIds, statsData, friendUpdates] = await Promise.all([
     getExplorePopular({ page, pageSize: PAGE_SIZE, q: q || undefined, genreIds, sort }),
     getDistinctGenres(),
     session?.user?.id ? getCarouselForUser(session.user.id) : Promise.resolve(null),
@@ -60,6 +61,7 @@ export default async function HomePage({
     getRecentlyAdded(4),
     session?.user?.id ? getUserLibraryGameIds(session.user.id) : Promise.resolve([]),
     session?.user?.id ? getStatsForUser(session.user.id) : Promise.resolve(null),
+    session?.user?.id ? getFriendUpdates(session.user.id, 4) : Promise.resolve([]),
   ]);
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
@@ -77,7 +79,7 @@ export default async function HomePage({
             <ExploreLibraryCarousel entries={carousel ?? []} />
           </div>
           <div className="hidden space-y-5 lg:block">
-            {statsData && <ExploreHomeSidebar stats={statsData} />}
+            {statsData && <ExploreHomeSidebar stats={statsData} friendUpdates={friendUpdates} />}
             <div className="border-t border-border pt-5">
               <ExploreRecentlyAdded entries={recentlyAdded} />
             </div>

@@ -1,6 +1,6 @@
-import { and, asc, desc, eq, ilike, isNotNull, sql } from "drizzle-orm";
+import { and, asc, desc, eq, ilike, inArray, isNotNull, or, sql } from "drizzle-orm";
 import { db } from "@/db";
-import { characterRoutes, games, libraryEntries } from "@/db/schema";
+import { activities, characterRoutes, friendships, games, libraryEntries, users } from "@/db/schema";
 import type { EntryStatus } from "@/lib/status";
 import type { ProfileStatsData } from "@/app/u/[handle]/profile-stats";
 
@@ -307,6 +307,46 @@ export async function getStatsForUser(userId: string): Promise<ProfileStatsData>
     routesCompleted: routeStats[0]?.completed ?? 0,
     routesTotal: routeStats[0]?.total ?? 0,
   };
+}
+
+export type FriendUpdate = {
+  id: string;
+  type: string;
+  payload: Record<string, unknown>;
+  createdAt: Date;
+  userId: string;
+  userHandle: string;
+  userDisplayName: string;
+  userAvatarUrl: string | null;
+};
+
+export async function getFriendUpdates(userId: string, limit = 4): Promise<FriendUpdate[]> {
+  const friendRows = await db
+    .select({ userA: friendships.userA, userB: friendships.userB })
+    .from(friendships)
+    .where(or(eq(friendships.userA, userId), eq(friendships.userB, userId)));
+
+  const friendIds = friendRows.map((r) => (r.userA === userId ? r.userB : r.userA));
+  if (friendIds.length === 0) return [];
+
+  const rows = await db
+    .select({
+      id: activities.id,
+      type: activities.type,
+      payload: activities.payload,
+      createdAt: activities.createdAt,
+      userId: activities.userId,
+      userHandle: users.handle,
+      userDisplayName: users.displayName,
+      userAvatarUrl: users.avatarUrl,
+    })
+    .from(activities)
+    .innerJoin(users, eq(activities.userId, users.id))
+    .where(inArray(activities.userId, friendIds))
+    .orderBy(desc(activities.createdAt))
+    .limit(limit);
+
+  return rows as FriendUpdate[];
 }
 
 export async function getDistinctGenres(): Promise<{ id: number; name: string }[]> {
