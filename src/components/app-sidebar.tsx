@@ -23,8 +23,8 @@ export function AppSidebar({ handle, avatar }: { handle: string; avatar: string 
   const profileActive = pathname.startsWith(profileHref);
 
   return (
-    <aside className="sticky top-[85px] hidden h-[calc(100vh-85px)] w-[254px] shrink-0 border-r border-border bg-card md:block">
-      <nav className="flex flex-col gap-2 px-4 pt-5">
+    <aside className="hidden w-[254px] shrink-0 border-r border-border bg-card md:block">
+      <nav className="sticky top-[85px] flex flex-col gap-2 px-4 pt-5">
         {navItems.map((item) => {
           const active =
             item.href === "/"
