@@ -70,7 +70,7 @@ export function ExploreLibraryCarousel({ entries }: { entries: CarouselEntry[] }
   }
 
   return (
-    <div>
+    <div className="min-w-0">
       <div className="mb-3 flex items-center justify-between">
         <h2 className="text-[16px] font-bold text-[#646373]">My Library</h2>
         <div className="flex items-center gap-2">
@@ -111,8 +111,7 @@ export function ExploreLibraryCarousel({ entries }: { entries: CarouselEntry[] }
           <Link
             key={e.entryId}
             href={`/library/${e.entryId}`}
-            className="group/card shrink-0"
-            style={{ width: "calc((100% - 4 * 1rem) / 5)" }}
+            className="group/card carousel-library-card shrink-0"
             onClick={(ev) => { if (dragState.current.moved) ev.preventDefault(); }}
             draggable={false}
           >

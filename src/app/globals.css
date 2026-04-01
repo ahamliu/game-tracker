@@ -75,6 +75,7 @@
 
 html {
   color-scheme: light;
+  overflow-x: hidden;
 }
 
 html.dark {
@@ -83,6 +84,7 @@ html.dark {
 
 body {
   @apply bg-background text-foreground antialiased min-h-screen;
+  overflow-x: hidden;
 }
 
 @layer utilities {
@@ -143,6 +145,24 @@ input[type="search"]::-webkit-search-cancel-button,
 input[type="search"]::-webkit-search-decoration {
   -webkit-appearance: none;
   appearance: none;
+}
+
+.carousel-library-card {
+  width: calc((100% - 2 * 1rem) / 3);
+}
+@media (min-width: 768px) {
+  .carousel-library-card {
+    width: calc((100% - 4 * 1rem) / 5);
+  }
+}
+
+.carousel-playing-card {
+  width: calc((100% - 1 * 0.75rem) / 1.3);
+}
+@media (min-width: 768px) {
+  .carousel-playing-card {
+    width: calc((100% - 2 * 0.75rem) / 2.3);
+  }
 }
 
 .scrollbar-none {

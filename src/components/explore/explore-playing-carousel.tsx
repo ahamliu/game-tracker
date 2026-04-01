@@ -62,7 +62,7 @@ export function ExplorePlayingCarousel({ entries }: { entries: PlayingEntry[] })
   if (entries.length === 0) return null;
 
   return (
-    <div>
+    <div className="min-w-0">
       <div className="mb-3 flex items-center justify-between">
         <h2 className="text-[16px] font-bold text-[#646373]">Currently Playing</h2>
         <div className="flex items-center gap-2">
@@ -97,8 +97,7 @@ export function ExplorePlayingCarousel({ entries }: { entries: PlayingEntry[] })
           <Link
             key={e.entryId}
             href={`/library/${e.entryId}`}
-            className="group/card shrink-0"
-            style={{ width: "calc((100% - 2 * 0.75rem) / 2.3)" }}
+            className="group/card carousel-playing-card shrink-0"
             onClick={(ev) => { if (dragState.current.moved) ev.preventDefault(); }}
             draggable={false}
           >

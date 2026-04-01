@@ -228,11 +228,11 @@ export default async function PublicProfilePage({ params }: PageProps) {
 
         {/* Info */}
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-3">
-            <h1 className="font-display text-[32px] text-[#646373]">
+          <div className="flex flex-col md:flex-row md:items-center md:gap-3">
+            <h1 className="font-display text-[24px] text-[#646373] md:text-[32px]">
               {user.displayName}
             </h1>
-            <span className="relative -top-[1px] flex items-center gap-1 text-[14px] text-muted-foreground">
+            <span className="flex items-center gap-1 text-[14px] text-muted-foreground md:relative md:-top-[1px]">
               @{user.handle}
               <CopyProfileUrl handle={user.handle} />
             </span>
@@ -242,10 +242,10 @@ export default async function PublicProfilePage({ params }: PageProps) {
               {user.bio}
             </p>
           )}
-          <div className="mt-3 flex flex-wrap items-center gap-4 text-[13px]">
+          <div className="mt-0.5 flex flex-wrap items-start gap-0.5 text-[13px] md:mt-3 md:gap-4">
             <ProfileFriendCount handle={user.handle} count={friendCount} />
-            <span className="flex items-center gap-1.5 text-muted-foreground">
-              <CalendarBlank size={14} />
+            <span className="flex items-start gap-1.5 whitespace-nowrap text-muted-foreground">
+              <CalendarBlank size={14} className="mt-[2px] shrink-0" />
               Joined {memberSince(user.createdAt)}
             </span>
           </div>
@@ -254,13 +254,21 @@ export default async function PublicProfilePage({ params }: PageProps) {
         {/* Actions */}
         <div className="flex shrink-0 items-center gap-2">
           {isSelf ? (
-            <Link
-              href="/settings"
-              className="flex items-center gap-1.5 rounded-lg border border-border px-4 py-2 font-mono text-[12px] font-semibold uppercase text-[#646373] hover:bg-muted"
-            >
-              <GearSix size={14} weight="bold" />
-              Settings
-            </Link>
+            <>
+              <Link
+                href="/settings"
+                className="hidden items-center gap-1.5 rounded-lg border border-border px-4 py-2 font-mono text-[12px] font-semibold uppercase text-[#646373] hover:bg-muted md:flex"
+              >
+                <GearSix size={14} weight="bold" />
+                Settings
+              </Link>
+              <Link
+                href="/settings"
+                className="flex h-9 w-9 items-center justify-center rounded-lg border border-border text-[#646373] hover:bg-muted md:hidden"
+              >
+                <GearSix size={18} weight="bold" />
+              </Link>
+            </>
           ) : session ? (
             <ProfileFriendButton
               targetUserId={user.id}

@@ -72,7 +72,7 @@ export default async function HomePage({
       {/* Currently Playing + Sidebar */}
       {session?.user?.id && (
         <section className="grid gap-6 lg:grid-cols-[1fr_280px]">
-          <div className="space-y-8">
+          <div className="min-w-0 space-y-8">
             {playing.length > 0 && (
               <ExplorePlayingCarousel entries={playing} />
             )}
@@ -90,7 +90,7 @@ export default async function HomePage({
       {/* Signed-out state */}
       {!session?.user?.id && (
         <section className="grid gap-6 lg:grid-cols-[1fr_280px]">
-          <div className="space-y-8">
+          <div className="min-w-0 space-y-8">
             <SignedOutPlaying sampleGame={rows[0] ? {
               id: rows[0].game.id,
               title: rows[0].game.title,
