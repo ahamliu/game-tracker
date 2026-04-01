@@ -184,7 +184,7 @@ export function AddGameModal({ open, onClose, initialManualTitle }: { open: bool
       <div className="w-full max-w-[520px] overflow-hidden rounded-xl border border-border bg-card shadow-xl">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-border px-5 py-4">
-          <h2 className="text-[16px] font-bold text-[#646373]">Add Game</h2>
+          <h2 className="text-[16px] font-bold text-app-muted">Add Game</h2>
           <button
             type="button"
             onClick={onClose}
@@ -201,7 +201,7 @@ export function AddGameModal({ open, onClose, initialManualTitle }: { open: bool
             className={cn(
               "flex flex-1 items-center justify-center gap-2 py-3 text-[13px] font-medium transition-colors",
               view === "search"
-                ? "border-b-2 border-[#656379] text-[#646373]"
+                ? "border-b-2 border-[#656379] text-app-muted"
                 : "text-muted-foreground hover:text-foreground"
             )}
             onClick={() => setView("search")}
@@ -214,7 +214,7 @@ export function AddGameModal({ open, onClose, initialManualTitle }: { open: bool
             className={cn(
               "flex flex-1 items-center justify-center gap-2 py-3 text-[13px] font-medium transition-colors",
               view === "manual"
-                ? "border-b-2 border-[#656379] text-[#646373]"
+                ? "border-b-2 border-[#656379] text-app-muted"
                 : "text-muted-foreground hover:text-foreground"
             )}
             onClick={() => setView("manual")}
@@ -287,7 +287,7 @@ export function AddGameModal({ open, onClose, initialManualTitle }: { open: bool
                           )}
                         </div>
                         <div className="min-w-0 flex-1">
-                          <p className="truncate text-[14px] font-semibold text-[#646373]">{r.title}</p>
+                          <p className="truncate text-[14px] font-semibold text-app-muted">{r.title}</p>
                           {r.developerName && (
                             <p className="truncate text-[12px] text-muted-foreground">
                               {r.developerName}
@@ -307,7 +307,7 @@ export function AddGameModal({ open, onClose, initialManualTitle }: { open: bool
                                 type="button"
                                 onClick={() => void addGame(r)}
                                 disabled={adding != null}
-                                className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-all hover:bg-[#D4D3DF] hover:text-[#646373] disabled:opacity-40"
+                                className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-all hover:bg-[#D4D3DF] hover:text-app-muted disabled:opacity-40"
                               >
                                 <Plus size={16} weight="bold" />
                               </button>
@@ -333,7 +333,7 @@ export function AddGameModal({ open, onClose, initialManualTitle }: { open: bool
           ) : (
             <div className="space-y-4">
               <div className="space-y-2">
-                <label className="text-[13px] font-medium text-[#646373]">
+                <label className="text-[13px] font-medium text-app-muted">
                   Title <span className="text-[#822B34]">*</span>
                 </label>
                 <Input
@@ -346,7 +346,7 @@ export function AddGameModal({ open, onClose, initialManualTitle }: { open: bool
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-[13px] font-medium text-[#646373]">
+                <label className="text-[13px] font-medium text-app-muted">
                   Cover Image URL <span className="text-[11px] font-normal text-muted-foreground">(optional)</span>
                 </label>
                 <Input

@@ -38,11 +38,11 @@ export function SiteHeader({ session, avatarUrl, unreadCount = 0 }: { session: S
 
   return (
     <>
-      <header className="sticky top-0 z-40 border-b border-border bg-card">
+      <header className="sticky top-0 z-40 bg-card">
         <div className="flex h-[80px] items-center px-4 md:h-[85px]">
           <Link
             href="/"
-            className="shrink-0 font-display text-[20px] uppercase text-[#646373] md:text-[24px]"
+            className="shrink-0 font-display text-[20px] uppercase text-app-muted md:text-[24px]"
           >
             PlayLog
           </Link>
@@ -54,14 +54,14 @@ export function SiteHeader({ session, avatarUrl, unreadCount = 0 }: { session: S
           <nav className="ml-auto flex shrink-0 items-center gap-2">
             <button
               type="button"
-              className="flex h-9 w-9 items-center justify-center rounded-md text-[#646373] hover:bg-muted md:hidden"
+              className="flex h-9 w-9 items-center justify-center rounded-md text-app-muted hover:bg-muted md:hidden"
               onClick={openMobileSearch}
             >
               <MagnifyingGlass size={22} weight="bold" />
             </button>
             <Link
               href="/library"
-              className="flex h-9 w-9 items-center justify-center rounded-md text-[#646373] hover:bg-muted md:hidden"
+              className="flex h-9 w-9 items-center justify-center rounded-md text-app-muted hover:bg-muted md:hidden"
             >
               <BookmarkSimple size={22} weight="fill" />
             </Link>

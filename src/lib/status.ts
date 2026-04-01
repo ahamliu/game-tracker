@@ -14,7 +14,7 @@ const colors: Record<EntryStatus, string> = {
   completed:
     "bg-[#5DAE6E] text-white border border-[#5DAE6E]",
   planning:
-    "bg-[#F4F4F4] text-[#646373] border border-[#E0E0E0]",
+    "bg-[#F4F4F4] text-app-muted border border-[#E0E0E0]",
   dropped:
     "bg-[#EBC6C6] text-[#822B34] border border-[#822B34]",
   on_hold:

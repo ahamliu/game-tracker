@@ -58,6 +58,8 @@ type SortOption = "recent" | "title" | "rating";
 
 const PAGE_SIZE = 20;
 
+const LIBRARY_LAYOUT_KEY = "playlog-library-layout";
+
 export function LibraryContent({
   user,
   entries,
@@ -71,6 +73,7 @@ export function LibraryContent({
   const [statusFilter, setStatusFilter] = useState<EntryStatus | "all">("all");
   const [sort, setSort] = useState<SortOption>("recent");
   const [view, setView] = useState<"card" | "table">("card");
+  const skipLayoutPersist = useRef(true);
   const [statusOpen, setStatusOpen] = useState(false);
   const [sortOpen, setSortOpen] = useState(false);
   const [addModalOpen, setAddModalOpen] = useState(false);
@@ -78,6 +81,27 @@ export function LibraryContent({
   const [page, setPage] = useState(1);
   const statusRef = useRef<HTMLDivElement>(null);
   const sortRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(LIBRARY_LAYOUT_KEY);
+      if (stored === "table" || stored === "card") setView(stored);
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  useEffect(() => {
+    if (skipLayoutPersist.current) {
+      skipLayoutPersist.current = false;
+      return;
+    }
+    try {
+      localStorage.setItem(LIBRARY_LAYOUT_KEY, view);
+    } catch {
+      /* ignore */
+    }
+  }, [view]);
 
   useEffect(() => {
     if (searchParams.get("addGame") === "1") {
@@ -168,7 +192,7 @@ export function LibraryContent({
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="font-display text-[20px] leading-none text-[#646373] md:text-[28px]">
+              <h1 className="font-display text-[20px] leading-none text-app-muted md:text-[28px]">
                 {user.displayName}
               </h1>
               <span className="relative -top-[2px] hidden text-[14px] font-normal text-muted-foreground md:inline">
@@ -196,7 +220,7 @@ export function LibraryContent({
           <div className="relative flex-1">
             <MagnifyingGlass
               size={20}
-              className="absolute left-4 top-1/2 -translate-y-1/2 text-[#646373]"
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-app-muted"
             />
             <Input
               type="search"
@@ -211,7 +235,7 @@ export function LibraryContent({
               type="button"
               onClick={() => setView("card")}
               className={cn(
-                "flex h-9 w-9 items-center justify-center rounded-md text-[#646373]",
+                "flex h-9 w-9 items-center justify-center rounded-md text-app-muted",
                 view === "card" ? "bg-[#D4D3DF]" : "hover:bg-[#E8E8E8]",
               )}
             >
@@ -221,7 +245,7 @@ export function LibraryContent({
               type="button"
               onClick={() => setView("table")}
               className={cn(
-                "flex h-9 w-9 items-center justify-center rounded-md text-[#646373]",
+                "flex h-9 w-9 items-center justify-center rounded-md text-app-muted",
                 view === "table" ? "bg-[#D4D3DF]" : "hover:bg-[#E8E8E8]",
               )}
             >
@@ -351,7 +375,7 @@ export function LibraryContent({
                     )}
                   </div>
                   <div className="flex min-w-0 flex-1 flex-col gap-1.5">
-                    <h3 className="text-[14px] font-bold leading-snug text-[#646373] line-clamp-2">{entry.game.title}</h3>
+                    <h3 className="text-[14px] font-bold leading-snug text-app-muted line-clamp-2">{entry.game.title}</h3>
                     <div className="flex items-center gap-1.5 text-[12px] text-muted-foreground" onClick={(e) => e.stopPropagation()}>
                       <span className="text-muted-foreground">Rating:</span>
                       <RatingDropdown entryId={entry.id} rating={entry.rating} compact />
@@ -379,7 +403,7 @@ export function LibraryContent({
                 <li key={entry.id}>
                   <CardLink
                     href={`/library/${entry.id}`}
-                    className="flex min-h-[150px] gap-4 rounded-[10px] border border-transparent bg-card p-4 select-text transition-all hover:border-[#646373] hover:shadow-[0_1px_1px_0_rgba(0,0,0,0.25)] cursor-pointer"
+                    className="flex min-h-[150px] gap-4 rounded-[10px] border border-transparent bg-card p-4 select-text transition-all hover:border-app-muted hover:shadow-[0_1px_1px_0_rgba(0,0,0,0.25)] cursor-pointer"
                   >
                     <div className="relative h-[118px] w-[90px] shrink-0 overflow-hidden rounded-md bg-muted">
                       {entry.game.coverUrl ? (
@@ -399,7 +423,7 @@ export function LibraryContent({
                     {/* Info */}
                     <div className="flex min-w-0 flex-1 flex-col justify-between py-0.5">
                       <div>
-                        <h3 className="text-[20px] font-semibold leading-tight text-[#646373]">
+                        <h3 className="text-[20px] font-semibold leading-tight text-app-muted">
                           {entry.game.title}
                         </h3>
                         <p className="mt-1 flex items-center gap-2 text-[12px] font-medium uppercase text-muted-foreground">
@@ -443,7 +467,7 @@ export function LibraryContent({
                                     "relative h-[42px] w-[42px] overflow-hidden rounded-full border-2 bg-muted",
                                     r.status === "completed"
                                       ? "border-success"
-                                      : "border-[#646373] grayscale",
+                                      : "border-app-muted grayscale",
                                   )}
                                 >
                                   {r.imageUrl ? (
@@ -531,7 +555,7 @@ export function LibraryContent({
                         </div>
                       )}
                     </div>
-                    <span className="truncate text-[14px] font-medium text-[#646373]">
+                    <span className="truncate text-[14px] font-medium text-app-muted">
                       {entry.game.title}
                     </span>
                   </div>
@@ -570,7 +594,7 @@ export function LibraryContent({
                 type="button"
                 disabled={safePage <= 1}
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
-                className="flex h-9 w-9 items-center justify-center rounded-lg text-[#646373] hover:bg-[#E8E8E8] disabled:pointer-events-none disabled:text-muted-foreground/30 dark:hover:bg-[#2a2a35]"
+                className="flex h-9 w-9 items-center justify-center rounded-lg text-app-muted hover:bg-[#E8E8E8] disabled:pointer-events-none disabled:text-muted-foreground/30 dark:hover:bg-[#2a2a35]"
               >
                 <CaretLeft size={16} weight="bold" />
               </button>
@@ -587,8 +611,8 @@ export function LibraryContent({
                     className={cn(
                       "flex h-9 w-9 items-center justify-center rounded-lg text-[13px] font-medium",
                     p === safePage
-                      ? "bg-[#D4D3DF] text-[#646373]"
-                      : "text-[#646373] hover:bg-[#E8E8E8] dark:hover:bg-[#2a2a35]",
+                      ? "bg-[#D4D3DF] text-app-muted"
+                      : "text-app-muted hover:bg-[#E8E8E8] dark:hover:bg-[#2a2a35]",
                     )}
                   >
                     {p}
@@ -599,7 +623,7 @@ export function LibraryContent({
                 type="button"
                 disabled={safePage >= totalPages}
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                className="flex h-9 w-9 items-center justify-center rounded-lg text-[#646373] hover:bg-[#E8E8E8] disabled:pointer-events-none disabled:text-muted-foreground/30 dark:hover:bg-[#2a2a35]"
+                className="flex h-9 w-9 items-center justify-center rounded-lg text-app-muted hover:bg-[#E8E8E8] disabled:pointer-events-none disabled:text-muted-foreground/30 dark:hover:bg-[#2a2a35]"
               >
                 <CaretRight size={16} weight="bold" />
               </button>

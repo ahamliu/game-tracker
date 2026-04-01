@@ -42,7 +42,7 @@ export function ConfirmDialog({
     >
       <div className="w-full max-w-[380px] rounded-xl border border-border bg-card p-6 shadow-xl">
         <div>
-          <h3 className="text-[15px] font-bold text-[#646373]">{title}</h3>
+          <h3 className="text-[15px] font-bold text-app-muted">{title}</h3>
           <p className="mt-1 text-[13px] leading-relaxed text-muted-foreground">{description}</p>
         </div>
 

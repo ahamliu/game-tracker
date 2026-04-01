@@ -68,7 +68,7 @@ export default async function GamePage({ params }: PageProps) {
 
           <div className="flex min-w-0 flex-1 flex-col justify-between">
             <div>
-              <h1 className="text-[28px] font-bold leading-tight text-[#646373]">
+              <h1 className="text-[28px] font-bold leading-tight text-app-muted">
                 {game.title}
               </h1>
 

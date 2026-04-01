@@ -30,12 +30,12 @@ export function ExploreHomeSidebar({ stats, friendUpdates = [] }: { stats: Profi
   return (
     <div className="space-y-5">
       <div>
-        <h2 className="mb-3 text-[16px] font-bold text-[#646373]">My Statistics</h2>
+        <h2 className="mb-3 text-[16px] font-bold text-app-muted">My Statistics</h2>
         <ProfileStatsSidebar data={stats} compact />
       </div>
 
       <div className="border-t border-border pt-5">
-        <h2 className="text-[16px] font-bold text-[#646373]">Friend Updates</h2>
+        <h2 className="text-[16px] font-bold text-app-muted">Friend Updates</h2>
         {friendUpdates.length === 0 ? (
           <p className="mt-3 text-[12px] text-muted-foreground">
             No friend updates yet.
@@ -67,7 +67,7 @@ export function ExploreHomeSidebar({ stats, friendUpdates = [] }: { stats: Profi
                     )}
                   </Link>
                   <div className="min-w-0 flex-1">
-                    <p className="text-[13px] leading-relaxed text-[#646373]">
+                    <p className="text-[13px] leading-relaxed text-app-muted">
                       <Link href={`/u/${u.userHandle}`} className="font-bold hover:underline">
                         {u.userDisplayName}
                       </Link>{" "}

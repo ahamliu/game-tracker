@@ -243,7 +243,7 @@ export function EntryDetail({
               className="absolute left-0 top-full z-50 mt-2 w-[280px] rounded-lg border border-border bg-card p-3 shadow-xl"
               onClick={(e) => e.stopPropagation()}
             >
-              <p className="mb-2 text-[12px] font-medium text-[#646373]">Cover Image URL</p>
+              <p className="mb-2 text-[12px] font-medium text-app-muted">Cover Image URL</p>
               <Input
                 type="url"
                 placeholder="https://..."
@@ -308,13 +308,13 @@ export function EntryDetail({
                     setEditingTitle(false);
                   }
                 }}
-                className="block w-full border-0 bg-transparent p-0 text-[28px] font-bold leading-tight text-[#646373] outline-none focus:ring-0"
+                className="block w-full border-0 bg-transparent p-0 text-[28px] font-bold leading-tight text-app-muted outline-none focus:ring-0"
                 autoFocus
               />
             ) : (
               <h1
                 className={cn(
-                  "text-[28px] font-bold leading-tight text-[#646373]",
+                  "text-[28px] font-bold leading-tight text-app-muted",
                   initial.game.source === "user" && "group/title"
                 )}
               >
@@ -379,7 +379,7 @@ export function EntryDetail({
       {/* Notes */}
       <section>
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-[16px] font-bold text-[#646373]">Notes</h2>
+          <h2 className="text-[16px] font-bold text-app-muted">Notes</h2>
           {!editingNotes && (
             <button
               type="button"
@@ -433,7 +433,7 @@ export function EntryDetail({
       <section>
         <div className="mb-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <h2 className="text-[16px] font-bold text-[#646373]">
+            <h2 className="text-[16px] font-bold text-app-muted">
               Content
             </h2>
             {routes.length > 0 && (
@@ -618,12 +618,12 @@ function RouteItem({
 
   return (
     <div
-      className="group flex items-start gap-4 rounded-[10px] border border-transparent bg-card p-4 transition-all hover:border-[#646373] hover:shadow-[0_1px_1px_0_rgba(0,0,0,0.25)]"
+      className="group flex items-start gap-4 rounded-[10px] border border-transparent bg-card p-4 transition-all hover:border-app-muted hover:shadow-[0_1px_1px_0_rgba(0,0,0,0.25)]"
     >
       {/* Avatar / image */}
       <div className="relative shrink-0">
         <div
-          className="group/avatar flex h-[75px] w-[75px] cursor-pointer items-center justify-center overflow-hidden rounded-full border-2 border-[#646373] bg-muted transition-colors"
+          className="group/avatar flex h-[75px] w-[75px] cursor-pointer items-center justify-center overflow-hidden rounded-full border-2 border-app-muted bg-muted transition-colors"
           onClick={() => {
             if (!route.imageUrl) {
               setImageInput("");
@@ -681,7 +681,7 @@ function RouteItem({
             className="absolute left-0 top-full z-50 mt-2 w-[260px] rounded-lg border border-border bg-card p-3 shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <p className="mb-2 text-[12px] font-medium text-[#646373]">Image URL</p>
+            <p className="mb-2 text-[12px] font-medium text-app-muted">Image URL</p>
             <Input
               type="url"
               placeholder="https://..."
@@ -853,7 +853,7 @@ function RouteStatusPill({ status, onChange, onRemove }: { status: EntryStatus; 
               key={o.value}
               type="button"
               className={cn(
-                "flex w-full items-center gap-2 px-3 py-1.5 text-left text-[14px] text-[#646373]",
+                "flex w-full items-center gap-2 px-3 py-1.5 text-left text-[14px] text-app-muted",
                 status === o.value ? "bg-muted" : "hover:bg-muted"
               )}
               onClick={() => { onChange(o.value); setOpen(false); }}
@@ -912,7 +912,7 @@ function RouteRating({ value, onChange }: { value: number | null; onChange: (v: 
           <button
             type="button"
             className={cn(
-              "mb-1 block w-full rounded py-1 text-center text-[14px] text-[#646373]",
+              "mb-1 block w-full rounded py-1 text-center text-[14px] text-app-muted",
               value == null ? "bg-muted" : "hover:bg-muted"
             )}
             onClick={() => { onChange(null); setOpen(false); }}
@@ -925,7 +925,7 @@ function RouteRating({ value, onChange }: { value: number | null; onChange: (v: 
                 key={v}
                 type="button"
                 className={cn(
-                  "rounded py-1 text-center text-[14px] text-[#646373]",
+                  "rounded py-1 text-center text-[14px] text-app-muted",
                   value === v ? "bg-muted" : "hover:bg-muted"
                 )}
                 onClick={() => { onChange(v); setOpen(false); }}

@@ -28,7 +28,7 @@ export function ProfileFriendCount({
         onClick={() => setOpen(true)}
         className="flex items-center gap-1.5 hover:underline"
       >
-        <span className="font-bold text-[#646373]">{count}</span>
+        <span className="font-bold text-app-muted">{count}</span>
         <span className="text-muted-foreground">{count === 1 ? "friend" : "friends"}</span>
       </button>
       {open && (
@@ -75,7 +75,7 @@ function FriendsListModal({ handle, onClose }: { handle: string; onClose: () => 
     >
       <div className="w-full max-w-[400px] overflow-hidden rounded-xl border border-border bg-card shadow-xl">
         <div className="flex items-center justify-between border-b border-border px-5 py-4">
-          <h2 className="text-[16px] font-bold text-[#646373]">Friends</h2>
+          <h2 className="text-[16px] font-bold text-app-muted">Friends</h2>
           <button
             type="button"
             onClick={onClose}
@@ -109,7 +109,7 @@ function FriendsListModal({ handle, onClose }: { handle: string; onClose: () => 
                 )}
               </div>
               <div className="min-w-0 flex-1">
-                <p className="truncate text-[14px] font-semibold text-[#646373]">{f.displayName}</p>
+                <p className="truncate text-[14px] font-semibold text-app-muted">{f.displayName}</p>
                 <p className="truncate text-[12px] text-muted-foreground">@{f.handle}</p>
               </div>
             </Link>

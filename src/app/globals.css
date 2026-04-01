@@ -36,6 +36,9 @@
   --status-on-hold-bg: 38 92% 50%;
   --status-on-hold-fg: 0 0% 100%;
   --status-on-hold-border: 38 92% 50%;
+
+  /* Primary UI gray text (#646373); dark mode uses lighter lavender-gray */
+  --app-muted-text: 100 99 115;
 }
 
 .dark {
@@ -44,7 +47,8 @@
   --card: 240 5% 13%;
   --card-foreground: 0 0% 90%;
   --muted: 240 4% 18%;
-  --muted-foreground: 0 0% 55%;
+  /* #8c8c8c */
+  --muted-foreground: 0 0% 54.9%;
   --border: 240 4% 22%;
   --primary: 248 20% 60%;
   --primary-foreground: 0 0% 100%;
@@ -71,6 +75,8 @@
   --status-on-hold-bg: 38 40% 22%;
   --status-on-hold-fg: 38 70% 65%;
   --status-on-hold-border: 38 40% 35%;
+
+  --app-muted-text: 180 177 197;
 }
 
 html {

@@ -131,7 +131,7 @@ export function ProfileAvatar({
           className="absolute left-0 top-full z-50 mt-2 w-[260px] rounded-lg border border-border bg-card p-3 shadow-xl"
           onClick={(e) => e.stopPropagation()}
         >
-          <p className="mb-2 text-[12px] font-medium text-[#646373]">Image URL</p>
+          <p className="mb-2 text-[12px] font-medium text-app-muted">Image URL</p>
           <Input
             type="url"
             placeholder="https://..."

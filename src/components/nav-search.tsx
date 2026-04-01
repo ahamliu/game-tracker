@@ -130,7 +130,7 @@ export function NavSearch({ signedIn = true, autoFocus, onNavigate }: { signedIn
     <div ref={containerRef} className="relative w-full max-w-[520px]" onBlur={handleBlur}>
       <div className="flex items-center">
         <div className="relative flex flex-1 items-center h-[50px] rounded-xl bg-[hsl(var(--muted))] pl-4 pr-1.5">
-          <MagnifyingGlass size={20} className="shrink-0 text-[#646373]" />
+          <MagnifyingGlass size={20} className="shrink-0 text-app-muted" />
           <Input
             ref={inputRef}
             type="search"
@@ -160,7 +160,7 @@ export function NavSearch({ signedIn = true, autoFocus, onNavigate }: { signedIn
           )}
           <button
             type="button"
-            className="h-[38px] shrink-0 rounded-lg bg-[#D4D3DF] px-4 font-mono text-[14px] font-semibold uppercase text-[#646373] hover:opacity-90"
+            className="h-[38px] shrink-0 rounded-lg bg-[#D4D3DF] px-4 font-mono text-[14px] font-semibold uppercase text-app-muted hover:opacity-90"
             onClick={() => void search(q)}
           >
             Search
@@ -216,7 +216,7 @@ export function NavSearch({ signedIn = true, autoFocus, onNavigate }: { signedIn
                     className="min-w-0 flex-1 text-left"
                     onClick={() => viewGame(r)}
                   >
-                    <p className="truncate text-[14px] font-semibold text-[#646373]">{r.title}</p>
+                    <p className="truncate text-[14px] font-semibold text-app-muted">{r.title}</p>
                     {r.developerName && (
                       <p className="truncate text-[12px] text-muted-foreground">{r.developerName}</p>
                     )}
@@ -233,7 +233,7 @@ export function NavSearch({ signedIn = true, autoFocus, onNavigate }: { signedIn
                             type="button"
                             onClick={() => addGame(r)}
                             disabled={loading}
-                            className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-all hover:bg-[#D4D3DF] hover:text-[#646373] disabled:opacity-40"
+                            className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-all hover:bg-[#D4D3DF] hover:text-app-muted disabled:opacity-40"
                           >
                             <Plus size={16} weight="bold" />
                           </button>

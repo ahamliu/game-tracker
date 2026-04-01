@@ -43,7 +43,7 @@ export function ProfileFavorites({
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <h2 className="flex items-center gap-2 text-[16px] font-bold text-[#646373]">
+        <h2 className="flex items-center gap-2 text-[16px] font-bold text-app-muted">
           <Heart size={18} weight="fill" className="text-[#C25450]" />
           Favorites
         </h2>
@@ -73,7 +73,7 @@ export function ProfileFavorites({
                 key={`empty-${i}`}
                 type="button"
                 onClick={() => setEditing(true)}
-                className="flex aspect-[3/4] items-center justify-center rounded-[10px] border border-dashed border-border bg-muted/30 transition-colors hover:border-[#646373] hover:bg-muted/50"
+                className="flex aspect-[3/4] items-center justify-center rounded-[10px] border border-dashed border-border bg-muted/30 transition-colors hover:border-app-muted hover:bg-muted/50"
                 style={{ width: "calc((100% - 4 * 0.75rem) / 5)" }}
               >
                 <Plus size={20} className="text-muted-foreground" />
@@ -115,7 +115,7 @@ function FavoriteCard({ game }: { game: FavoriteGame }) {
         )}
         <div className="absolute inset-0 rounded-[10px] transition-[backdrop-filter] duration-200 group-hover:backdrop-saturate-[1.4] group-hover:backdrop-contrast-[1.05]" />
       </div>
-      <p className="mt-1.5 line-clamp-2 text-[11px] font-medium leading-tight text-[#646373]">
+      <p className="mt-1.5 line-clamp-2 text-[11px] font-medium leading-tight text-app-muted">
         {game.title}
       </p>
     </Link>
@@ -194,7 +194,7 @@ function EditFavoritesModal({
       <div className="w-full max-w-[520px] overflow-hidden rounded-xl border border-border bg-card shadow-xl">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-border px-5 py-4">
-          <h2 className="text-[16px] font-bold text-[#646373]">Edit Favorites</h2>
+          <h2 className="text-[16px] font-bold text-app-muted">Edit Favorites</h2>
           <button
             type="button"
             onClick={onClose}
@@ -227,7 +227,7 @@ function EditFavoritesModal({
                   >
                     <X size={10} weight="bold" />
                   </button>
-                  <p className="mt-1 line-clamp-1 text-[10px] font-medium leading-tight text-[#646373]">
+                  <p className="mt-1 line-clamp-1 text-[10px] font-medium leading-tight text-app-muted">
                     {game.title}
                   </p>
                 </div>
@@ -277,18 +277,18 @@ function EditFavoritesModal({
                       )}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-[14px] font-semibold text-[#646373]">{game.title}</p>
+                      <p className="truncate text-[14px] font-semibold text-app-muted">{game.title}</p>
                       {game.developerName && (
                         <p className="truncate text-[12px] text-muted-foreground">{game.developerName}</p>
                       )}
                     </div>
                     <div className="flex shrink-0 items-center">
                       {isSelected ? (
-                        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#D4D3DF] text-[#646373]">
+                        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#D4D3DF] text-app-muted">
                           <Check size={16} weight="bold" />
                         </span>
                       ) : (
-                        <span className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-all hover:bg-[#D4D3DF] hover:text-[#646373]">
+                        <span className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-all hover:bg-[#D4D3DF] hover:text-app-muted">
                           <Plus size={16} weight="bold" />
                         </span>
                       )}

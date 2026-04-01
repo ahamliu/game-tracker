@@ -30,7 +30,7 @@ export function ExplorePagination({
     <nav className="flex items-center justify-center gap-3 pt-4" aria-label="Pagination">
       {page > 1 ? (
         <Link
-          className="flex h-8 w-8 items-center justify-center rounded-lg text-[#646373] hover:bg-[#E8E8E8] dark:hover:bg-[#2a2a35]"
+          className="flex h-8 w-8 items-center justify-center rounded-lg text-app-muted hover:bg-[#E8E8E8] dark:hover:bg-[#2a2a35]"
           href={hrefFor(page - 1)}
         >
           <CaretLeft size={16} weight="bold" />
@@ -45,7 +45,7 @@ export function ExplorePagination({
       </span>
       {page < totalPages ? (
         <Link
-          className="flex h-8 w-8 items-center justify-center rounded-lg text-[#646373] hover:bg-[#E8E8E8] dark:hover:bg-[#2a2a35]"
+          className="flex h-8 w-8 items-center justify-center rounded-lg text-app-muted hover:bg-[#E8E8E8] dark:hover:bg-[#2a2a35]"
           href={hrefFor(page + 1)}
         >
           <CaretRight size={16} weight="bold" />

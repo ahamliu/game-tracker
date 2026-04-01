@@ -61,7 +61,7 @@ export function RatingDropdown({ entryId, rating, compact }: { entryId: string; 
           <button
             type="button"
             className={cn(
-              "mb-1 block w-full rounded py-1 text-center text-[14px] text-[#646373]",
+              "mb-1 block w-full rounded py-1 text-center text-[14px] text-app-muted",
               optimistic == null ? "bg-muted" : "hover:bg-muted"
             )}
             onClick={(e) => { e.preventDefault(); void updateRating(null); }}
@@ -74,7 +74,7 @@ export function RatingDropdown({ entryId, rating, compact }: { entryId: string; 
                 key={v}
                 type="button"
                 className={cn(
-                  "rounded py-1 text-center text-[14px] text-[#646373]",
+                  "rounded py-1 text-center text-[14px] text-app-muted",
                   optimistic === v ? "bg-muted" : "hover:bg-muted"
                 )}
                 onClick={(e) => { e.preventDefault(); void updateRating(v); }}
@@ -150,7 +150,7 @@ export function StatusDropdown({ entryId, status, gameTitle, showRemove = true, 
               key={o.value}
               type="button"
               className={cn(
-                "flex w-full items-center gap-2 px-3 py-1.5 text-left text-[14px] text-[#646373]",
+                "flex w-full items-center gap-2 px-3 py-1.5 text-left text-[14px] text-app-muted",
                 optimistic === o.value ? "bg-muted" : "hover:bg-muted"
               )}
               onClick={(e) => { e.preventDefault(); void updateStatus(o.value); }}

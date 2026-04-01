@@ -229,7 +229,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
         {/* Info */}
         <div className="min-w-0 flex-1">
           <div className="flex flex-col md:flex-row md:items-center md:gap-3">
-            <h1 className="font-display text-[24px] text-[#646373] md:text-[32px]">
+            <h1 className="font-display text-[24px] text-app-muted md:text-[32px]">
               {user.displayName}
             </h1>
             <span className="flex items-center gap-1 text-[14px] text-muted-foreground md:relative md:-top-[1px]">
@@ -257,14 +257,14 @@ export default async function PublicProfilePage({ params }: PageProps) {
             <>
               <Link
                 href="/settings"
-                className="hidden items-center gap-1.5 rounded-lg border border-border px-4 py-2 font-mono text-[12px] font-semibold uppercase text-[#646373] hover:bg-muted md:flex"
+                className="hidden items-center gap-1.5 rounded-lg border border-border px-4 py-2 font-mono text-[12px] font-semibold uppercase text-app-muted hover:bg-muted md:flex"
               >
                 <GearSix size={14} weight="bold" />
                 Settings
               </Link>
               <Link
                 href="/settings"
-                className="flex h-9 w-9 items-center justify-center rounded-lg border border-border text-[#646373] hover:bg-muted md:hidden"
+                className="flex h-9 w-9 items-center justify-center rounded-lg border border-border text-app-muted hover:bg-muted md:hidden"
               >
                 <GearSix size={18} weight="bold" />
               </Link>
@@ -298,7 +298,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
 
           {/* Recent Activity */}
           <section className="space-y-3">
-            <h2 className="text-[16px] font-bold text-[#646373]">Recent Activity</h2>
+            <h2 className="text-[16px] font-bold text-app-muted">Recent Activity</h2>
             {recentActivity.length === 0 ? (
               <p className="text-[13px] text-muted-foreground">No activity yet.</p>
             ) : (
@@ -322,7 +322,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
                         <GameController size={14} className="text-muted-foreground" />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-[13px] text-[#646373]">
+                        <p className="truncate text-[13px] text-app-muted">
                           <span className="font-medium text-muted-foreground">{label}:</span>{" "}
                           {gameId ? (
                             <Link href={`/games/${gameId}`} className="font-medium hover:underline">
@@ -354,7 +354,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
 
           {/* Last Game Updates */}
           <div className="rounded-[10px] border border-border bg-card p-4">
-            <h3 className="mb-3 text-[14px] font-bold text-[#646373]">Last Updates</h3>
+            <h3 className="mb-3 text-[14px] font-bold text-app-muted">Last Updates</h3>
             {lastUpdates.length === 0 ? (
               <p className="text-[12px] text-muted-foreground">No entries yet.</p>
             ) : (
@@ -390,7 +390,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
                         )}
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-[12px] font-medium leading-snug text-[#646373]">
+                        <p className="truncate text-[12px] font-medium leading-snug text-app-muted">
                           {entry.game.title}
                         </p>
                         <p className="text-[10px] text-muted-foreground">

@@ -77,7 +77,7 @@ export function ProfileFriendButton({
           type="button"
           disabled={busy}
           onClick={() => respondToRequest("decline")}
-          className="flex items-center gap-1.5 rounded-lg border border-border px-4 py-2 font-mono text-[12px] font-semibold uppercase text-[#646373] hover:bg-muted disabled:opacity-50"
+          className="flex items-center gap-1.5 rounded-lg border border-border px-4 py-2 font-mono text-[12px] font-semibold uppercase text-app-muted hover:bg-muted disabled:opacity-50"
         >
           <X size={14} weight="bold" />
           Decline
@@ -105,7 +105,7 @@ export function ProfileFriendButton({
         type="button"
         disabled={busy}
         onClick={unfriend}
-        className="group flex items-center gap-1.5 rounded-lg border border-border bg-card px-4 py-2 font-mono text-[12px] font-semibold uppercase text-[#646373] transition-colors hover:border-[#822B34] hover:bg-[#822B34]/5 hover:text-[#822B34] disabled:opacity-50"
+        className="group flex items-center gap-1.5 rounded-lg border border-border bg-card px-4 py-2 font-mono text-[12px] font-semibold uppercase text-app-muted transition-colors hover:border-[#822B34] hover:bg-[#822B34]/5 hover:text-[#822B34] disabled:opacity-50"
       >
         <UserMinus size={14} weight="bold" className="hidden group-hover:block" />
         <Check size={14} weight="bold" className="block group-hover:hidden" />

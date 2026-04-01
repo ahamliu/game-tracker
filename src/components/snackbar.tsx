@@ -45,7 +45,7 @@ export function Snackbar() {
       {items.map((item) => (
         <div
           key={item.id}
-          className="flex items-center gap-2 rounded-lg bg-[#D4D3DF] px-4 py-3 text-[13px] font-medium text-[#646373] shadow-lg transition-all duration-300 ease-out"
+          className="flex items-center gap-2 rounded-lg bg-[#D4D3DF] px-4 py-3 text-[13px] font-medium text-app-muted shadow-lg transition-all duration-300 ease-out"
           style={{
             opacity: item.phase === "visible" ? 1 : 0,
             transform: item.phase === "entering"

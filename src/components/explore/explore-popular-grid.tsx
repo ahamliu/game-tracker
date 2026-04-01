@@ -59,7 +59,7 @@ export function ExplorePopularGrid({
         return (
           <li key={game.id}>
             <Link href={`/games/${game.id}`} className="group/card block h-full">
-              <article className="relative flex h-full cursor-pointer gap-3 rounded-[10px] border border-transparent bg-card p-3 transition-all hover:border-[#646373] hover:shadow-[0_1px_1px_0_rgba(0,0,0,0.25)]">
+              <article className="relative flex h-full cursor-pointer gap-3 rounded-[10px] border border-transparent bg-card p-3 transition-all hover:border-app-muted hover:shadow-[0_1px_1px_0_rgba(0,0,0,0.25)]">
                 <div className="relative h-24 w-[66px] shrink-0 overflow-hidden rounded-lg bg-muted">
                   {game.coverUrl ? (
                     <Image src={game.coverUrl} alt="" fill className="object-cover" sizes="66px" />
@@ -68,7 +68,7 @@ export function ExplorePopularGrid({
                   )}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <h3 className="text-[16px] font-semibold leading-snug text-[#646373] line-clamp-2">{game.title}</h3>
+                  <h3 className="text-[16px] font-semibold leading-snug text-app-muted line-clamp-2">{game.title}</h3>
                   {game.developerName && (
                     <p className="mt-0.5 truncate text-[10px] font-medium uppercase text-muted-foreground">
                       {game.developerName}
@@ -90,7 +90,7 @@ export function ExplorePopularGrid({
 
                 <div className="absolute bottom-2 right-2 flex shrink-0 items-center opacity-0 transition-opacity group-hover/card:opacity-100">
                   {inLibrary ? (
-                    <span className="rounded-md bg-[#D4D3DF] px-2 py-0.5 text-[11px] font-medium text-[#646373]">
+                    <span className="rounded-md bg-[#D4D3DF] px-2 py-0.5 text-[11px] font-medium text-app-muted">
                       Added
                     </span>
                   ) : (
@@ -107,7 +107,7 @@ export function ExplorePopularGrid({
                           addGame(game.id, game.title, e);
                         }}
                         disabled={isLoading}
-                        className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#D4D3DF] text-[#646373] transition-all hover:opacity-80 disabled:opacity-40"
+                        className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#D4D3DF] text-app-muted transition-all hover:opacity-80 disabled:opacity-40"
                       >
                         {isLoading ? (
                           <CircleNotch size={14} className="animate-spin" />

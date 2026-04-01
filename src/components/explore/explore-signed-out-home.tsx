@@ -32,7 +32,7 @@ function RealPlayingCard({ game }: { game: SampleGame }) {
             )}
           </div>
           <div className="flex min-w-0 flex-1 flex-col">
-            <h3 className="text-[16px] font-semibold leading-snug text-[#646373] line-clamp-2">{game.title}</h3>
+            <h3 className="text-[16px] font-semibold leading-snug text-app-muted line-clamp-2">{game.title}</h3>
             {game.notes && (
               <p className="mt-1 line-clamp-2 text-[11px] leading-snug text-muted-foreground">{game.notes}</p>
             )}
@@ -43,7 +43,7 @@ function RealPlayingCard({ game }: { game: SampleGame }) {
                     <div
                       className={cn(
                         "relative h-[32px] w-[32px] overflow-hidden rounded-full border-2 bg-muted",
-                        r.cleared ? "border-success" : "border-[#646373] grayscale",
+                        r.cleared ? "border-success" : "border-app-muted grayscale",
                       )}
                     >
                       {r.imageUrl ? (
@@ -107,7 +107,7 @@ function RealLibraryCard({ game }: { game: SampleGame }) {
             <div className="flex h-full items-center justify-center text-[10px] text-muted-foreground">No cover</div>
           )}
         </div>
-        <p className="mt-1 line-clamp-2 text-center text-[14px] font-semibold leading-tight text-[#646373]">{game.title}</p>
+        <p className="mt-1 line-clamp-2 text-center text-[14px] font-semibold leading-tight text-app-muted">{game.title}</p>
       </Link>
     </div>
   );
@@ -127,7 +127,7 @@ export function SignedOutPlaying({ sampleGame }: { sampleGame?: SampleGame }) {
   return (
     <div>
       <div className="mb-3 flex items-center gap-3">
-        <h2 className="text-[16px] font-bold text-[#646373]">Currently Playing</h2>
+        <h2 className="text-[16px] font-bold text-app-muted">Currently Playing</h2>
         <span className="text-[12px] text-muted-foreground">Your active games will appear here</span>
       </div>
       <div className="relative">
@@ -147,7 +147,7 @@ export function SignedOutPlaying({ sampleGame }: { sampleGame?: SampleGame }) {
             </Link>
             <Link
               href="/register"
-              className="rounded-lg border border-border bg-white px-5 py-2 font-mono text-[12px] font-semibold uppercase text-[#646373] shadow-md hover:bg-muted dark:bg-card"
+              className="rounded-lg border border-border bg-white px-5 py-2 font-mono text-[12px] font-semibold uppercase text-app-muted shadow-md hover:bg-muted dark:bg-card"
             >
               Register
             </Link>
@@ -163,7 +163,7 @@ export function SignedOutLibrary({ sampleGame }: { sampleGame?: SampleGame }) {
     <div>
       <div className="mb-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <h2 className="text-[16px] font-bold text-[#646373]">My Library</h2>
+          <h2 className="text-[16px] font-bold text-app-muted">My Library</h2>
           <span className="text-[12px] text-muted-foreground">Your collection will appear here</span>
         </div>
         <div className="flex items-center gap-2">
@@ -189,14 +189,14 @@ export function SignedOutSidebar() {
   return (
     <div className="space-y-5">
       <div>
-        <h2 className="text-[16px] font-bold text-[#646373]">My Statistics</h2>
+        <h2 className="text-[16px] font-bold text-app-muted">My Statistics</h2>
         <p className="mt-3 text-[12px] text-muted-foreground">
           Your stats will appear here
         </p>
       </div>
 
       <div className="border-t border-border pt-5">
-        <h2 className="text-[16px] font-bold text-[#646373]">Friend Updates</h2>
+        <h2 className="text-[16px] font-bold text-app-muted">Friend Updates</h2>
         <p className="mt-3 text-[12px] text-muted-foreground">
           Your friend activity will appear here
         </p>

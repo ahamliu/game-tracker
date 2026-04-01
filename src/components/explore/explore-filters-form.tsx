@@ -85,7 +85,7 @@ export function ExploreFiltersForm({
       <div className="relative">
         <MagnifyingGlass
           size={20}
-          className="absolute left-4 top-1/2 -translate-y-1/2 text-[#646373]"
+          className="absolute left-4 top-1/2 -translate-y-1/2 text-app-muted"
         />
         <Input
           type="search"
@@ -145,7 +145,7 @@ export function ExploreFiltersForm({
                       <button
                         key={g.id}
                         type="button"
-                        className={`flex w-full items-start gap-2 px-3 py-1.5 text-left text-[14px] text-[#646373] hover:bg-muted ${
+                        className={`flex w-full items-start gap-2 px-3 py-1.5 text-left text-[14px] text-app-muted hover:bg-muted ${
                           active ? "bg-muted font-medium" : ""
                         }`}
                         onClick={() => handleGenreToggle(g.id)}
@@ -181,7 +181,7 @@ export function ExploreFiltersForm({
                   <button
                     key={o.value}
                     type="button"
-                    className={`flex w-full items-center px-3 py-1.5 text-[14px] text-[#646373] hover:bg-muted ${
+                    className={`flex w-full items-center px-3 py-1.5 text-[14px] text-app-muted hover:bg-muted ${
                       sort === o.value ? "bg-muted font-medium" : ""
                     }`}
                     onClick={() => handleSortChange(o.value)}

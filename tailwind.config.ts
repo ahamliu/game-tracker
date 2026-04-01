@@ -43,6 +43,8 @@ const config: Config = {
           DEFAULT: "hsl(var(--success))",
           foreground: "hsl(var(--success-foreground))",
         },
+        /** Matches legacy #646373 in light; rgb(180 177 197) in dark via CSS variable */
+        "app-muted": "rgb(var(--app-muted-text) / <alpha-value>)",
       },
       borderRadius: {
         lg: "var(--radius)",

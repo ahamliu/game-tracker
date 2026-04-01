@@ -117,7 +117,7 @@ export function NotificationBell({ initialUnread }: { initialUnread: number }) {
       <button
         type="button"
         onClick={handleOpen}
-        className="relative flex h-9 w-9 items-center justify-center rounded-full text-[#646373] hover:bg-muted"
+        className="relative flex h-9 w-9 items-center justify-center rounded-full text-app-muted hover:bg-muted"
       >
         <Bell size={22} weight="fill" />
         {unread > 0 && (
@@ -130,7 +130,7 @@ export function NotificationBell({ initialUnread }: { initialUnread: number }) {
       {open && (
         <div className="absolute right-0 top-full z-50 mt-1.5 w-[340px] rounded-xl border border-border bg-card shadow-lg">
           <div className="border-b border-border px-4 py-3">
-            <h3 className="text-[13px] font-bold text-[#646373]">Notifications</h3>
+            <h3 className="text-[13px] font-bold text-app-muted">Notifications</h3>
           </div>
 
           <div className="max-h-[360px] overflow-y-auto">
@@ -157,7 +157,7 @@ export function NotificationBell({ initialUnread }: { initialUnread: number }) {
                 </Link>
 
                 <div className="min-w-0 flex-1">
-                  <p className="text-[14px] leading-relaxed text-[#646373]">
+                  <p className="text-[14px] leading-relaxed text-app-muted">
                     <Link
                       href={n.senderHandle ? `/u/${n.senderHandle}` : "#"}
                       className="font-bold hover:underline"
@@ -187,7 +187,7 @@ export function NotificationBell({ initialUnread }: { initialUnread: number }) {
                         type="button"
                         disabled={actionLoading === n.referenceId}
                         onClick={() => handleAction(n.referenceId!, "decline")}
-                        className="flex items-center gap-1 rounded-md border border-border px-3 py-1 text-[11px] font-semibold text-[#646373] hover:bg-muted disabled:opacity-50"
+                        className="flex items-center gap-1 rounded-md border border-border px-3 py-1 text-[11px] font-semibold text-app-muted hover:bg-muted disabled:opacity-50"
                       >
                         <X size={12} weight="bold" />
                         Decline

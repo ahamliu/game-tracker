@@ -21,7 +21,7 @@ export function ExploreRecentlyAdded({ entries }: { entries: RecentEntry[] }) {
 
   return (
     <div>
-      <h2 className="mb-3 text-[16px] font-bold text-[#646373]">Recently Added</h2>
+      <h2 className="mb-3 text-[16px] font-bold text-app-muted">Recently Added</h2>
       <div className="space-y-1">
         {entries.map((e) => (
           <Link
@@ -42,7 +42,7 @@ export function ExploreRecentlyAdded({ entries }: { entries: RecentEntry[] }) {
                   {e.developerName}
                 </p>
               )}
-              <p className="truncate text-[13px] font-semibold text-[#646373] leading-snug">
+              <p className="truncate text-[13px] font-semibold text-app-muted leading-snug">
                 {e.title}
               </p>
               <p className="text-[11px] text-muted-foreground">

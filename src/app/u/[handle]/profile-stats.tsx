@@ -46,7 +46,7 @@ export function ProfileStats({ data }: { data: ProfileStatsData }) {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-[16px] font-bold text-[#646373]">Game Statistics</h2>
+      <h2 className="text-[16px] font-bold text-app-muted">Game Statistics</h2>
 
       {/* Colored proportional bar */}
       {totalEntries > 0 ? (
@@ -80,7 +80,7 @@ export function ProfileStats({ data }: { data: ProfileStatsData }) {
                 />
                 <span className="text-muted-foreground">{STATUS_LABELS[s]}</span>
               </span>
-              <span className="font-medium text-[#646373]">{statusCounts[s] ?? 0}</span>
+              <span className="font-medium text-app-muted">{statusCounts[s] ?? 0}</span>
             </div>
           ))}
         </div>
@@ -104,7 +104,7 @@ function StatRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between text-[13px]">
       <span className="text-muted-foreground">{label}</span>
-      <span className="font-medium text-[#646373]">{value}</span>
+      <span className="font-medium text-app-muted">{value}</span>
     </div>
   );
 }
@@ -121,8 +121,8 @@ export function ProfileStatsSidebar({ data, compact }: { data: ProfileStatsData;
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <h3 className="text-[14px] font-bold text-[#646373]">Game Stats</h3>
-        <span className="text-[13px] text-muted-foreground"><span className="font-bold text-[#646373]">{totalEntries}</span> total</span>
+        <h3 className="text-[14px] font-bold text-app-muted">Game Stats</h3>
+        <span className="text-[13px] text-muted-foreground"><span className="font-bold text-app-muted">{totalEntries}</span> total</span>
       </div>
 
       {totalEntries > 0 ? (
@@ -153,7 +153,7 @@ export function ProfileStatsSidebar({ data, compact }: { data: ProfileStatsData;
               />
               <span className="text-muted-foreground">{STATUS_LABELS[s]}</span>
             </span>
-            <span className="font-medium text-[#646373]">{statusCounts[s] ?? 0}</span>
+            <span className="font-medium text-app-muted">{statusCounts[s] ?? 0}</span>
           </div>
         ))}
       </div>
@@ -162,7 +162,7 @@ export function ProfileStatsSidebar({ data, compact }: { data: ProfileStatsData;
         <div className="border-t border-border pt-2">
           <div className="flex items-center justify-between text-[12px]">
             <span className="text-muted-foreground">Total Games</span>
-            <span className="font-bold text-[#646373]">{totalEntries}</span>
+            <span className="font-bold text-app-muted">{totalEntries}</span>
           </div>
         </div>
       )}

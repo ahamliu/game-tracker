@@ -37,10 +37,9 @@ export function AppSidebar({ handle, avatar }: { handle: string; avatar: string 
               className={cn(
                 "flex h-10 items-center gap-2 rounded px-2 text-[16px] font-medium transition-colors",
                 active
-                  ? "bg-[hsl(var(--muted))] text-foreground"
-                  : "text-muted-foreground hover:bg-[hsl(var(--muted))] hover:text-foreground"
+                  ? "bg-[hsl(var(--muted))] text-muted-foreground dark:text-app-muted"
+                  : "text-muted-foreground hover:bg-[hsl(var(--muted))] dark:text-app-muted"
               )}
-              style={{ color: "hsl(249,1%,42%)" }}
             >
               <item.icon size={22} weight="fill" />
               {item.label}
@@ -55,10 +54,9 @@ export function AppSidebar({ handle, avatar }: { handle: string; avatar: string 
           className={cn(
             "flex h-10 items-center gap-2 rounded px-2 text-[16px] font-medium transition-colors",
             profileActive
-              ? "bg-[hsl(var(--muted))] text-foreground"
-              : "text-muted-foreground hover:bg-[hsl(var(--muted))] hover:text-foreground"
+              ? "bg-[hsl(var(--muted))] text-muted-foreground dark:text-app-muted"
+              : "text-muted-foreground hover:bg-[hsl(var(--muted))] dark:text-app-muted"
           )}
-          style={{ color: "hsl(249,1%,42%)" }}
         >
           <div className="relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#656379]">
             {avatar ? (

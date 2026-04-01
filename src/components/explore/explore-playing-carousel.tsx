@@ -64,13 +64,13 @@ export function ExplorePlayingCarousel({ entries }: { entries: PlayingEntry[] })
   return (
     <div className="min-w-0">
       <div className="mb-3 flex items-center justify-between">
-        <h2 className="text-[16px] font-bold text-[#646373]">Currently Playing</h2>
+        <h2 className="text-[16px] font-bold text-app-muted">Currently Playing</h2>
         <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={() => scroll("left")}
             disabled={!canScrollLeft}
-            className="flex h-7 w-7 items-center justify-center rounded-md text-[#646373] hover:bg-[#E8E8E8] disabled:pointer-events-none disabled:text-muted-foreground/30 dark:hover:bg-[#2a2a35]"
+            className="flex h-7 w-7 items-center justify-center rounded-md text-app-muted hover:bg-[#E8E8E8] disabled:pointer-events-none disabled:text-muted-foreground/30 dark:hover:bg-[#2a2a35]"
           >
             <CaretLeft size={14} weight="bold" />
           </button>
@@ -78,7 +78,7 @@ export function ExplorePlayingCarousel({ entries }: { entries: PlayingEntry[] })
             type="button"
             onClick={() => scroll("right")}
             disabled={!canScrollRight}
-            className="flex h-7 w-7 items-center justify-center rounded-md text-[#646373] hover:bg-[#E8E8E8] disabled:pointer-events-none disabled:text-muted-foreground/30 dark:hover:bg-[#2a2a35]"
+            className="flex h-7 w-7 items-center justify-center rounded-md text-app-muted hover:bg-[#E8E8E8] disabled:pointer-events-none disabled:text-muted-foreground/30 dark:hover:bg-[#2a2a35]"
           >
             <CaretRight size={14} weight="bold" />
           </button>
@@ -101,7 +101,7 @@ export function ExplorePlayingCarousel({ entries }: { entries: PlayingEntry[] })
             onClick={(ev) => { if (dragState.current.moved) ev.preventDefault(); }}
             draggable={false}
           >
-            <article className="flex h-full gap-3 rounded-[10px] border border-transparent bg-card p-3 transition-all hover:border-[#646373] hover:shadow-[0_1px_1px_0_rgba(0,0,0,0.25)]">
+            <article className="flex h-full gap-3 rounded-[10px] border border-transparent bg-card p-3 transition-all hover:border-app-muted hover:shadow-[0_1px_1px_0_rgba(0,0,0,0.25)]">
               <div className="relative h-28 w-[78px] shrink-0 overflow-hidden rounded-lg bg-muted">
                 {e.coverUrl ? (
                   <Image src={e.coverUrl} alt="" fill className="pointer-events-none object-cover" sizes="78px" draggable={false} />
@@ -110,7 +110,7 @@ export function ExplorePlayingCarousel({ entries }: { entries: PlayingEntry[] })
                 )}
               </div>
               <div className="flex min-w-0 flex-1 flex-col">
-                <h3 className="text-[16px] font-semibold leading-snug text-[#646373] line-clamp-2">{e.title}</h3>
+                <h3 className="text-[16px] font-semibold leading-snug text-app-muted line-clamp-2">{e.title}</h3>
                 {e.notes && (
                   <p className="mt-1 line-clamp-2 text-[11px] leading-snug text-muted-foreground">
                     {e.notes}
@@ -125,7 +125,7 @@ export function ExplorePlayingCarousel({ entries }: { entries: PlayingEntry[] })
                             "relative h-[32px] w-[32px] overflow-hidden rounded-full border-2 bg-muted",
                             r.cleared
                               ? "border-success"
-                              : "border-[#646373] grayscale",
+                              : "border-app-muted grayscale",
                           )}
                         >
                           {r.imageUrl ? (

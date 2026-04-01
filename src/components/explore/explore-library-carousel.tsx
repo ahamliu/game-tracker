@@ -72,13 +72,13 @@ export function ExploreLibraryCarousel({ entries }: { entries: CarouselEntry[] }
   return (
     <div className="min-w-0">
       <div className="mb-3 flex items-center justify-between">
-        <h2 className="text-[16px] font-bold text-[#646373]">My Library</h2>
+        <h2 className="text-[16px] font-bold text-app-muted">My Library</h2>
         <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={() => scroll("left")}
             disabled={!canScrollLeft}
-            className="flex h-7 w-7 items-center justify-center rounded-md text-[#646373] hover:bg-[#E8E8E8] disabled:pointer-events-none disabled:text-muted-foreground/30 dark:hover:bg-[#2a2a35]"
+            className="flex h-7 w-7 items-center justify-center rounded-md text-app-muted hover:bg-[#E8E8E8] disabled:pointer-events-none disabled:text-muted-foreground/30 dark:hover:bg-[#2a2a35]"
           >
             <CaretLeft size={14} weight="bold" />
           </button>
@@ -86,7 +86,7 @@ export function ExploreLibraryCarousel({ entries }: { entries: CarouselEntry[] }
             type="button"
             onClick={() => scroll("right")}
             disabled={!canScrollRight}
-            className="flex h-7 w-7 items-center justify-center rounded-md text-[#646373] hover:bg-[#E8E8E8] disabled:pointer-events-none disabled:text-muted-foreground/30 dark:hover:bg-[#2a2a35]"
+            className="flex h-7 w-7 items-center justify-center rounded-md text-app-muted hover:bg-[#E8E8E8] disabled:pointer-events-none disabled:text-muted-foreground/30 dark:hover:bg-[#2a2a35]"
           >
             <CaretRight size={14} weight="bold" />
           </button>
@@ -129,7 +129,7 @@ export function ExploreLibraryCarousel({ entries }: { entries: CarouselEntry[] }
               )}
               <div className="absolute inset-0 rounded-[10px] transition-[backdrop-filter] duration-200 group-hover/card:backdrop-saturate-[1.4] group-hover/card:backdrop-contrast-[1.05]" />
             </div>
-            <p className="mt-1 line-clamp-2 text-center text-[15px] font-semibold leading-tight text-[#646373]">{e.title}</p>
+            <p className="mt-1 line-clamp-2 text-center text-[15px] font-semibold leading-tight text-app-muted">{e.title}</p>
           </Link>
         ))}
       </div>
