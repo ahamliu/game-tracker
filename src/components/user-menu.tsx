@@ -41,6 +41,13 @@ export function UserMenu({
       {open && (
         <div className="absolute right-0 top-full z-50 mt-1 w-36 rounded-lg border border-border bg-card py-1">
           <Link
+            href="/library"
+            className="block px-3 py-1.5 text-[12px] text-[#646373] hover:bg-muted"
+            onClick={() => setOpen(false)}
+          >
+            My Library
+          </Link>
+          <Link
             href={`/u/${user.handle}`}
             className="block px-3 py-1.5 text-[12px] text-[#646373] hover:bg-muted"
             onClick={() => setOpen(false)}
@@ -59,7 +66,7 @@ export function UserMenu({
             className="block w-full px-3 py-1.5 text-left text-[12px] text-[#646373] hover:bg-muted"
             onClick={() => signOut({ callbackUrl: "/" })}
           >
-            Sign out
+            Sign Out
           </button>
         </div>
       )}

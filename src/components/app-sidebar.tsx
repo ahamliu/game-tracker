@@ -14,7 +14,7 @@ type NavItem = {
 
 const navItems: NavItem[] = [
   { label: "Home", href: "/", icon: GameController },
-  { label: "Library", href: "/library", icon: BookmarkSimple },
+  { label: "My Library", href: "/library", icon: BookmarkSimple },
 ];
 
 export function AppSidebar({ handle, avatar }: { handle: string; avatar: string | null }) {
