@@ -32,7 +32,7 @@ export async function getCarouselForUser(userId: string): Promise<CarouselEntry[
         orderBy: (r, { asc: a }) => [a(r.sortOrder), a(r.createdAt)],
       },
     },
-    orderBy: [desc(libraryEntries.updatedAt)],
+    orderBy: [desc(libraryEntries.createdAt)],
     limit: 24,
   });
 
