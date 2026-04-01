@@ -105,7 +105,7 @@ export function ExploreFiltersForm({
         )}
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-4 text-[14px]">
+      <div className="flex flex-wrap items-center gap-4 text-[14px] md:justify-between">
         <p className="font-normal text-muted-foreground">
           {total} {total === 1 ? "item" : "items"}
         </p>
@@ -116,7 +116,7 @@ export function ExploreFiltersForm({
               <button
                 type="button"
                 onClick={() => setGenresOpen(!genresOpen)}
-                className="flex h-[36px] min-w-[200px] max-w-[200px] items-center gap-1.5 rounded-lg px-3 text-[14px] text-[#8B8B8B]"
+                className="flex h-[36px] min-w-[200px] max-w-[200px] items-center gap-1.5 rounded-lg pl-0 pr-3 text-[14px] text-[#8B8B8B] md:pl-3"
               >
                 <span className="shrink-0">Genre:</span>
                 <span className="min-w-0 flex-1 truncate text-left">

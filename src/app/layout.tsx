@@ -63,7 +63,7 @@ export default async function RootLayout({
           <SiteHeader session={session} avatarUrl={avatarUrl} unreadCount={unreadCount} />
           <div className="flex">
             {session && <AppSidebar handle={session.user.handle} avatar={avatarUrl} />}
-            <main className="min-h-[calc(100vh-85px)] flex-1 overflow-y-auto px-6 pt-6 pb-[42px]">{children}</main>
+            <main className="min-h-[calc(100vh-80px)] flex-1 overflow-y-auto px-4 pt-4 pb-[42px] md:min-h-[calc(100vh-85px)] md:px-6 md:pt-6">{children}</main>
           </div>
           <Snackbar />
         </Providers>

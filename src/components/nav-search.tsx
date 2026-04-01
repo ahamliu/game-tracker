@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { MagnifyingGlass, X, Plus, PencilSimpleLine } from "@phosphor-icons/react";
 import { Input } from "@/components/ui/input";
 import type { EntryStatus } from "@/lib/status";
@@ -27,7 +27,7 @@ async function readJsonBody(res: Response): Promise<unknown> {
   }
 }
 
-export function NavSearch({ signedIn = true }: { signedIn?: boolean }) {
+export function NavSearch({ signedIn = true, autoFocus, onNavigate }: { signedIn?: boolean; autoFocus?: boolean; onNavigate?: () => void }) {
   const router = useRouter();
   const [q, setQ] = useState("");
   const [loading, setLoading] = useState(false);
@@ -36,6 +36,10 @@ export function NavSearch({ signedIn = true }: { signedIn?: boolean }) {
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (autoFocus) setTimeout(() => inputRef.current?.focus(), 50);
+  }, [autoFocus]);
 
   const search = useCallback(async (query: string) => {
     if (query.trim().length < 2) {
@@ -82,6 +86,7 @@ export function NavSearch({ signedIn = true }: { signedIn?: boolean }) {
         setQ("");
         setResults([]);
         setOpen(false);
+        onNavigate?.();
         router.push(`/library/${data.error.entryId}`);
         return;
       }
@@ -93,6 +98,7 @@ export function NavSearch({ signedIn = true }: { signedIn?: boolean }) {
         setQ("");
         setResults([]);
         setOpen(false);
+        onNavigate?.();
         router.refresh();
         router.push(`/library/${data.entry.id}`);
       }
@@ -106,6 +112,7 @@ export function NavSearch({ signedIn = true }: { signedIn?: boolean }) {
     setQ("");
     setResults([]);
     setOpen(false);
+    onNavigate?.();
     if (hit.kind === "local") {
       router.push(`/games/${hit.id}`);
     } else if (hit.igdbId != null) {
@@ -180,6 +187,7 @@ export function NavSearch({ signedIn = true }: { signedIn?: boolean }) {
                     setQ("");
                     setResults([]);
                     setOpen(false);
+                    onNavigate?.();
                     router.push(`/library?addGame=1&title=${encodeURIComponent(q)}`);
                   }}
                 >

@@ -42,7 +42,7 @@ export function AppSidebar({ handle, avatar }: { handle: string; avatar: string 
               )}
               style={{ color: "hsl(249,1%,42%)" }}
             >
-              <item.icon size={20} />
+              <item.icon size={22} weight="fill" />
               {item.label}
             </Link>
           );
