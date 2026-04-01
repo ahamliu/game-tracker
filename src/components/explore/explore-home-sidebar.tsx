@@ -67,7 +67,7 @@ export function ExploreHomeSidebar({ stats, friendUpdates = [] }: { stats: Profi
                     )}
                   </Link>
                   <div className="min-w-0 flex-1">
-                    <p className="text-[11px] leading-relaxed text-[#646373]">
+                    <p className="text-[13px] leading-relaxed text-[#646373]">
                       <Link href={`/u/${u.userHandle}`} className="font-bold hover:underline">
                         {u.userDisplayName}
                       </Link>{" "}

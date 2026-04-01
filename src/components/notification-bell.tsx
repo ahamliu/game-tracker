@@ -135,11 +135,11 @@ export function NotificationBell({ initialUnread }: { initialUnread: number }) {
 
           <div className="max-h-[360px] overflow-y-auto">
             {loading && items.length === 0 && (
-              <p className="px-4 py-6 text-center text-[12px] text-muted-foreground">Loading...</p>
+              <p className="px-4 py-6 text-center text-[14px] text-muted-foreground">Loading...</p>
             )}
 
             {!loading && items.length === 0 && (
-              <p className="px-4 py-6 text-center text-[12px] text-muted-foreground">No notifications yet</p>
+              <p className="px-4 py-6 text-center text-[14px] text-muted-foreground">No notifications yet</p>
             )}
 
             {items.map((n) => (
@@ -157,7 +157,7 @@ export function NotificationBell({ initialUnread }: { initialUnread: number }) {
                 </Link>
 
                 <div className="min-w-0 flex-1">
-                  <p className="text-[12px] leading-relaxed text-[#646373]">
+                  <p className="text-[14px] leading-relaxed text-[#646373]">
                     <Link
                       href={n.senderHandle ? `/u/${n.senderHandle}` : "#"}
                       className="font-bold hover:underline"

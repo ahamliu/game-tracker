@@ -133,7 +133,7 @@ export function ExploreFiltersForm({
                   {selectedGenres.length > 0 && (
                     <button
                       type="button"
-                      className="flex w-full items-center px-3 py-1.5 text-[12px] text-muted-foreground hover:bg-muted"
+                      className="flex w-full items-center px-3 py-1.5 text-[14px] text-muted-foreground hover:bg-muted"
                       onClick={() => { setSelectedGenres([]); navigate(q, sort, []); }}
                     >
                       Clear all
@@ -145,7 +145,7 @@ export function ExploreFiltersForm({
                       <button
                         key={g.id}
                         type="button"
-                        className={`flex w-full items-start gap-2 px-3 py-1.5 text-left text-[12px] text-[#646373] hover:bg-muted ${
+                        className={`flex w-full items-start gap-2 px-3 py-1.5 text-left text-[14px] text-[#646373] hover:bg-muted ${
                           active ? "bg-muted font-medium" : ""
                         }`}
                         onClick={() => handleGenreToggle(g.id)}
@@ -181,7 +181,7 @@ export function ExploreFiltersForm({
                   <button
                     key={o.value}
                     type="button"
-                    className={`flex w-full items-center px-3 py-1.5 text-[12px] text-[#646373] hover:bg-muted ${
+                    className={`flex w-full items-center px-3 py-1.5 text-[14px] text-[#646373] hover:bg-muted ${
                       sort === o.value ? "bg-muted font-medium" : ""
                     }`}
                     onClick={() => handleSortChange(o.value)}

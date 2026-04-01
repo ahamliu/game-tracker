@@ -258,7 +258,7 @@ export function LibraryContent({
                       key={o.value}
                       type="button"
                       className={cn(
-                        "block w-full px-3 py-1.5 text-left text-[12px] text-foreground",
+                        "block w-full px-3 py-1.5 text-left text-[14px] text-foreground",
                         statusFilter === o.value
                           ? "bg-muted"
                           : "hover:bg-muted",
@@ -306,7 +306,7 @@ export function LibraryContent({
                       key={o.value}
                       type="button"
                       className={cn(
-                        "block w-full px-3 py-1.5 text-left text-[12px] text-foreground",
+                        "block w-full px-3 py-1.5 text-left text-[14px] text-foreground",
                         sort === o.value ? "bg-muted" : "hover:bg-muted",
                       )}
                       onClick={() => {
@@ -399,7 +399,7 @@ export function LibraryContent({
                     {/* Info */}
                     <div className="flex min-w-0 flex-1 flex-col justify-between py-0.5">
                       <div>
-                        <h3 className="text-[20px] font-bold leading-tight text-[#646373]">
+                        <h3 className="text-[20px] font-semibold leading-tight text-[#646373]">
                           {entry.game.title}
                         </h3>
                         <p className="mt-1 flex items-center gap-2 text-[12px] font-medium uppercase text-muted-foreground">

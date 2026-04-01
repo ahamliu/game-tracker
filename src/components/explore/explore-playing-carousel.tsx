@@ -110,7 +110,7 @@ export function ExplorePlayingCarousel({ entries }: { entries: PlayingEntry[] })
                 )}
               </div>
               <div className="flex min-w-0 flex-1 flex-col">
-                <h3 className="text-[13px] font-bold leading-snug text-[#646373] line-clamp-2">{e.title}</h3>
+                <h3 className="text-[16px] font-semibold leading-snug text-[#646373] line-clamp-2">{e.title}</h3>
                 {e.notes && (
                   <p className="mt-1 line-clamp-2 text-[11px] leading-snug text-muted-foreground">
                     {e.notes}

@@ -68,7 +68,7 @@ export function ExplorePopularGrid({
                   )}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <h3 className="text-[13px] font-bold leading-snug text-[#646373] line-clamp-2">{game.title}</h3>
+                  <h3 className="text-[16px] font-semibold leading-snug text-[#646373] line-clamp-2">{game.title}</h3>
                   {game.developerName && (
                     <p className="mt-0.5 truncate text-[10px] font-medium uppercase text-muted-foreground">
                       {game.developerName}

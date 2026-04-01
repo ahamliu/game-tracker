@@ -129,7 +129,7 @@ export function ExploreLibraryCarousel({ entries }: { entries: CarouselEntry[] }
               )}
               <div className="absolute inset-0 rounded-[10px] transition-[backdrop-filter] duration-200 group-hover/card:backdrop-saturate-[1.4] group-hover/card:backdrop-contrast-[1.05]" />
             </div>
-            <p className="mt-1 line-clamp-2 text-center text-[14px] font-semibold leading-tight text-[#646373]">{e.title}</p>
+            <p className="mt-1 line-clamp-2 text-center text-[15px] font-semibold leading-tight text-[#646373]">{e.title}</p>
           </Link>
         ))}
       </div>

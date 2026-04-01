@@ -853,7 +853,7 @@ function RouteStatusPill({ status, onChange, onRemove }: { status: EntryStatus; 
               key={o.value}
               type="button"
               className={cn(
-                "flex w-full items-center gap-2 px-3 py-1.5 text-left text-[12px] text-[#646373]",
+                "flex w-full items-center gap-2 px-3 py-1.5 text-left text-[14px] text-[#646373]",
                 status === o.value ? "bg-muted" : "hover:bg-muted"
               )}
               onClick={() => { onChange(o.value); setOpen(false); }}
@@ -867,7 +867,7 @@ function RouteStatusPill({ status, onChange, onRemove }: { status: EntryStatus; 
               <div className="my-1 border-t border-border" />
               <button
                 type="button"
-                className="flex w-full items-center gap-2 px-3 py-1.5 text-left text-[12px] text-[#822B34] hover:bg-muted"
+                className="flex w-full items-center gap-2 px-3 py-1.5 text-left text-[14px] text-[#822B34] hover:bg-muted"
                 onClick={() => { setOpen(false); setConfirmRemove(true); }}
               >
                 <X size={12} weight="bold" />
@@ -912,7 +912,7 @@ function RouteRating({ value, onChange }: { value: number | null; onChange: (v: 
           <button
             type="button"
             className={cn(
-              "mb-1 block w-full rounded py-1 text-center text-[12px] text-[#646373]",
+              "mb-1 block w-full rounded py-1 text-center text-[14px] text-[#646373]",
               value == null ? "bg-muted" : "hover:bg-muted"
             )}
             onClick={() => { onChange(null); setOpen(false); }}
@@ -925,7 +925,7 @@ function RouteRating({ value, onChange }: { value: number | null; onChange: (v: 
                 key={v}
                 type="button"
                 className={cn(
-                  "rounded py-1 text-center text-[12px] text-[#646373]",
+                  "rounded py-1 text-center text-[14px] text-[#646373]",
                   value === v ? "bg-muted" : "hover:bg-muted"
                 )}
                 onClick={() => { onChange(v); setOpen(false); }}
