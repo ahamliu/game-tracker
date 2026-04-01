@@ -160,7 +160,7 @@ export function NavSearch({ signedIn = true, autoFocus, onNavigate }: { signedIn
           )}
           <button
             type="button"
-            className="h-[38px] shrink-0 rounded-lg bg-[#D4D3DF] px-4 font-mono text-[14px] font-semibold uppercase text-app-muted hover:opacity-90"
+            className="h-[38px] shrink-0 rounded-lg bg-[#D4D3DF] px-4 font-mono text-[14px] font-semibold uppercase text-app-muted hover:opacity-90 dark:text-[#656379]"
             onClick={() => void search(q)}
           >
             Search

@@ -90,7 +90,7 @@ export function ExplorePopularGrid({
 
                 <div className="absolute bottom-2 right-2 flex shrink-0 items-center opacity-0 transition-opacity group-hover/card:opacity-100">
                   {inLibrary ? (
-                    <span className="rounded-md bg-[#D4D3DF] px-2 py-0.5 text-[11px] font-medium text-app-muted">
+                    <span className="rounded-md bg-[#D4D3DF] px-2 py-0.5 text-[11px] font-medium text-app-muted dark:text-[#656379]">
                       Added
                     </span>
                   ) : (
@@ -107,7 +107,7 @@ export function ExplorePopularGrid({
                           addGame(game.id, game.title, e);
                         }}
                         disabled={isLoading}
-                        className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#D4D3DF] text-app-muted transition-all hover:opacity-80 disabled:opacity-40"
+                        className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#D4D3DF] text-app-muted transition-all hover:opacity-80 disabled:opacity-40 dark:text-[#656379]"
                       >
                         {isLoading ? (
                           <CircleNotch size={14} className="animate-spin" />

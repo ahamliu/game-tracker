@@ -235,8 +235,10 @@ export function LibraryContent({
               type="button"
               onClick={() => setView("card")}
               className={cn(
-                "flex h-9 w-9 items-center justify-center rounded-md text-app-muted",
-                view === "card" ? "bg-[#D4D3DF]" : "hover:bg-[#E8E8E8]",
+                "flex h-9 w-9 items-center justify-center rounded-md",
+                view === "card"
+                  ? "bg-[#D4D3DF] text-[#656379]"
+                  : "text-app-muted hover:bg-[#E8E8E8]",
               )}
             >
               <SquaresFour size={20} weight="fill" />
@@ -245,8 +247,10 @@ export function LibraryContent({
               type="button"
               onClick={() => setView("table")}
               className={cn(
-                "flex h-9 w-9 items-center justify-center rounded-md text-app-muted",
-                view === "table" ? "bg-[#D4D3DF]" : "hover:bg-[#E8E8E8]",
+                "flex h-9 w-9 items-center justify-center rounded-md",
+                view === "table"
+                  ? "bg-[#D4D3DF] text-[#656379]"
+                  : "text-app-muted hover:bg-[#E8E8E8]",
               )}
             >
               <ListBullets size={20} weight="bold" />

@@ -192,8 +192,8 @@ export function EntryDetail({
   return (
     <div className="mx-auto max-w-[860px] space-y-8 py-2">
       {/* Hero */}
-      <div className="flex gap-6">
-        <div className="relative w-[160px] shrink-0">
+      <div className="flex flex-col gap-5 sm:flex-row sm:gap-6">
+        <div className="relative mx-auto w-[160px] shrink-0 sm:mx-0">
           <div className="group/cover relative h-[220px] w-[160px] overflow-hidden rounded-xl bg-muted shadow-md">
             {coverUrl ? (
               <Image
@@ -240,7 +240,7 @@ export function EntryDetail({
           {/* URL input popover -- outside overflow-hidden container */}
           {canEditCover && editingCover && (
             <div
-              className="absolute left-0 top-full z-50 mt-2 w-[280px] rounded-lg border border-border bg-card p-3 shadow-xl"
+              className="absolute left-1/2 top-full z-50 mt-2 w-[280px] -translate-x-1/2 rounded-lg border border-border bg-card p-3 shadow-xl sm:left-0 sm:translate-x-0"
               onClick={(e) => e.stopPropagation()}
             >
               <p className="mb-2 text-[12px] font-medium text-app-muted">Cover Image URL</p>
@@ -308,13 +308,13 @@ export function EntryDetail({
                     setEditingTitle(false);
                   }
                 }}
-                className="block w-full border-0 bg-transparent p-0 text-[28px] font-bold leading-tight text-app-muted outline-none focus:ring-0"
+                className="block w-full border-0 bg-transparent p-0 text-center text-[28px] font-bold leading-tight text-app-muted outline-none focus:ring-0 sm:text-left"
                 autoFocus
               />
             ) : (
               <h1
                 className={cn(
-                  "text-[28px] font-bold leading-tight text-app-muted",
+                  "text-center text-[28px] font-bold leading-tight text-app-muted sm:text-left",
                   initial.game.source === "user" && "group/title"
                 )}
               >
@@ -332,7 +332,35 @@ export function EntryDetail({
               </h1>
             )}
 
-            <p className="mt-1 flex items-center gap-2 text-[12px] font-medium uppercase text-muted-foreground">
+            <div className="mt-1 space-y-1 text-[12px] font-medium uppercase text-muted-foreground sm:hidden">
+              <div className="flex items-center justify-center gap-2">
+                {initial.game.developerName && (
+                  <span>{initial.game.developerName}</span>
+                )}
+                {initial.game.releaseDate && (
+                  <>
+                    {initial.game.developerName && <span>&middot;</span>}
+                    <span>{new Date(initial.game.releaseDate).getFullYear()}</span>
+                  </>
+                )}
+              </div>
+              <div className="flex items-center justify-center gap-2">
+                {initial.game.savedCount > 0 && (
+                  <span className="inline-flex items-center gap-0.5">
+                    <BookmarkSimple size={12} weight="fill" />
+                    {initial.game.savedCount.toLocaleString()}
+                  </span>
+                )}
+                {initial.game.aggregatedRating != null && (
+                  <span className="inline-flex items-center gap-0.5">
+                    <Star size={12} weight="fill" />
+                    {(initial.game.aggregatedRating / 10).toFixed(1)}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            <p className="mt-1 hidden items-center gap-2 text-[12px] font-medium uppercase text-muted-foreground sm:flex">
               {initial.game.developerName && (
                 <span>{initial.game.developerName}</span>
               )}
@@ -357,12 +385,12 @@ export function EntryDetail({
             </p>
 
             {initial.game.summary && (
-              <p className="mt-2 max-w-2xl text-[14px] leading-relaxed text-muted-foreground line-clamp-3">
+              <p className="mt-2 max-w-2xl text-left text-[14px] leading-relaxed text-muted-foreground line-clamp-3">
                 {initial.game.summary}
               </p>
             )}
 
-            <div className="mt-4 flex flex-wrap items-center gap-4">
+            <div className="mt-4 flex flex-wrap items-center justify-center gap-4 sm:justify-start">
               <RouteRating value={rating} onChange={handleRatingSelect} />
               <StatusDropdown
                 entryId={entryId}

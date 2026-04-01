@@ -199,10 +199,10 @@ export function AddGameModal({ open, onClose, initialManualTitle }: { open: bool
           <button
             type="button"
             className={cn(
-              "flex flex-1 items-center justify-center gap-2 py-3 text-[13px] font-medium transition-colors",
+              "flex flex-1 items-center justify-center gap-2 border-b-2 py-3 text-[13px] font-medium transition-colors",
               view === "search"
-                ? "border-b-2 border-[#656379] text-app-muted"
-                : "text-muted-foreground hover:text-foreground"
+                ? "border-[#656379] text-app-muted"
+                : "border-transparent text-muted-foreground hover:text-foreground"
             )}
             onClick={() => setView("search")}
           >
@@ -212,10 +212,10 @@ export function AddGameModal({ open, onClose, initialManualTitle }: { open: bool
           <button
             type="button"
             className={cn(
-              "flex flex-1 items-center justify-center gap-2 py-3 text-[13px] font-medium transition-colors",
+              "flex flex-1 items-center justify-center gap-2 border-b-2 py-3 text-[13px] font-medium transition-colors",
               view === "manual"
-                ? "border-b-2 border-[#656379] text-app-muted"
-                : "text-muted-foreground hover:text-foreground"
+                ? "border-[#656379] text-app-muted"
+                : "border-transparent text-muted-foreground hover:text-foreground"
             )}
             onClick={() => setView("manual")}
           >
@@ -250,15 +250,15 @@ export function AddGameModal({ open, onClose, initialManualTitle }: { open: bool
               </div>
 
               {/* Results */}
-              <div className="max-h-[320px] overflow-y-auto">
+              <div className="min-h-[164px] max-h-[320px] overflow-y-auto">
                 {loading && (
-                  <div className="flex items-center justify-center py-8">
+                  <div className="flex min-h-[164px] items-center justify-center">
                     <SpinnerGap size={24} className="animate-spin text-muted-foreground" />
                   </div>
                 )}
 
                 {!loading && searched && results.length === 0 && (
-                  <div className="py-8 text-center">
+                  <div className="flex min-h-[164px] flex-col items-center justify-center text-center">
                     <GameController size={32} className="mx-auto mb-2 text-muted-foreground" />
                     <p className="text-[13px] text-muted-foreground">No games found for &ldquo;{query}&rdquo;</p>
                     <button
@@ -323,7 +323,7 @@ export function AddGameModal({ open, onClose, initialManualTitle }: { open: bool
                 )}
 
                 {!loading && !searched && query.length < 2 && (
-                  <div className="py-8 text-center">
+                  <div className="flex min-h-[164px] flex-col items-center justify-center text-center">
                     <MagnifyingGlass size={32} className="mx-auto mb-2 text-muted-foreground/50" />
                     <p className="text-[13px] text-muted-foreground">Type at least 2 characters to search</p>
                   </div>

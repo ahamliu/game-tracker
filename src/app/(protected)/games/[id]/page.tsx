@@ -50,8 +50,8 @@ export default async function GamePage({ params }: PageProps) {
 
       <div className="mx-auto max-w-[860px] space-y-8 py-2">
         {/* Hero */}
-        <div className="flex gap-6">
-          <div className="relative h-[220px] w-[160px] shrink-0 overflow-hidden rounded-xl bg-muted shadow-md">
+        <div className="flex flex-col gap-5 sm:flex-row sm:gap-6">
+          <div className="relative mx-auto h-[220px] w-[160px] shrink-0 overflow-hidden rounded-xl bg-muted shadow-md sm:mx-0">
             {game.coverUrl ? (
               <Image
                 src={game.coverUrl}
@@ -68,11 +68,37 @@ export default async function GamePage({ params }: PageProps) {
 
           <div className="flex min-w-0 flex-1 flex-col justify-between">
             <div>
-              <h1 className="text-[28px] font-bold leading-tight text-app-muted">
+              <h1 className="text-center text-[28px] font-bold leading-tight text-app-muted sm:text-left">
                 {game.title}
               </h1>
 
-              <p className="mt-1 flex items-center gap-2 text-[12px] font-medium uppercase text-muted-foreground">
+              <div className="mt-1 space-y-1 text-[12px] font-medium uppercase text-muted-foreground sm:hidden">
+                <div className="flex items-center justify-center gap-2">
+                  {game.developerName && <span>{game.developerName}</span>}
+                  {releaseYear && (
+                    <>
+                      {game.developerName && <span>&middot;</span>}
+                      <span>{releaseYear}</span>
+                    </>
+                  )}
+                </div>
+                <div className="flex items-center justify-center gap-2">
+                  {savedCount > 0 && (
+                    <span className="inline-flex items-center gap-0.5">
+                      <BookmarkSimple size={12} weight="fill" />
+                      {savedCount.toLocaleString()}
+                    </span>
+                  )}
+                  {game.aggregatedRating != null && (
+                    <span className="inline-flex items-center gap-0.5">
+                      <Star size={12} weight="fill" />
+                      {(game.aggregatedRating / 10).toFixed(1)}/10
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <p className="mt-1 hidden items-center gap-2 text-[12px] font-medium uppercase text-muted-foreground sm:flex">
                 {game.developerName && <span>{game.developerName}</span>}
                 {releaseYear && (
                   <>
@@ -95,7 +121,7 @@ export default async function GamePage({ params }: PageProps) {
               </p>
 
               {genres.length > 0 && (
-                <div className="mt-3 flex flex-wrap gap-1.5">
+                <div className="mt-3 flex flex-wrap justify-center gap-1.5 sm:justify-start">
                   {genres.map((g) => (
                     <span
                       key={g.id}
@@ -108,7 +134,7 @@ export default async function GamePage({ params }: PageProps) {
               )}
 
               {game.summary && (
-                <p className="mt-4 max-w-2xl text-[14px] leading-relaxed text-muted-foreground">
+                <p className="mt-4 max-w-2xl text-left text-[14px] leading-relaxed text-muted-foreground">
                   {game.summary}
                 </p>
               )}

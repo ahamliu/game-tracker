@@ -41,7 +41,7 @@ export function ProfileFavorites({
   const [editing, setEditing] = useState(false);
 
   return (
-    <div className="space-y-3">
+    <div className="min-w-0 space-y-3">
       <div className="flex items-center justify-between">
         <h2 className="flex items-center gap-2 text-[16px] font-bold text-app-muted">
           <Heart size={18} weight="fill" className="text-[#C25450]" />
@@ -63,7 +63,7 @@ export function ProfileFavorites({
         <p className="text-[13px] text-muted-foreground">No favorites selected yet.</p>
       )}
 
-      <div className="flex gap-3">
+      <div className="flex min-w-0 gap-3">
         {favorites.map((game) => (
           <FavoriteCard key={game.id} game={game} />
         ))}
@@ -102,7 +102,7 @@ function FavoriteCard({ game }: { game: FavoriteGame }) {
   return (
     <Link
       href={`/games/${game.id}`}
-      className="group shrink-0"
+      className="group min-w-0 shrink-0"
       style={{ width: "calc((100% - 4 * 0.75rem) / 5)" }}
     >
       <div className="relative aspect-[3/4] w-full overflow-hidden rounded-[10px] bg-muted">

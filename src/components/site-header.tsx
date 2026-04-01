@@ -51,17 +51,17 @@ export function SiteHeader({ session, avatarUrl, unreadCount = 0 }: { session: S
             <NavSearch signedIn={!!session} />
           </div>
 
-          <nav className="ml-auto flex shrink-0 items-center gap-2">
+          <nav className="ml-auto flex shrink-0 items-center">
             <button
               type="button"
-              className="flex h-9 w-9 items-center justify-center rounded-md text-app-muted hover:bg-muted md:hidden"
+              className="flex h-[42px] w-[42px] items-center justify-center rounded-md text-app-muted hover:bg-muted md:hidden"
               onClick={openMobileSearch}
             >
               <MagnifyingGlass size={22} weight="bold" />
             </button>
             <Link
               href="/library"
-              className="flex h-9 w-9 items-center justify-center rounded-md text-app-muted hover:bg-muted md:hidden"
+              className="flex h-[42px] w-[42px] items-center justify-center rounded-md text-app-muted hover:bg-muted md:hidden"
             >
               <BookmarkSimple size={22} weight="fill" />
             </Link>
@@ -69,15 +69,19 @@ export function SiteHeader({ session, avatarUrl, unreadCount = 0 }: { session: S
             {session ? (
               <>
                 <NotificationBell initialUnread={unreadCount} />
-                <UserMenu user={{ ...session.user, image: avatarUrl }} />
+                <div className="ml-2">
+                  <UserMenu user={{ ...session.user, image: avatarUrl }} />
+                </div>
               </>
             ) : (
-              <Link
-                href="/login"
-                className="rounded-lg bg-[#656379] px-5 py-2 font-mono text-[12px] font-semibold uppercase text-white hover:opacity-90"
-              >
-                Sign in
-              </Link>
+              <div className="ml-2">
+                <Link
+                  href="/login"
+                  className="rounded-lg bg-[#656379] px-5 py-2 font-mono text-[12px] font-semibold uppercase text-white hover:opacity-90"
+                >
+                  Sign in
+                </Link>
+              </div>
             )}
           </nav>
         </div>

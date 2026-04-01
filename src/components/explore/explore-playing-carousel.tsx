@@ -82,6 +82,12 @@ export function ExplorePlayingCarousel({ entries }: { entries: PlayingEntry[] })
           >
             <CaretRight size={14} weight="bold" />
           </button>
+          <Link
+            href="/library"
+            className="text-[12px] font-medium text-[#656379] hover:underline"
+          >
+            View all
+          </Link>
         </div>
       </div>
       <div

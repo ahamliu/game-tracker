@@ -272,6 +272,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
           ) : session ? (
             <ProfileFriendButton
               targetUserId={user.id}
+              targetName={user.displayName}
               initialState={friendState}
             />
           ) : null}
@@ -281,7 +282,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
       {/* Two-column body */}
       <div className="grid gap-8 lg:grid-cols-[1fr_280px]">
         {/* Left column */}
-        <div className="space-y-8">
+        <div className="min-w-0 space-y-8">
           {/* Favorites */}
           <section>
             <ProfileFavorites
@@ -316,23 +317,29 @@ export default async function PublicProfilePage({ params }: PageProps) {
                   return (
                     <div
                       key={a.id}
-                      className="flex items-center gap-3 rounded-lg pl-0 pr-2 py-1 transition-colors hover:bg-muted/50"
+                      className="flex min-w-0 items-center gap-3 rounded-lg py-1 pl-0 pr-2 transition-colors hover:bg-muted/50"
                     >
                       <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-muted">
                         <GameController size={14} className="text-muted-foreground" />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-[13px] text-app-muted">
-                          <span className="font-medium text-muted-foreground">{label}:</span>{" "}
+                        <div className="flex min-w-0 items-baseline gap-1 text-[13px] text-app-muted">
+                          <span className="shrink-0 font-medium text-muted-foreground">{label}:</span>
                           {gameId ? (
-                            <Link href={`/games/${gameId}`} className="font-medium hover:underline">
+                            <Link
+                              href={`/games/${gameId}`}
+                              className="truncate font-medium hover:underline"
+                            >
                               {title}
+                              {ratingVal}
                             </Link>
                           ) : (
-                            <span className="font-medium">{title}</span>
+                            <span className="truncate font-medium">
+                              {title}
+                              {ratingVal}
+                            </span>
                           )}
-                          {ratingVal}
-                        </p>
+                        </div>
                       </div>
                       <span className="shrink-0 text-[11px] text-muted-foreground">
                         {timeAgo(a.createdAt)}
@@ -346,14 +353,14 @@ export default async function PublicProfilePage({ params }: PageProps) {
         </div>
 
         {/* Right column / sidebar */}
-        <div className="space-y-6">
+        <div className="min-w-0 space-y-6">
           {/* Status breakdown */}
-          <div className="rounded-[10px] border border-border bg-card p-4">
+          <div className="min-w-0 overflow-hidden rounded-[10px] border border-border bg-card p-4">
             <ProfileStatsSidebar data={statsData} />
           </div>
 
           {/* Last Game Updates */}
-          <div className="rounded-[10px] border border-border bg-card p-4">
+          <div className="min-w-0 overflow-hidden rounded-[10px] border border-border bg-card p-4">
             <h3 className="mb-3 text-[14px] font-bold text-app-muted">Last Updates</h3>
             {lastUpdates.length === 0 ? (
               <p className="text-[12px] text-muted-foreground">No entries yet.</p>
@@ -372,7 +379,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
                     <Link
                       key={entry.id}
                       href={`/library/${entry.id}`}
-                      className="flex items-center gap-2.5 rounded-lg px-1.5 py-1.5 transition-colors hover:bg-muted/50"
+                      className="flex min-w-0 items-center gap-2.5 rounded-lg px-1.5 py-1.5 transition-colors hover:bg-muted/50"
                     >
                       <div className="relative h-12 w-9 shrink-0 overflow-hidden rounded bg-muted">
                         {entry.game.coverUrl ? (

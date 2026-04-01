@@ -53,7 +53,7 @@ export function ExploreFiltersForm({
       if (genreIds.length) params.set("genres", genreIds.join(","));
       const s = params.toString();
       startTransition(() => {
-        router.push(s ? `/?${s}` : "/");
+        router.push(s ? `/?${s}` : "/", { scroll: false });
       });
     },
     [router]

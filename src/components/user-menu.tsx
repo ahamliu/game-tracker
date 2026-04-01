@@ -29,7 +29,7 @@ export function UserMenu({
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="relative flex h-9 w-9 items-center justify-center rounded-full bg-[#656379] overflow-hidden"
+        className="relative flex h-[42px] w-[42px] items-center justify-center overflow-hidden rounded-full bg-[#656379]"
       >
         {user.image ? (
           <Image src={user.image} alt="" fill unoptimized className="rounded-full object-cover" />

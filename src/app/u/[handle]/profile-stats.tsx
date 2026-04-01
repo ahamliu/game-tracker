@@ -45,7 +45,7 @@ export function ProfileStats({ data }: { data: ProfileStatsData }) {
   })).filter((seg) => seg.count > 0);
 
   return (
-    <div className="space-y-4">
+    <div className="min-w-0 space-y-4">
       <h2 className="text-[16px] font-bold text-app-muted">Game Statistics</h2>
 
       {/* Colored proportional bar */}
@@ -68,17 +68,17 @@ export function ProfileStats({ data }: { data: ProfileStatsData }) {
       )}
 
       {/* Two-column stats */}
-      <div className="grid grid-cols-2 gap-x-6 gap-y-1">
+      <div className="grid min-w-0 grid-cols-2 gap-x-6 gap-y-1">
         {/* Left: status breakdown */}
-        <div className="space-y-1">
+        <div className="min-w-0 space-y-1">
           {STATUS_ORDER.map((s) => (
-            <div key={s} className="flex items-center justify-between text-[13px]">
-              <span className="flex items-center gap-2">
+            <div key={s} className="flex min-w-0 items-center justify-between gap-2 text-[13px]">
+              <span className="flex min-w-0 items-center gap-2">
                 <span
                   className="inline-block h-2.5 w-2.5 rounded-full"
                   style={{ backgroundColor: DOT_COLORS[s] }}
                 />
-                <span className="text-muted-foreground">{STATUS_LABELS[s]}</span>
+                <span className="truncate text-muted-foreground">{STATUS_LABELS[s]}</span>
               </span>
               <span className="font-medium text-app-muted">{statusCounts[s] ?? 0}</span>
             </div>
@@ -86,7 +86,7 @@ export function ProfileStats({ data }: { data: ProfileStatsData }) {
         </div>
 
         {/* Right: aggregate stats */}
-        <div className="space-y-1">
+        <div className="min-w-0 space-y-1">
           <StatRow label="Total Games" value={String(totalEntries)} />
           <StatRow
             label="Mean Score"
@@ -102,8 +102,8 @@ export function ProfileStats({ data }: { data: ProfileStatsData }) {
 
 function StatRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-center justify-between text-[13px]">
-      <span className="text-muted-foreground">{label}</span>
+    <div className="flex min-w-0 items-center justify-between gap-2 text-[13px]">
+      <span className="truncate text-muted-foreground">{label}</span>
       <span className="font-medium text-app-muted">{value}</span>
     </div>
   );
@@ -119,8 +119,8 @@ export function ProfileStatsSidebar({ data, compact }: { data: ProfileStatsData;
   })).filter((seg) => seg.count > 0);
 
   return (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between">
+    <div className="min-w-0 space-y-3">
+      <div className="flex min-w-0 items-center justify-between gap-2">
         <h3 className="text-[14px] font-bold text-app-muted">Game Stats</h3>
         <span className="text-[13px] text-muted-foreground"><span className="font-bold text-app-muted">{totalEntries}</span> total</span>
       </div>
@@ -143,15 +143,15 @@ export function ProfileStatsSidebar({ data, compact }: { data: ProfileStatsData;
         <div className="h-2.5 rounded-full bg-muted" />
       )}
 
-      <div className="space-y-1">
+      <div className="min-w-0 space-y-1">
         {STATUS_ORDER.map((s) => (
-          <div key={s} className="flex items-center justify-between text-[12px]">
-            <span className="flex items-center gap-2">
+          <div key={s} className="flex min-w-0 items-center justify-between gap-2 text-[12px]">
+            <span className="flex min-w-0 items-center gap-2">
               <span
                 className="inline-block h-2 w-2 rounded-full"
                 style={{ backgroundColor: DOT_COLORS[s] }}
               />
-              <span className="text-muted-foreground">{STATUS_LABELS[s]}</span>
+              <span className="truncate text-muted-foreground">{STATUS_LABELS[s]}</span>
             </span>
             <span className="font-medium text-app-muted">{statusCounts[s] ?? 0}</span>
           </div>
@@ -160,8 +160,8 @@ export function ProfileStatsSidebar({ data, compact }: { data: ProfileStatsData;
 
       {!compact && (
         <div className="border-t border-border pt-2">
-          <div className="flex items-center justify-between text-[12px]">
-            <span className="text-muted-foreground">Total Games</span>
+          <div className="flex min-w-0 items-center justify-between gap-2 text-[12px]">
+            <span className="truncate text-muted-foreground">Total Games</span>
             <span className="font-bold text-app-muted">{totalEntries}</span>
           </div>
         </div>

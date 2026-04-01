@@ -117,7 +117,7 @@ export function NotificationBell({ initialUnread }: { initialUnread: number }) {
       <button
         type="button"
         onClick={handleOpen}
-        className="relative flex h-9 w-9 items-center justify-center rounded-full text-app-muted hover:bg-muted"
+        className="relative flex h-[42px] w-[42px] items-center justify-center rounded-md text-app-muted hover:bg-muted"
       >
         <Bell size={22} weight="fill" />
         {unread > 0 && (

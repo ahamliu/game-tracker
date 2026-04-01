@@ -32,6 +32,7 @@ export function ExplorePagination({
         <Link
           className="flex h-8 w-8 items-center justify-center rounded-lg text-app-muted hover:bg-[#E8E8E8] dark:hover:bg-[#2a2a35]"
           href={hrefFor(page - 1)}
+          scroll={false}
         >
           <CaretLeft size={16} weight="bold" />
         </Link>
@@ -47,6 +48,7 @@ export function ExplorePagination({
         <Link
           className="flex h-8 w-8 items-center justify-center rounded-lg text-app-muted hover:bg-[#E8E8E8] dark:hover:bg-[#2a2a35]"
           href={hrefFor(page + 1)}
+          scroll={false}
         >
           <CaretRight size={16} weight="bold" />
         </Link>
