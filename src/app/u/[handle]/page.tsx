@@ -25,6 +25,7 @@ import { CopyProfileUrl } from "@/app/(protected)/settings/copy-profile-url";
 import { ProfileAvatar } from "./profile-avatar";
 import { ProfileFriendButton, type FriendState } from "./profile-friend-button";
 import { ProfileFavorites } from "./profile-favorites";
+import { ProfileFriendCount } from "./profile-friends-list";
 import { ProfileStats, ProfileStatsSidebar, type ProfileStatsData } from "./profile-stats";
 
 type PageProps = { params: Promise<{ handle: string }> };
@@ -242,10 +243,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
             </p>
           )}
           <div className="mt-3 flex flex-wrap items-center gap-4 text-[13px]">
-            <span className="flex items-center gap-1.5">
-              <span className="font-bold text-[#646373]">{friendCount}</span>
-              <span className="text-muted-foreground">{friendCount === 1 ? "friend" : "friends"}</span>
-            </span>
+            <ProfileFriendCount handle={user.handle} count={friendCount} />
             <span className="flex items-center gap-1.5 text-muted-foreground">
               <CalendarBlank size={14} />
               Joined {memberSince(user.createdAt)}
