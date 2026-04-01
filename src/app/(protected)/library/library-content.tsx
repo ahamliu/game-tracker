@@ -148,7 +148,7 @@ export function LibraryContent({
   return (
     <>
     <AddGameModal open={addModalOpen} onClose={() => { setAddModalOpen(false); setManualTitle(""); }} initialManualTitle={manualTitle || undefined} />
-    <div className="mx-auto max-w-[860px] space-y-6 py-2">
+    <div className="mx-auto max-w-[1000px] space-y-6 py-2">
       {/* User header */}
       <div className="flex items-center justify-between">
         <Link href={`/u/${user.handle}`} className="flex items-center gap-4">

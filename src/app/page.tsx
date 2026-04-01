@@ -68,7 +68,7 @@ export default async function HomePage({
   const genresCsv = genreIds.length ? genreIds.join(",") : "";
 
   return (
-    <div className="mx-auto max-w-[1100px] space-y-8 py-2">
+    <div className="mx-auto max-w-[1380px] space-y-8 py-2">
       {/* Currently Playing + Sidebar */}
       {session?.user?.id && (
         <section className="grid gap-6 lg:grid-cols-[1fr_280px]">

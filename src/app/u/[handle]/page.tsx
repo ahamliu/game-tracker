@@ -220,7 +220,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
   };
 
   return (
-    <div className="mx-auto max-w-[960px] space-y-8 py-2">
+    <div className="mx-auto max-w-[1380px] space-y-8 py-2">
       {/* Hero Section */}
       <section className="flex flex-wrap items-start gap-6">
         {/* Avatar */}
@@ -271,7 +271,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
       </section>
 
       {/* Two-column body */}
-      <div className="grid gap-8 lg:grid-cols-[1fr_260px]">
+      <div className="grid gap-8 lg:grid-cols-[1fr_280px]">
         {/* Left column */}
         <div className="space-y-8">
           {/* Favorites */}
