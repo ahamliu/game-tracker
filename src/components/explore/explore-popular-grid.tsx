@@ -11,9 +11,11 @@ import type { PopularRow } from "@/lib/explore";
 export function ExplorePopularGrid({
   rows,
   libraryGameIds,
+  signedIn = true,
 }: {
   rows: PopularRow[];
   libraryGameIds: string[];
+  signedIn?: boolean;
 }) {
   const librarySet = useMemo(() => new Set(libraryGameIds), [libraryGameIds]);
   const [addedIds, setAddedIds] = useState<Set<string>>(new Set());
@@ -95,7 +97,15 @@ export function ExplorePopularGrid({
                     <div className="group/add relative">
                       <button
                         type="button"
-                        onClick={(e) => addGame(game.id, game.title, e)}
+                        onClick={(e) => {
+                          if (!signedIn) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            router.push("/login");
+                            return;
+                          }
+                          addGame(game.id, game.title, e);
+                        }}
                         disabled={isLoading}
                         className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#D4D3DF] text-[#646373] transition-all hover:opacity-80 disabled:opacity-40"
                       >
@@ -106,7 +116,7 @@ export function ExplorePopularGrid({
                         )}
                       </button>
                       <span className="pointer-events-none absolute -top-8 right-0 whitespace-nowrap rounded bg-[#333] px-2 py-1 text-[11px] text-white opacity-0 shadow transition-opacity group-hover/add:opacity-100 dark:bg-[#e5e5e5] dark:text-[#1a1a1a]">
-                        Add to library
+                        {signedIn ? "Add to library" : "Sign in to add"}
                       </span>
                     </div>
                   )}

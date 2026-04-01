@@ -127,7 +127,7 @@ export default async function HomePage({
           total={total}
         />
         <div className="mt-3">
-          <ExplorePopularGrid rows={rows} libraryGameIds={libraryGameIds} />
+          <ExplorePopularGrid rows={rows} libraryGameIds={libraryGameIds} signedIn={!!session?.user} />
         </div>
         <ExplorePagination
           page={page}
