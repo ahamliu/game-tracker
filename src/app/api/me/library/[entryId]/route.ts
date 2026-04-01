@@ -11,7 +11,7 @@ const statusSchema = z.enum(["planning", "playing", "completed", "on_hold", "dro
 const patchSchema = z.object({
   status: statusSchema.optional(),
   rating: z.number().int().min(0).max(10).nullable().optional(),
-  notes: z.string().max(20000).nullable().optional(),
+  notes: z.string().max(5000).nullable().optional(),
   progressPercent: z.number().int().min(0).max(100).nullable().optional(),
   progressNote: z.string().max(500).nullable().optional(),
 });

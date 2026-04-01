@@ -1,9 +1,13 @@
 import { auth } from "@/auth";
 import { ExploreFiltersForm } from "@/components/explore/explore-filters-form";
+import { ExploreLibraryCarousel } from "@/components/explore/explore-library-carousel";
+import { ExploreHomeSidebar } from "@/components/explore/explore-home-sidebar";
+import { ExplorePlayingCarousel } from "@/components/explore/explore-playing-carousel";
 import {
-  ExploreLibraryCarousel,
-  ExploreSignedOutCarousel,
-} from "@/components/explore/explore-library-carousel";
+  SignedOutPlaying,
+  SignedOutLibrary,
+  SignedOutSidebar,
+} from "@/components/explore/explore-signed-out-home";
 import { ExplorePagination } from "@/components/explore/explore-pagination";
 import { ExplorePopularGrid } from "@/components/explore/explore-popular-grid";
 import { ExploreRecentlyAdded } from "@/components/explore/explore-recently-added";
@@ -11,7 +15,10 @@ import {
   getCarouselForUser,
   getDistinctGenres,
   getExplorePopular,
+  getPlayingForUser,
   getRecentlyAdded,
+  getStatsForUser,
+  getUserLibraryGameIds,
   type ExploreSort,
 } from "@/lib/explore";
 
@@ -45,11 +52,14 @@ export default async function HomePage({
 
   const session = await auth();
 
-  const [{ rows, total }, genreOptions, carousel, recentlyAdded] = await Promise.all([
+  const [{ rows, total }, genreOptions, carousel, playing, recentlyAdded, libraryGameIds, statsData] = await Promise.all([
     getExplorePopular({ page, pageSize: PAGE_SIZE, q: q || undefined, genreIds, sort }),
     getDistinctGenres(),
     session?.user?.id ? getCarouselForUser(session.user.id) : Promise.resolve(null),
-    getRecentlyAdded(12),
+    session?.user?.id ? getPlayingForUser(session.user.id) : Promise.resolve([]),
+    getRecentlyAdded(4),
+    session?.user?.id ? getUserLibraryGameIds(session.user.id) : Promise.resolve([]),
+    session?.user?.id ? getStatsForUser(session.user.id) : Promise.resolve(null),
   ]);
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
@@ -57,39 +67,66 @@ export default async function HomePage({
 
   return (
     <div className="mx-auto max-w-[1100px] space-y-8 py-2">
-      {/* Search and filters */}
+      {/* Currently Playing + Sidebar */}
+      {session?.user?.id && (
+        <section className="grid gap-6 lg:grid-cols-[1fr_280px]">
+          <div className="space-y-8">
+            {playing.length > 0 && (
+              <ExplorePlayingCarousel entries={playing} />
+            )}
+            <ExploreLibraryCarousel entries={carousel ?? []} />
+          </div>
+          <div className="hidden space-y-5 lg:block">
+            {statsData && <ExploreHomeSidebar stats={statsData} />}
+            <div className="border-t border-border pt-5">
+              <ExploreRecentlyAdded entries={recentlyAdded} />
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Signed-out state */}
+      {!session?.user?.id && (
+        <section className="grid gap-6 lg:grid-cols-[1fr_280px]">
+          <div className="space-y-8">
+            <SignedOutPlaying sampleGame={rows[0] ? {
+              id: rows[0].game.id,
+              title: rows[0].game.title,
+              coverUrl: rows[0].game.coverUrl,
+              developerName: rows[0].game.developerName,
+              notes: "my gamenotes here :)",
+              routes: [
+                { name: "Dawntrail", imageUrl: "https://lds-img.finalfantasyxiv.com/promo/h/P/vlB4zV5DeQaEK3K8BN2Qr975YU.png" },
+                { name: "Endwalker", imageUrl: "https://lds-img.finalfantasyxiv.com/promo/h/M/xRfPaGRwUih5gCM0FcNvQJSevw.png", cleared: true },
+                { name: "Shadowbringers", imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQk5CdWScx01eAVTOlaQSr4OLTYQCyVQzAq5A&s", cleared: true },
+                { name: "Stormblood", imageUrl: null },
+                { name: "Heavensward", imageUrl: null },
+              ],
+            } : undefined} />
+            <SignedOutLibrary sampleGame={rows[1] ? { id: rows[1].game.id, title: rows[1].game.title, coverUrl: rows[1].game.coverUrl, developerName: rows[1].game.developerName } : undefined} />
+          </div>
+          <div className="hidden space-y-5 lg:block">
+            <SignedOutSidebar />
+            <div className="border-t border-border pt-5">
+              <ExploreRecentlyAdded entries={recentlyAdded} />
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Popular games */}
       <section>
+        <h2 className="mb-3 text-[16px] font-bold text-[#646373]">Popular Games</h2>
         <ExploreFiltersForm
           initialQ={q}
           initialSort={sort}
           initialGenreIds={genreIds}
           genres={genreOptions}
+          total={total}
         />
-      </section>
-
-      {/* Library + Recently Added side by side */}
-      <section className="grid gap-6 lg:grid-cols-[1fr_280px]">
-        <div>
-          {session?.user?.id ? (
-            <ExploreLibraryCarousel entries={carousel ?? []} />
-          ) : (
-            <ExploreSignedOutCarousel />
-          )}
+        <div className="mt-3">
+          <ExplorePopularGrid rows={rows} libraryGameIds={libraryGameIds} />
         </div>
-        <div className="hidden lg:block">
-          <ExploreRecentlyAdded entries={recentlyAdded} />
-        </div>
-      </section>
-
-      {/* Popular games */}
-      <section className="space-y-3">
-        <div className="flex items-center justify-between">
-          <h2 className="text-[16px] font-bold text-[#646373]">Popular Games</h2>
-          <span className="text-[12px] text-muted-foreground">
-            {total.toLocaleString()} {total === 1 ? "game" : "games"}
-          </span>
-        </div>
-        <ExplorePopularGrid rows={rows} />
         <ExplorePagination
           page={page}
           totalPages={totalPages}

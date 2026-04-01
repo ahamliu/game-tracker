@@ -26,7 +26,7 @@ export function ExploreRecentlyAdded({ entries }: { entries: RecentEntry[] }) {
         {entries.map((e) => (
           <Link
             key={e.entryId}
-            href={`/library/${e.entryId}`}
+            href={`/games/${e.gameId}`}
             className="flex items-center gap-3 rounded-lg px-2 py-2 transition-colors hover:bg-muted/50"
           >
             <div className="relative h-14 w-10 shrink-0 overflow-hidden rounded bg-muted">
@@ -42,7 +42,7 @@ export function ExploreRecentlyAdded({ entries }: { entries: RecentEntry[] }) {
                   {e.developerName}
                 </p>
               )}
-              <p className="truncate text-[13px] font-medium text-foreground leading-snug">
+              <p className="truncate text-[13px] font-semibold text-[#646373] leading-snug">
                 {e.title}
               </p>
               <p className="text-[11px] text-muted-foreground">

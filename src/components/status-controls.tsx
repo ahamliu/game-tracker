@@ -12,11 +12,12 @@ import {
   X,
 } from "@phosphor-icons/react";
 import { ConfirmDialog } from "@/components/confirm-dialog";
+import { showSnackbar } from "@/components/snackbar";
 import type { EntryStatus } from "@/lib/status";
 import { statusLabel, statusColor, STATUS_OPTIONS } from "@/lib/status";
 import { cn } from "@/lib/utils";
 
-export function RatingDropdown({ entryId, rating }: { entryId: string; rating: number | null }) {
+export function RatingDropdown({ entryId, rating, compact }: { entryId: string; rating: number | null; compact?: boolean }) {
   const router = useRouter();
   const [optimistic, setOptimistic] = useState(rating);
   const [open, setOpen] = useState(false);
@@ -50,7 +51,9 @@ export function RatingDropdown({ entryId, rating }: { entryId: string; rating: n
         onClick={(e) => { e.preventDefault(); setOpen((v) => !v); }}
       >
         <Star size={14} weight="fill" />
-        Rating: {optimistic != null ? `${optimistic}/10` : "-/-"}
+        {compact
+          ? (optimistic != null ? optimistic : "-")
+          : <>Rating: {optimistic != null ? `${optimistic}/10` : "-/-"}</>}
         <CaretDown size={12} />
       </button>
       {open && (
@@ -58,7 +61,7 @@ export function RatingDropdown({ entryId, rating }: { entryId: string; rating: n
           <button
             type="button"
             className={cn(
-              "mb-1 block w-full rounded py-1 text-center text-[12px] text-foreground",
+              "mb-1 block w-full rounded py-1 text-center text-[12px] text-[#646373]",
               optimistic == null ? "bg-muted" : "hover:bg-muted"
             )}
             onClick={(e) => { e.preventDefault(); void updateRating(null); }}
@@ -71,7 +74,7 @@ export function RatingDropdown({ entryId, rating }: { entryId: string; rating: n
                 key={v}
                 type="button"
                 className={cn(
-                  "rounded py-1 text-center text-[12px] text-foreground",
+                  "rounded py-1 text-center text-[12px] text-[#646373]",
                   optimistic === v ? "bg-muted" : "hover:bg-muted"
                 )}
                 onClick={(e) => { e.preventDefault(); void updateRating(v); }}
@@ -86,7 +89,7 @@ export function RatingDropdown({ entryId, rating }: { entryId: string; rating: n
   );
 }
 
-export function StatusDropdown({ entryId, status, showRemove = true, onRemove }: { entryId: string; status: EntryStatus; showRemove?: boolean; onRemove?: () => void }) {
+export function StatusDropdown({ entryId, status, gameTitle, showRemove = true, onRemove }: { entryId: string; status: EntryStatus; gameTitle?: string; showRemove?: boolean; onRemove?: () => void }) {
   const router = useRouter();
   const [optimistic, setOptimistic] = useState(status);
   const [open, setOpen] = useState(false);
@@ -117,12 +120,13 @@ export function StatusDropdown({ entryId, status, showRemove = true, onRemove }:
     setConfirmRemove(false);
     setOpen(false);
     await fetch(`/api/me/library/${entryId}`, { method: "DELETE" });
+    showSnackbar(`${gameTitle ?? "Game"} removed from library`);
     if (onRemove) {
       onRemove();
     } else {
       router.refresh();
     }
-  }, [entryId, router, onRemove]);
+  }, [entryId, gameTitle, router, onRemove]);
 
   return (
     <div ref={ref} className="relative">
@@ -145,7 +149,7 @@ export function StatusDropdown({ entryId, status, showRemove = true, onRemove }:
               key={o.value}
               type="button"
               className={cn(
-                "flex w-full items-center gap-2 px-3 py-1.5 text-left text-[12px] text-foreground",
+                "flex w-full items-center gap-2 px-3 py-1.5 text-left text-[12px] text-[#646373]",
                 optimistic === o.value ? "bg-muted" : "hover:bg-muted"
               )}
               onClick={(e) => { e.preventDefault(); void updateStatus(o.value); }}

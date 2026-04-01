@@ -49,6 +49,7 @@ export default async function LibraryPage() {
         id: e.id,
         status: e.status,
         rating: e.rating,
+        notes: e.notes,
         createdAt: e.createdAt,
         game: {
           id: e.game.id,

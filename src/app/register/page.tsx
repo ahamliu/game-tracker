@@ -13,6 +13,7 @@ export default function RegisterPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [handle, setHandle] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -21,6 +22,10 @@ export default function RegisterPage() {
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
     setLoading(true);
     const res = await fetch("/api/auth/register", {
       method: "POST",
@@ -52,7 +57,7 @@ export default function RegisterPage() {
       <Card>
         <CardHeader>
           <CardTitle>Create account</CardTitle>
-          <CardDescription>Choose a handle for your public profile URL.</CardDescription>
+          <CardDescription>Track your games, take notes, build lists, and share your progress with friends.</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={onSubmit} className="space-y-4">
@@ -66,15 +71,14 @@ export default function RegisterPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="handle">Handle</Label>
+              <Label htmlFor="handle">Username</Label>
               <Input
                 id="handle"
                 required
-                placeholder="e.g. amy_plays"
+                placeholder="e.g. user_name"
                 value={handle}
                 onChange={(e) => setHandle(e.target.value)}
               />
-              <p className="text-xs text-muted-foreground">Letters, numbers, underscore. Used in /u/your_handle</p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
@@ -97,6 +101,18 @@ export default function RegisterPage() {
                 minLength={8}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Confirm password</Label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                autoComplete="new-password"
+                required
+                minLength={8}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
               />
             </div>
             {error && <p className="text-sm text-destructive">{typeof error === "string" ? error : "Error"}</p>}

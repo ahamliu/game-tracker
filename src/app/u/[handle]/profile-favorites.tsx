@@ -8,9 +8,10 @@ import {
   Heart,
   Plus,
   X,
+  MagnifyingGlass,
   PencilSimple,
-  DotsSixVertical,
   SpinnerGap,
+  Check,
 } from "@phosphor-icons/react";
 
 type FavoriteGame = {
@@ -72,7 +73,7 @@ export function ProfileFavorites({
               key={`empty-${i}`}
               type="button"
               onClick={() => setEditing(true)}
-              className="flex h-[160px] w-[110px] shrink-0 items-center justify-center rounded-[10px] border border-dashed border-border bg-muted/30 transition-colors hover:border-[#646373] hover:bg-muted/50"
+              className="flex aspect-[3/4] min-w-0 flex-1 items-center justify-center rounded-[10px] border border-dashed border-border bg-muted/30 transition-colors hover:border-[#646373] hover:bg-muted/50"
             >
               <Plus size={20} className="text-muted-foreground" />
             </button>
@@ -93,17 +94,18 @@ export function ProfileFavorites({
 function FavoriteCard({ game }: { game: FavoriteGame }) {
   return (
     <Link
-      href="#"
-      className="group w-[110px] shrink-0"
+      href={`/games/${game.id}`}
+      className="group min-w-0 flex-1"
     >
-      <div className="relative h-[150px] w-[110px] overflow-hidden rounded-[10px] bg-muted transition-all group-hover:shadow-[0_1px_1px_0_rgba(0,0,0,0.25)]">
+      <div className="relative aspect-[3/4] w-full overflow-hidden rounded-[10px] bg-muted">
         {game.coverUrl ? (
-          <Image src={game.coverUrl} alt="" fill className="object-cover" sizes="110px" />
+          <Image src={game.coverUrl} alt="" fill className="object-cover" sizes="20vw" />
         ) : (
           <div className="flex h-full items-center justify-center text-[10px] text-muted-foreground">
             No cover
           </div>
         )}
+        <div className="absolute inset-0 rounded-[10px] transition-[backdrop-filter] duration-200 group-hover:backdrop-saturate-[1.4] group-hover:backdrop-contrast-[1.05]" />
       </div>
       <p className="mt-1.5 line-clamp-2 text-[11px] font-medium leading-tight text-[#646373]">
         {game.title}
@@ -152,15 +154,6 @@ function EditFavoritesModal({
     []
   );
 
-  const moveUp = useCallback((idx: number) => {
-    if (idx === 0) return;
-    setSelected((prev) => {
-      const next = [...prev];
-      [next[idx - 1], next[idx]] = [next[idx], next[idx - 1]];
-      return next;
-    });
-  }, []);
-
   async function save() {
     setSaving(true);
     try {
@@ -185,7 +178,7 @@ function EditFavoritesModal({
   return (
     <div
       ref={overlayRef}
-      className="fixed inset-0 z-50 flex items-start justify-center bg-black/40 pt-[10vh] backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-start justify-center bg-black/50 pt-[10vh]"
       onClick={(e) => {
         if (e.target === overlayRef.current) onClose();
       }}
@@ -204,124 +197,103 @@ function EditFavoritesModal({
         </div>
 
         <div className="p-5 space-y-4">
-          {/* Current selection */}
+          {/* Selected favorites */}
           <div>
-            <p className="mb-2 text-[12px] font-medium text-muted-foreground">
-              Selected ({selected.length}/5)
+            <p className="mb-2 text-right text-[12px] font-medium text-muted-foreground">
+              {selected.length}/5 selected
             </p>
-            {selected.length === 0 ? (
-              <p className="text-[12px] text-muted-foreground/60">
-                Select up to 5 games from your library below.
-              </p>
-            ) : (
-              <div className="space-y-1">
-                {selected.map((game, idx) => (
-                  <div
-                    key={game.gameId}
-                    className="flex items-center gap-2 rounded-lg bg-muted/50 px-2 py-1.5"
-                  >
-                    <div className="flex flex-col">
-                      <button
-                        type="button"
-                        onClick={() => moveUp(idx)}
-                        className="text-muted-foreground hover:text-foreground disabled:opacity-30"
-                        disabled={idx === 0}
-                      >
-                        <DotsSixVertical size={14} />
-                      </button>
-                    </div>
-                    <div className="relative h-10 w-7 shrink-0 overflow-hidden rounded bg-muted">
-                      {game.coverUrl ? (
-                        <Image
-                          src={game.coverUrl}
-                          alt=""
-                          fill
-                          className="object-cover"
-                          sizes="28px"
-                        />
-                      ) : (
-                        <div className="flex h-full items-center justify-center text-[7px] text-muted-foreground">
-                          —
-                        </div>
-                      )}
-                    </div>
-                    <span className="min-w-0 flex-1 truncate text-[13px] font-medium text-foreground">
-                      {game.title}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => toggleGame(game)}
-                      className="flex h-6 w-6 shrink-0 items-center justify-center rounded text-muted-foreground hover:bg-destructive/10 hover:text-[#822B34]"
-                    >
-                      <X size={12} />
-                    </button>
+            <div className="flex gap-2">
+              {selected.map((game) => (
+                <div key={game.gameId} className="group/fav relative min-w-0 flex-1">
+                  <div className="relative aspect-[3/4] w-full overflow-hidden rounded-lg bg-muted">
+                    {game.coverUrl ? (
+                      <Image src={game.coverUrl} alt="" fill className="object-cover" sizes="20vw" />
+                    ) : (
+                      <div className="flex h-full items-center justify-center text-[8px] text-muted-foreground">—</div>
+                    )}
                   </div>
-                ))}
-              </div>
-            )}
+                  <button
+                    type="button"
+                    onClick={() => toggleGame(game)}
+                    className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-[#656379] text-white opacity-0 shadow transition-opacity group-hover/fav:opacity-100"
+                  >
+                    <X size={10} weight="bold" />
+                  </button>
+                  <p className="mt-1 line-clamp-1 text-[10px] font-medium leading-tight text-[#646373]">
+                    {game.title}
+                  </p>
+                </div>
+              ))}
+              {Array.from({ length: Math.max(0, 5 - selected.length) }).map((_, i) => (
+                <div
+                  key={`slot-${i}`}
+                  className="flex aspect-[3/4] min-w-0 flex-1 items-center justify-center rounded-lg border border-dashed border-border bg-muted/20"
+                >
+                  <Plus size={14} className="text-muted-foreground/40" />
+                </div>
+              ))}
+            </div>
           </div>
 
-          {/* Search + library list */}
-          <div>
+          {/* Search */}
+          <div className="relative">
+            <MagnifyingGlass size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <input
               type="search"
-              placeholder="Filter library..."
-              className="mb-2 h-9 w-full rounded-lg border-0 bg-muted/50 px-3 text-[13px] placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-[#656379]/30"
+              placeholder="Search your library..."
+              className="h-10 w-full rounded-lg border-0 bg-muted/50 pl-9 pr-3 text-[13px] placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-[#656379]/30"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
-            <div className="max-h-[220px] overflow-y-auto space-y-0.5">
+          </div>
+
+          {/* Library list */}
+          <div className="max-h-[240px] overflow-y-auto">
+            <ul className="py-1">
               {filtered.map((game) => {
                 const isSelected = selected.some((s) => s.gameId === game.gameId);
+                const atLimit = !isSelected && selected.length >= 5;
                 return (
-                  <button
+                  <li
                     key={game.gameId}
-                    type="button"
-                    className={`flex w-full items-center gap-3 rounded-lg px-2 py-2 text-left transition-colors hover:bg-muted ${
-                      isSelected ? "bg-muted/70" : ""
-                    } ${!isSelected && selected.length >= 5 ? "opacity-40" : ""}`}
-                    onClick={() => toggleGame(game)}
-                    disabled={!isSelected && selected.length >= 5}
+                    className={`flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2 transition-colors hover:bg-muted/50 ${
+                      atLimit ? "pointer-events-none opacity-40" : ""
+                    }`}
+                    onClick={() => !atLimit && toggleGame(game)}
                   >
-                    <div className="relative h-12 w-9 shrink-0 overflow-hidden rounded bg-muted">
+                    <div className="relative h-14 w-10 shrink-0 overflow-hidden rounded-md bg-muted">
                       {game.coverUrl ? (
-                        <Image
-                          src={game.coverUrl}
-                          alt=""
-                          fill
-                          className="object-cover"
-                          sizes="36px"
-                        />
+                        <Image src={game.coverUrl} alt="" fill className="object-cover" sizes="40px" />
                       ) : (
-                        <div className="flex h-full items-center justify-center text-[8px] text-muted-foreground">
-                          —
-                        </div>
+                        <div className="flex h-full items-center justify-center text-[9px] text-muted-foreground">—</div>
                       )}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-[13px] font-medium text-foreground">
-                        {game.title}
-                      </p>
+                      <p className="truncate text-[14px] font-semibold text-[#646373]">{game.title}</p>
                       {game.developerName && (
-                        <p className="truncate text-[10px] font-medium uppercase text-muted-foreground">
-                          {game.developerName}
-                        </p>
+                        <p className="truncate text-[12px] text-muted-foreground">{game.developerName}</p>
                       )}
                     </div>
-                    {isSelected && (
-                      <span className="shrink-0 rounded-full bg-[#656379] px-2 py-0.5 text-[10px] font-bold text-white">
-                        {selected.findIndex((s) => s.gameId === game.gameId) + 1}
-                      </span>
-                    )}
-                  </button>
+                    <div className="flex shrink-0 items-center">
+                      {isSelected ? (
+                        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#D4D3DF] text-[#646373]">
+                          <Check size={16} weight="bold" />
+                        </span>
+                      ) : (
+                        <span className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-all hover:bg-[#D4D3DF] hover:text-[#646373]">
+                          <Plus size={16} weight="bold" />
+                        </span>
+                      )}
+                    </div>
+                  </li>
                 );
               })}
               {filtered.length === 0 && (
-                <p className="py-4 text-center text-[12px] text-muted-foreground">
-                  No games match your filter.
+                <p className="py-6 text-center text-[13px] text-muted-foreground">
+                  No games match your search.
                 </p>
               )}
-            </div>
+            </ul>
           </div>
 
           {/* Save */}

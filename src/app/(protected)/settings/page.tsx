@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { CopyProfileUrl } from "./copy-profile-url";
 
 export default async function SettingsPage() {
   const session = await auth();
@@ -18,12 +19,15 @@ export default async function SettingsPage() {
           <CardDescription>Signed in as {session.user.email}</CardDescription>
         </CardHeader>
         <CardContent className="text-sm text-muted-foreground">
-          <p>
-            Public profile:{" "}
-            <a className="text-primary hover:underline" href={`/u/${session.user.handle}`}>
-              /u/{session.user.handle}
-            </a>
-          </p>
+          <div className="flex items-center gap-2">
+            <p>
+              Public profile:{" "}
+              <a className="text-primary hover:underline" href={`/u/${session.user.handle}`}>
+                /u/{session.user.handle}
+              </a>
+            </p>
+            <CopyProfileUrl handle={session.user.handle!} />
+          </div>
         </CardContent>
       </Card>
     </div>

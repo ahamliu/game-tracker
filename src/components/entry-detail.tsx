@@ -18,6 +18,9 @@ import type { EntryStatus } from "@/lib/status";
 import { statusLabel, statusColor, STATUS_OPTIONS } from "@/lib/status";
 import { cn } from "@/lib/utils";
 
+const NOTES_MAX = 5_000;
+const ROUTE_NOTES_MAX = 5_000;
+
 type Game = {
   id: string;
   title: string;
@@ -57,16 +60,11 @@ export function EntryDetail({
 }) {
   const router = useRouter();
   const [notes, setNotes] = useState(initial.notes ?? "");
-  const [progressPercent, setProgressPercent] = useState(
-    initial.progressPercent?.toString() ?? "",
-  );
-  const [progressNote, setProgressNote] = useState(initial.progressNote ?? "");
   const [rating, setRating] = useState(initial.rating);
   const [routes, setRoutes] = useState(initial.routes);
   const [addingRoute, setAddingRoute] = useState(false);
   const [newRouteName, setNewRouteName] = useState("");
   const [editingNotes, setEditingNotes] = useState(false);
-  const [editingProgress, setEditingProgress] = useState(false);
   const [gameTitle, setGameTitle] = useState(initial.game.title);
   const [editingTitle, setEditingTitle] = useState(false);
   const [titleInput, setTitleInput] = useState(initial.game.title);
@@ -93,15 +91,6 @@ export function EntryDetail({
     const val = notes.trim() || null;
     if (val !== initial.notes) {
       void patchEntry({ notes: val });
-    }
-  }
-
-  function handleProgressBlur() {
-    setEditingProgress(false);
-    const pct = progressPercent === "" ? null : Number(progressPercent);
-    const note = progressNote.trim() || null;
-    if (pct !== initial.progressPercent || note !== initial.progressNote) {
-      void patchEntry({ progressPercent: pct, progressNote: note });
     }
   }
 
@@ -198,7 +187,6 @@ export function EntryDetail({
   }
 
   const completedCount = routes.filter((r) => r.status === "completed").length;
-  const progressValue = progressPercent ? Number(progressPercent) : 0;
   const canEditCover = initial.game.source === "user" || !initial.game.coverUrl;
 
   return (
@@ -379,64 +367,12 @@ export function EntryDetail({
               <StatusDropdown
                 entryId={entryId}
                 status={initial.status}
+                gameTitle={gameTitle}
                 onRemove={() => router.push("/library")}
               />
             </div>
           </div>
 
-          {/* Progress bar */}
-          <div className="mt-4">
-            {editingProgress ? (
-              <div className="flex items-center gap-3">
-                <Input
-                  type="number"
-                  min={0}
-                  max={100}
-                  placeholder="0"
-                  value={progressPercent}
-                  onChange={(e) => setProgressPercent(e.target.value)}
-                  onBlur={handleProgressBlur}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") handleProgressBlur();
-                  }}
-                  className="h-8 w-20 text-sm"
-                  autoFocus
-                />
-                <span className="text-sm text-muted-foreground">%</span>
-                <Input
-                  placeholder="Chapter, label..."
-                  value={progressNote}
-                  onChange={(e) => setProgressNote(e.target.value)}
-                  onBlur={handleProgressBlur}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") handleProgressBlur();
-                  }}
-                  className="h-8 flex-1 text-sm"
-                />
-              </div>
-            ) : (
-              <button
-                type="button"
-                className="group flex w-full items-center gap-3"
-                onClick={() => setEditingProgress(true)}
-              >
-                <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted">
-                  <div
-                    className="h-full rounded-full bg-[#656379] transition-all"
-                    style={{ width: `${Math.min(progressValue, 100)}%` }}
-                  />
-                </div>
-                <span className="shrink-0 text-[12px] font-medium text-muted-foreground">
-                  {progressPercent ? `${progressPercent}%` : "0%"}
-                  {progressNote && ` · ${progressNote}`}
-                </span>
-                <PencilSimple
-                  size={14}
-                  className="shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100"
-                />
-              </button>
-            )}
-          </div>
         </div>
       </div>
 
@@ -456,14 +392,29 @@ export function EntryDetail({
           )}
         </div>
         {editingNotes ? (
-          <textarea
-            className="min-h-[120px] w-full rounded-lg border border-border bg-card px-4 py-3 text-[14px] leading-relaxed focus:outline-none focus:ring-2 focus:ring-[#656379]/30"
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            onBlur={handleNotesBlur}
-            autoFocus
-            placeholder="Add notes about this game..."
-          />
+          <div className="relative">
+            <textarea
+              className="min-h-[120px] w-full rounded-lg border border-border bg-card px-4 py-3 text-[14px] leading-relaxed focus:outline-none focus:ring-2 focus:ring-[#656379]/30"
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              onBlur={handleNotesBlur}
+              maxLength={NOTES_MAX}
+              autoFocus
+              placeholder="Add notes about this game..."
+            />
+            {notes.length > NOTES_MAX * 0.75 && (
+              <span
+                className={cn(
+                  "absolute bottom-2 right-3 select-none text-[11px] tabular-nums",
+                  notes.length > NOTES_MAX * 0.9
+                    ? "text-[#822B34]"
+                    : "text-muted-foreground",
+                )}
+              >
+                {notes.length.toLocaleString()}/{NOTES_MAX.toLocaleString()}
+              </span>
+            )}
+          </div>
         ) : (
           <div
             className="min-h-[60px] cursor-pointer rounded-lg bg-card px-4 py-3 text-[14px] leading-relaxed text-muted-foreground transition-colors hover:bg-muted/50"
@@ -478,17 +429,28 @@ export function EntryDetail({
         )}
       </section>
 
-      {/* Character Routes */}
+      {/* Content */}
       <section>
         <div className="mb-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <h2 className="text-[16px] font-bold text-[#646373]">
-              Character Routes
+              Content
             </h2>
             {routes.length > 0 && (
-              <span className="text-[12px] text-muted-foreground">
-                {completedCount}/{routes.length} completed
-              </span>
+              <div className="flex items-center gap-2">
+                <div className="h-1.5 w-24 overflow-hidden rounded-full bg-muted">
+                  <div
+                    className="h-full rounded-full transition-all"
+                    style={{
+                      width: `${Math.round((completedCount / routes.length) * 100)}%`,
+                      backgroundColor: routeProgressColor(completedCount / routes.length),
+                    }}
+                  />
+                </div>
+                <span className="text-[12px] tabular-nums text-muted-foreground">
+                  {completedCount}/{routes.length}
+                </span>
+              </div>
             )}
           </div>
           <button
@@ -521,7 +483,7 @@ export function EntryDetail({
               <Input
                 value={newRouteName}
                 onChange={(e) => setNewRouteName(e.target.value)}
-                placeholder="Route name..."
+                placeholder="Content name..."
                 className="h-8 flex-1 border-0 bg-transparent p-0 text-[14px] shadow-none focus-visible:ring-0"
                 autoFocus
                 onKeyDown={(e) => {
@@ -559,7 +521,7 @@ export function EntryDetail({
               onClick={() => setAddingRoute(true)}
             >
               <p className="text-[13px] text-muted-foreground">
-                No routes yet. Click to add your first character route.
+                Nothing here yet. Track routes, DLC, chapters, or any other content within this game.
               </p>
             </div>
           )}
@@ -818,21 +780,36 @@ function RouteItem({
 
         {/* Notes */}
         {editingNotes ? (
-          <textarea
-            className="mt-1 w-full resize-none rounded border border-border bg-transparent px-2 py-1 text-[13px] leading-relaxed text-foreground outline-none focus:ring-1 focus:ring-[#656379]/30"
-            value={routeNotes}
-            onChange={(e) => setRouteNotes(e.target.value)}
-            onBlur={handleNotesBlur}
-            onKeyDown={(e) => {
-              if (e.key === "Escape") {
-                setRouteNotes(route.notes ?? "");
-                setEditingNotes(false);
-              }
-            }}
-            autoFocus
-            rows={2}
-            placeholder="Add notes..."
-          />
+          <div className="relative mt-1">
+            <textarea
+              className="w-full resize-none rounded border border-border bg-transparent px-2 py-1 text-[13px] leading-relaxed text-foreground outline-none focus:ring-1 focus:ring-[#656379]/30"
+              value={routeNotes}
+              onChange={(e) => setRouteNotes(e.target.value)}
+              onBlur={handleNotesBlur}
+              onKeyDown={(e) => {
+                if (e.key === "Escape") {
+                  setRouteNotes(route.notes ?? "");
+                  setEditingNotes(false);
+                }
+              }}
+              maxLength={ROUTE_NOTES_MAX}
+              autoFocus
+              rows={2}
+              placeholder="Add notes..."
+            />
+            {routeNotes.length > ROUTE_NOTES_MAX * 0.75 && (
+              <span
+                className={cn(
+                  "absolute bottom-1.5 right-2 select-none text-[10px] tabular-nums",
+                  routeNotes.length > ROUTE_NOTES_MAX * 0.9
+                    ? "text-[#822B34]"
+                    : "text-muted-foreground",
+                )}
+              >
+                {routeNotes.length.toLocaleString()}/{ROUTE_NOTES_MAX.toLocaleString()}
+              </span>
+            )}
+          </div>
         ) : (
           <p
             className="mt-1 cursor-pointer text-[13px] leading-relaxed text-muted-foreground hover:text-foreground"
@@ -876,7 +853,7 @@ function RouteStatusPill({ status, onChange, onRemove }: { status: EntryStatus; 
               key={o.value}
               type="button"
               className={cn(
-                "flex w-full items-center gap-2 px-3 py-1.5 text-left text-[12px] text-foreground",
+                "flex w-full items-center gap-2 px-3 py-1.5 text-left text-[12px] text-[#646373]",
                 status === o.value ? "bg-muted" : "hover:bg-muted"
               )}
               onClick={() => { onChange(o.value); setOpen(false); }}
@@ -902,8 +879,8 @@ function RouteStatusPill({ status, onChange, onRemove }: { status: EntryStatus; 
       )}
       <ConfirmDialog
         open={confirmRemove}
-        title="Remove route"
-        description="This route and its notes will be permanently deleted."
+        title="Remove entry"
+        description="This entry and its notes will be permanently deleted."
         confirmLabel="Remove"
         onConfirm={() => { setConfirmRemove(false); onRemove?.(); }}
         onCancel={() => setConfirmRemove(false)}
@@ -926,7 +903,7 @@ function RouteRating({ value, onChange }: { value: number | null; onChange: (v: 
           if (!ref.current?.contains(e.relatedTarget as Node)) setOpen(false);
         }}
       >
-        <Star size={14} weight="fill" className={value != null ? "text-[#F5A623]" : ""} />
+        <Star size={14} weight="fill" />
         Rating: {value != null ? `${value}/10` : "-/-"}
         <CaretDown size={10} />
       </button>
@@ -935,7 +912,7 @@ function RouteRating({ value, onChange }: { value: number | null; onChange: (v: 
           <button
             type="button"
             className={cn(
-              "mb-1 block w-full rounded py-1 text-center text-[12px] text-foreground",
+              "mb-1 block w-full rounded py-1 text-center text-[12px] text-[#646373]",
               value == null ? "bg-muted" : "hover:bg-muted"
             )}
             onClick={() => { onChange(null); setOpen(false); }}
@@ -948,7 +925,7 @@ function RouteRating({ value, onChange }: { value: number | null; onChange: (v: 
                 key={v}
                 type="button"
                 className={cn(
-                  "rounded py-1 text-center text-[12px] text-foreground",
+                  "rounded py-1 text-center text-[12px] text-[#646373]",
                   value === v ? "bg-muted" : "hover:bg-muted"
                 )}
                 onClick={() => { onChange(v); setOpen(false); }}
@@ -961,4 +938,11 @@ function RouteRating({ value, onChange }: { value: number | null; onChange: (v: 
       )}
     </div>
   );
+}
+
+function routeProgressColor(ratio: number): string {
+  if (ratio >= 1) return "#5DAE6E";
+  if (ratio >= 0.5) return "#8EC5E2";
+  if (ratio > 0) return "#D7D7D7";
+  return "#E0E0E0";
 }

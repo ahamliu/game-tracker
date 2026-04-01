@@ -11,7 +11,7 @@ const patchSchema = z.object({
   name: z.string().min(1).max(200).optional(),
   status: statusSchema.optional(),
   rating: z.number().int().min(0).max(10).nullable().optional(),
-  notes: z.string().max(20000).nullable().optional(),
+  notes: z.string().max(5000).nullable().optional(),
   sortOrder: z.number().int().min(0).optional(),
   imageUrl: z.union([z.string().url(), z.null()]).optional(),
 });

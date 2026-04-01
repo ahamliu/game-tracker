@@ -17,14 +17,16 @@ export function ExploreFiltersForm({
   initialSort,
   initialGenreIds,
   genres,
+  total,
 }: {
   initialQ: string;
   initialSort: ExploreSort;
   initialGenreIds: number[];
   genres: { id: number; name: string }[];
+  total: number;
 }) {
   const router = useRouter();
-  const [pending, startTransition] = useTransition();
+  const [, startTransition] = useTransition();
   const [q, setQ] = useState(initialQ);
   const [sort, setSort] = useState<ExploreSort>(initialSort);
   const [sortOpen, setSortOpen] = useState(false);
@@ -78,16 +80,16 @@ export function ExploreFiltersForm({
   }
 
   return (
-    <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+    <div className="space-y-2">
       {/* Search */}
-      <div className="relative min-w-0 flex-1">
+      <div className="relative">
         <MagnifyingGlass
           size={20}
           className="absolute left-4 top-1/2 -translate-y-1/2 text-[#646373]"
         />
         <Input
           type="search"
-          placeholder="Search games..."
+          placeholder="Search..."
           className="h-[50px] border-0 bg-card pl-12 text-[16px] shadow-none placeholder:text-muted-foreground focus-visible:ring-0"
           value={q}
           onChange={(e) => handleQueryChange(e.target.value)}
@@ -103,92 +105,95 @@ export function ExploreFiltersForm({
         )}
       </div>
 
-      {/* Sort dropdown */}
-      <div ref={sortRef} className="relative">
-        <button
-          type="button"
-          onClick={() => setSortOpen(!sortOpen)}
-          className="flex h-[36px] items-center gap-1.5 rounded-lg px-3 text-[14px] text-[#8B8B8B] hover:bg-[#E8E8E8] dark:hover:bg-[#2a2a35]"
-        >
-          <span>Sort:</span>
-          <span className="text-[#8B8B8B]">{SORT_OPTIONS.find((o) => o.value === sort)?.label}</span>
-          <CaretDown size={12} />
-        </button>
-        {sortOpen && (
-          <div className="absolute right-0 top-full z-50 mt-1 w-36 rounded-lg border border-border bg-card py-1">
-            {SORT_OPTIONS.map((o) => (
+      <div className="flex flex-wrap items-center justify-between gap-4 text-[14px]">
+        <p className="font-normal text-muted-foreground">
+          {total} {total === 1 ? "item" : "items"}
+        </p>
+        <div className="flex items-center gap-2">
+          {/* Genre filter */}
+          {genres.length > 0 && (
+            <div ref={genresRef} className="relative">
               <button
-                key={o.value}
                 type="button"
-                className={`flex w-full items-center px-3 py-1.5 text-[12px] hover:bg-muted ${
-                  sort === o.value ? "bg-muted font-medium" : ""
-                }`}
-                onClick={() => handleSortChange(o.value)}
+                onClick={() => setGenresOpen(!genresOpen)}
+                className="flex h-[36px] min-w-[200px] max-w-[200px] items-center gap-1.5 rounded-lg px-3 text-[14px] text-[#8B8B8B]"
               >
-                {o.label}
+                <span className="shrink-0">Genre:</span>
+                <span className="min-w-0 flex-1 truncate text-left">
+                  {selectedGenres.length === 0
+                    ? "Any"
+                    : selectedGenres.length === 1
+                      ? genres.find((g) => g.id === selectedGenres[0])?.name ?? "1 genre"
+                      : `${selectedGenres.length} genres`}
+                </span>
+                <CaretDown size={12} className="ml-auto shrink-0" />
               </button>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Genre filter */}
-      {genres.length > 0 && (
-        <div ref={genresRef} className="relative">
-          <button
-            type="button"
-            onClick={() => setGenresOpen(!genresOpen)}
-            className="flex h-[36px] items-center gap-1.5 rounded-lg px-3 text-[14px] text-[#8B8B8B] hover:bg-[#E8E8E8] dark:hover:bg-[#2a2a35]"
-          >
-            <span>Genre:</span>
-            <span className="text-[#8B8B8B]">
-              {selectedGenres.length === 0
-                ? "Any"
-                : selectedGenres.length === 1
-                  ? genres.find((g) => g.id === selectedGenres[0])?.name ?? "1 genre"
-                  : `${selectedGenres.length} genres`}
-            </span>
-            <CaretDown size={12} />
-          </button>
-          {genresOpen && (
-            <div className="absolute right-0 top-full z-50 mt-1 max-h-[280px] w-48 overflow-y-auto rounded-lg border border-border bg-card py-1">
-              {selectedGenres.length > 0 && (
-                <button
-                  type="button"
-                  className="flex w-full items-center px-3 py-1.5 text-[12px] text-muted-foreground hover:bg-muted"
-                  onClick={() => { setSelectedGenres([]); navigate(q, sort, []); }}
-                >
-                  Clear all
-                </button>
+              {genresOpen && (
+                <div className="absolute right-0 top-full z-50 mt-1 max-h-[280px] w-48 overflow-y-auto rounded-lg border border-border bg-card py-1">
+                  {selectedGenres.length > 0 && (
+                    <button
+                      type="button"
+                      className="flex w-full items-center px-3 py-1.5 text-[12px] text-muted-foreground hover:bg-muted"
+                      onClick={() => { setSelectedGenres([]); navigate(q, sort, []); }}
+                    >
+                      Clear all
+                    </button>
+                  )}
+                  {genres.map((g) => {
+                    const active = selectedGenres.includes(g.id);
+                    return (
+                      <button
+                        key={g.id}
+                        type="button"
+                        className={`flex w-full items-start gap-2 px-3 py-1.5 text-left text-[12px] text-[#646373] hover:bg-muted ${
+                          active ? "bg-muted font-medium" : ""
+                        }`}
+                        onClick={() => handleGenreToggle(g.id)}
+                      >
+                        <span className={`mt-[1px] flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded border text-[8px] ${
+                          active ? "border-[#656379] bg-[#656379] text-white" : "border-border"
+                        }`}>
+                          {active && "✓"}
+                        </span>
+                        {g.name}
+                      </button>
+                    );
+                  })}
+                </div>
               )}
-              {genres.map((g) => {
-                const active = selectedGenres.includes(g.id);
-                return (
-                  <button
-                    key={g.id}
-                    type="button"
-                    className={`flex w-full items-center gap-2 px-3 py-1.5 text-[12px] hover:bg-muted ${
-                      active ? "bg-muted font-medium" : ""
-                    }`}
-                    onClick={() => handleGenreToggle(g.id)}
-                  >
-                    <span className={`flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded border text-[8px] ${
-                      active ? "border-[#656379] bg-[#656379] text-white" : "border-border"
-                    }`}>
-                      {active && "✓"}
-                    </span>
-                    {g.name}
-                  </button>
-                );
-              })}
             </div>
           )}
-        </div>
-      )}
 
-      {pending && (
-        <span className="text-[12px] text-muted-foreground">Loading...</span>
-      )}
+          {/* Sort dropdown */}
+          <div ref={sortRef} className="relative">
+            <button
+              type="button"
+              onClick={() => setSortOpen(!sortOpen)}
+              className="flex h-[36px] w-[180px] items-center gap-1.5 rounded-lg px-3 text-[14px] text-[#8B8B8B]"
+            >
+              <span className="shrink-0">Sort by:</span>
+              <span className="min-w-0 flex-1 truncate text-left">{SORT_OPTIONS.find((o) => o.value === sort)?.label}</span>
+              <CaretDown size={12} className="ml-auto shrink-0" />
+            </button>
+            {sortOpen && (
+              <div className="absolute right-0 top-full z-50 mt-1 w-36 rounded-lg border border-border bg-card py-1">
+                {SORT_OPTIONS.map((o) => (
+                  <button
+                    key={o.value}
+                    type="button"
+                    className={`flex w-full items-center px-3 py-1.5 text-[12px] text-[#646373] hover:bg-muted ${
+                      sort === o.value ? "bg-muted font-medium" : ""
+                    }`}
+                    onClick={() => handleSortChange(o.value)}
+                  >
+                    {o.label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

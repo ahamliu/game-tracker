@@ -5,6 +5,7 @@ import {
   timestamp,
   uuid,
   integer,
+  boolean,
   uniqueIndex,
   index,
   jsonb,
@@ -31,6 +32,12 @@ export const activityTypeEnum = pgEnum("activity_type", [
   "rated",
   "dropped",
   "on_hold",
+]);
+
+export const friendRequestStatusEnum = pgEnum("friend_request_status", [
+  "pending",
+  "accepted",
+  "declined",
 ]);
 
 export const users = pgTable(
@@ -162,21 +169,60 @@ export const characterRoutes = pgTable(
   (t) => [index("routes_entry_idx").on(t.libraryEntryId)]
 );
 
-export const follows = pgTable(
-  "follows",
+export const friendships = pgTable(
+  "friendships",
   {
     id: uuid("id").defaultRandom().primaryKey(),
-    followerId: uuid("follower_id")
+    userA: uuid("user_a")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
-    followingId: uuid("following_id")
+    userB: uuid("user_b")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   },
   (t) => [
-    uniqueIndex("follows_unique").on(t.followerId, t.followingId),
-    index("follows_following_idx").on(t.followingId),
+    uniqueIndex("friendships_pair_unique").on(t.userA, t.userB),
+    index("friendships_user_b_idx").on(t.userB),
+  ]
+);
+
+export const friendRequests = pgTable(
+  "friend_requests",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    senderId: uuid("sender_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    receiverId: uuid("receiver_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    status: friendRequestStatusEnum("status").notNull().default("pending"),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (t) => [
+    uniqueIndex("friend_requests_pair_unique").on(t.senderId, t.receiverId),
+    index("friend_requests_receiver_idx").on(t.receiverId),
+  ]
+);
+
+export const notifications = pgTable(
+  "notifications",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    type: varchar("type", { length: 50 }).notNull(),
+    referenceId: uuid("reference_id"),
+    senderUserId: uuid("sender_user_id").references(() => users.id, { onDelete: "cascade" }),
+    read: boolean("read").notNull().default(false),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (t) => [
+    index("notifications_user_idx").on(t.userId),
+    index("notifications_user_read_idx").on(t.userId, t.read),
   ]
 );
 
@@ -234,15 +280,41 @@ export const characterRoutesRelations = relations(characterRoutes, ({ one }) => 
   }),
 }));
 
-export const followsRelations = relations(follows, ({ one }) => ({
-  follower: one(users, {
-    fields: [follows.followerId],
+export const friendshipsRelations = relations(friendships, ({ one }) => ({
+  userARef: one(users, {
+    fields: [friendships.userA],
     references: [users.id],
-    relationName: "followers",
+    relationName: "friendshipsA",
   }),
-  following: one(users, {
-    fields: [follows.followingId],
+  userBRef: one(users, {
+    fields: [friendships.userB],
     references: [users.id],
-    relationName: "following",
+    relationName: "friendshipsB",
+  }),
+}));
+
+export const friendRequestsRelations = relations(friendRequests, ({ one }) => ({
+  sender: one(users, {
+    fields: [friendRequests.senderId],
+    references: [users.id],
+    relationName: "sentFriendRequests",
+  }),
+  receiver: one(users, {
+    fields: [friendRequests.receiverId],
+    references: [users.id],
+    relationName: "receivedFriendRequests",
+  }),
+}));
+
+export const notificationsRelations = relations(notifications, ({ one }) => ({
+  user: one(users, {
+    fields: [notifications.userId],
+    references: [users.id],
+    relationName: "notifications",
+  }),
+  senderUser: one(users, {
+    fields: [notifications.senderUserId],
+    references: [users.id],
+    relationName: "sentNotifications",
   }),
 }));

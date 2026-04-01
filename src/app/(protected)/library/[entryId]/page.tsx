@@ -1,9 +1,9 @@
 import { and, eq, sql } from "drizzle-orm";
-import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { db } from "@/db";
 import { libraryEntries } from "@/db/schema";
+import { BackButton } from "@/components/back-button";
 import { EntryDetail } from "@/components/entry-detail";
 
 type PageProps = { params: Promise<{ entryId: string }> };
@@ -35,12 +35,7 @@ export default async function EntryPage({ params }: PageProps) {
   return (
     <div className="space-y-4">
       <div className="mx-auto max-w-[860px]">
-        <Link
-          href="/library"
-          className="inline-flex items-center gap-1 text-[13px] text-muted-foreground transition-colors hover:text-foreground"
-        >
-          ← Library
-        </Link>
+        <BackButton />
       </div>
       <EntryDetail
         entryId={entry.id}

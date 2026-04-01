@@ -61,7 +61,7 @@ export type IgdbGameHit = {
 };
 
 const searchMemory = new Map<string, { at: number; hits: IgdbGameHit[] }>();
-const SEARCH_TTL_MS = 24 * 60 * 60 * 1000;
+const SEARCH_TTL_MS = 5 * 60 * 1000;
 
 export async function searchIgdb(query: string, limit = 20): Promise<IgdbGameHit[]> {
   const q = query.trim();
@@ -71,7 +71,7 @@ export async function searchIgdb(query: string, limit = 20): Promise<IgdbGameHit
   const token = await getAccessToken();
   if (!id || !token) return [];
 
-  const cacheKey = `${q.toLowerCase()}:${limit}`;
+  const cacheKey = `v3:${q.toLowerCase()}:${limit}`;
   const cached = searchMemory.get(cacheKey);
   if (cached && Date.now() - cached.at < SEARCH_TTL_MS) return cached.hits;
 

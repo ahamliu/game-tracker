@@ -1,7 +1,7 @@
-import { count, eq } from "drizzle-orm";
+import { count, eq, or } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { db } from "@/db";
-import { follows, users } from "@/db/schema";
+import { friendships, users } from "@/db/schema";
 
 type Ctx = { params: Promise<{ handle: string }> };
 
@@ -16,13 +16,8 @@ export async function GET(_req: Request, ctx: Ctx) {
 
   const [{ fc }] = await db
     .select({ fc: count() })
-    .from(follows)
-    .where(eq(follows.followingId, user.id));
-
-  const [{ fg }] = await db
-    .select({ fg: count() })
-    .from(follows)
-    .where(eq(follows.followerId, user.id));
+    .from(friendships)
+    .where(or(eq(friendships.userA, user.id), eq(friendships.userB, user.id)));
 
   return NextResponse.json({
     user: {
@@ -31,6 +26,6 @@ export async function GET(_req: Request, ctx: Ctx) {
       bio: user.bio,
       avatarUrl: user.avatarUrl,
     },
-    stats: { followers: fc, following: fg },
+    stats: { friends: fc },
   });
 }

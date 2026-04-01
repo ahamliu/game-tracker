@@ -42,7 +42,7 @@ function LoginForm() {
       <Card>
         <CardHeader>
           <CardTitle>Sign in</CardTitle>
-          <CardDescription>Welcome back to GameShelf.</CardDescription>
+          <CardDescription>Pick up where you left off.</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={onSubmit} className="space-y-4">

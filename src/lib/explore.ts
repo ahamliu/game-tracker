@@ -1,7 +1,8 @@
-import { and, asc, desc, eq, ilike, sql } from "drizzle-orm";
+import { and, asc, desc, eq, ilike, isNotNull, sql } from "drizzle-orm";
 import { db } from "@/db";
-import { games, libraryEntries } from "@/db/schema";
+import { characterRoutes, games, libraryEntries } from "@/db/schema";
 import type { EntryStatus } from "@/lib/status";
+import type { ProfileStatsData } from "@/app/u/[handle]/profile-stats";
 
 export type ExploreSort = "popular" | "rated" | "newest";
 
@@ -54,6 +55,57 @@ export async function getCarouselForUser(userId: string): Promise<CarouselEntry[
   });
 }
 
+export type PlayingRoute = {
+  id: string;
+  name: string;
+  imageUrl: string | null;
+  cleared: boolean;
+};
+
+export type PlayingEntry = {
+  entryId: string;
+  gameId: string;
+  title: string;
+  coverUrl: string | null;
+  notes: string | null;
+  routes: PlayingRoute[];
+  overflowRoutes: number;
+};
+
+const PLAYING_ROUTE_PREVIEW = 6;
+
+export async function getPlayingForUser(userId: string): Promise<PlayingEntry[]> {
+  const entries = await db.query.libraryEntries.findMany({
+    where: and(eq(libraryEntries.userId, userId), eq(libraryEntries.status, "playing")),
+    with: {
+      game: true,
+      routes: {
+        orderBy: (r, { asc: a }) => [a(r.sortOrder), a(r.createdAt)],
+      },
+    },
+    orderBy: [desc(libraryEntries.updatedAt)],
+    limit: 24,
+  });
+
+  return entries.map((e) => {
+    const slice = e.routes.slice(0, PLAYING_ROUTE_PREVIEW);
+    return {
+      entryId: e.id,
+      gameId: e.game.id,
+      title: e.game.title,
+      coverUrl: e.game.coverUrl,
+      notes: e.notes,
+      routes: slice.map((r) => ({
+        id: r.id,
+        name: r.name,
+        imageUrl: r.imageUrl,
+        cleared: r.status === "completed",
+      })),
+      overflowRoutes: Math.max(0, e.routes.length - PLAYING_ROUTE_PREVIEW),
+    };
+  });
+}
+
 export type PopularRow = {
   game: typeof games.$inferSelect;
   saves: number;
@@ -71,7 +123,7 @@ function ratingDisplayForGame(
     return {
       ratingLabel: "critic",
       ratingValue: game.aggregatedRating,
-      ratingDisplay: `${Math.round(game.aggregatedRating)}/100`,
+      ratingDisplay: `${(game.aggregatedRating / 10).toFixed(1)}/10`,
     };
   }
   if (avgPlayer != null && !Number.isNaN(avgPlayer)) {
@@ -178,6 +230,7 @@ export async function getExplorePopular(params: {
 
 export type RecentEntry = {
   entryId: string;
+  gameId: string;
   title: string;
   coverUrl: string | null;
   developerName: string | null;
@@ -193,11 +246,67 @@ export async function getRecentlyAdded(limit = 12): Promise<RecentEntry[]> {
 
   return entries.map((e) => ({
     entryId: e.id,
+    gameId: e.gameId,
     title: e.game.title,
     coverUrl: e.game.coverUrl,
     developerName: e.game.developerName,
     addedAt: e.createdAt,
   }));
+}
+
+export async function getUserLibraryGameIds(userId: string): Promise<string[]> {
+  const entries = await db
+    .select({ gameId: libraryEntries.gameId })
+    .from(libraryEntries)
+    .where(eq(libraryEntries.userId, userId));
+  return entries.map((e) => e.gameId);
+}
+
+export async function getStatsForUser(userId: string): Promise<ProfileStatsData> {
+  const [statusRows, ratingRow, routeStats] = await Promise.all([
+    db
+      .select({
+        status: libraryEntries.status,
+        cnt: sql<number>`cast(count(*) as int)`,
+      })
+      .from(libraryEntries)
+      .where(eq(libraryEntries.userId, userId))
+      .groupBy(libraryEntries.status),
+    db
+      .select({ avg: sql<number | null>`avg(${libraryEntries.rating})` })
+      .from(libraryEntries)
+      .where(and(eq(libraryEntries.userId, userId), isNotNull(libraryEntries.rating))),
+    db
+      .select({
+        total: sql<number>`cast(count(*) as int)`,
+        completed: sql<number>`cast(count(*) filter (where ${characterRoutes.status} = 'completed') as int)`,
+      })
+      .from(characterRoutes)
+      .innerJoin(libraryEntries, eq(characterRoutes.libraryEntryId, libraryEntries.id))
+      .where(eq(libraryEntries.userId, userId)),
+  ]);
+
+  const statusCounts: Record<EntryStatus, number> = {
+    planning: 0,
+    playing: 0,
+    completed: 0,
+    on_hold: 0,
+    dropped: 0,
+  };
+  for (const row of statusRows) {
+    statusCounts[row.status as EntryStatus] = row.cnt;
+  }
+  const totalEntries = Object.values(statusCounts).reduce((a, b) => a + b, 0);
+  const meanScore =
+    ratingRow[0]?.avg != null ? Math.round(Number(ratingRow[0].avg) * 100) / 100 : null;
+
+  return {
+    statusCounts,
+    totalEntries,
+    meanScore,
+    routesCompleted: routeStats[0]?.completed ?? 0,
+    routesTotal: routeStats[0]?.total ?? 0,
+  };
 }
 
 export async function getDistinctGenres(): Promise<{ id: number; name: string }[]> {

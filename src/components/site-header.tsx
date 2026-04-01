@@ -3,9 +3,9 @@ import type { Session } from "next-auth";
 import { UserMenu } from "@/components/user-menu";
 import { NavSearch } from "@/components/nav-search";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { Ghost } from "@phosphor-icons/react/dist/ssr";
+import { NotificationBell } from "@/components/notification-bell";
 
-export function SiteHeader({ session }: { session: Session | null }) {
+export function SiteHeader({ session, avatarUrl, unreadCount = 0 }: { session: Session | null; avatarUrl?: string | null; unreadCount?: number }) {
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-card">
       <div className="flex h-[85px] items-center px-4">
@@ -17,20 +17,22 @@ export function SiteHeader({ session }: { session: Session | null }) {
         </Link>
 
         <div className="mx-auto flex-1 flex justify-center">
-          <NavSearch />
+          <NavSearch signedIn={!!session} />
         </div>
 
         <nav className="flex shrink-0 items-center gap-2">
           <ThemeToggle />
           {session ? (
-            <UserMenu user={session.user} />
+            <>
+              <NotificationBell initialUnread={unreadCount} />
+              <UserMenu user={{ ...session.user, image: avatarUrl }} />
+            </>
           ) : (
             <Link
               href="/login"
-              className="flex h-9 w-9 items-center justify-center rounded-full"
-              style={{ backgroundColor: "hsl(248,11%,43%)" }}
+              className="rounded-lg bg-[#656379] px-5 py-2 font-mono text-[12px] font-semibold uppercase text-white hover:opacity-90"
             >
-              <Ghost size={18} className="text-white" weight="fill" />
+              Sign in
             </Link>
           )}
         </nav>

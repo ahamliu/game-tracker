@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useCallback, useRef, useState } from "react";
-import { MagnifyingGlass, X } from "@phosphor-icons/react";
+import { MagnifyingGlass, X, Plus } from "@phosphor-icons/react";
 import { Input } from "@/components/ui/input";
 import type { EntryStatus } from "@/lib/status";
 
@@ -13,6 +13,8 @@ type SearchHit = {
   igdbId?: number;
   title: string;
   coverUrl?: string | null;
+  developerName?: string | null;
+  inLibrary?: boolean;
 };
 
 async function readJsonBody(res: Response): Promise<unknown> {
@@ -25,7 +27,7 @@ async function readJsonBody(res: Response): Promise<unknown> {
   }
 }
 
-export function NavSearch() {
+export function NavSearch({ signedIn = true }: { signedIn?: boolean }) {
   const router = useRouter();
   const [q, setQ] = useState("");
   const [loading, setLoading] = useState(false);
@@ -100,6 +102,17 @@ export function NavSearch() {
     }
   }
 
+  function viewGame(hit: SearchHit) {
+    setQ("");
+    setResults([]);
+    setOpen(false);
+    if (hit.kind === "local") {
+      router.push(`/games/${hit.id}`);
+    } else if (hit.igdbId != null) {
+      router.push(`/games/igdb/${hit.igdbId}`);
+    }
+  }
+
   function handleBlur(e: React.FocusEvent) {
     if (!containerRef.current?.contains(e.relatedTarget as Node)) {
       setTimeout(() => setOpen(false), 150);
@@ -149,40 +162,63 @@ export function NavSearch() {
       </div>
 
       {open && (q.length >= 2 || results.length > 0) && (
-        <div className="absolute left-0 right-0 top-full z-50 mt-1 max-h-[400px] overflow-y-auto rounded-lg border border-border bg-card">
+        <div className="absolute left-0 right-0 top-full z-50 mt-1.5 max-h-[420px] overflow-y-auto rounded-xl border border-border bg-card shadow-lg">
           {loading && (
-            <p className="px-3 py-2 text-sm text-muted-foreground">Searching…</p>
+            <p className="px-4 py-3 text-[13px] text-muted-foreground">Searching…</p>
           )}
           {error && (
-            <p className="px-3 py-2 text-sm text-destructive">{error}</p>
+            <p className="px-4 py-3 text-[13px] text-destructive">{error}</p>
           )}
           {!loading && results.length === 0 && q.length >= 2 && (
-            <p className="px-3 py-2 text-sm text-muted-foreground">No results found.</p>
+            <p className="px-4 py-3 text-[13px] text-muted-foreground">No results found.</p>
           )}
           {results.length > 0 && (
-            <ul>
+            <ul className="py-1">
               {results.map((r) => (
-                <li key={r.id}>
+                <li
+                  key={r.id}
+                  className="group/row flex items-center gap-3 px-3 py-2 transition-colors hover:bg-muted/50"
+                >
+                  <div className="relative h-14 w-10 shrink-0 overflow-hidden rounded-md bg-muted">
+                    {r.coverUrl ? (
+                      <Image src={r.coverUrl} alt="" fill className="object-cover" sizes="40px" />
+                    ) : (
+                      <div className="flex h-full items-center justify-center text-[9px] text-muted-foreground">—</div>
+                    )}
+                  </div>
                   <button
                     type="button"
-                    className="flex w-full items-center gap-3 px-3 py-2 text-left transition-colors hover:bg-accent"
-                    onClick={() => addGame(r)}
-                    disabled={loading}
+                    className="min-w-0 flex-1 text-left"
+                    onClick={() => viewGame(r)}
                   >
-                    <div className="relative h-12 w-8 shrink-0 overflow-hidden rounded bg-muted">
-                      {r.coverUrl ? (
-                        <Image src={r.coverUrl} alt="" fill className="object-cover" />
+                    <p className="truncate text-[14px] font-semibold text-[#646373]">{r.title}</p>
+                    {r.developerName && (
+                      <p className="truncate text-[12px] text-muted-foreground">{r.developerName}</p>
+                    )}
+                  </button>
+                  {signedIn && (
+                    <div className="flex shrink-0 items-center gap-1">
+                      {r.inLibrary ? (
+                        <span className="px-2 text-[11px] font-medium text-muted-foreground">
+                          Added
+                        </span>
                       ) : (
-                        <div className="flex h-full items-center justify-center text-[9px] text-muted-foreground">—</div>
+                        <div className="group/add relative">
+                          <button
+                            type="button"
+                            onClick={() => addGame(r)}
+                            disabled={loading}
+                            className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-all hover:bg-[#D4D3DF] hover:text-[#646373] disabled:opacity-40"
+                          >
+                            <Plus size={16} weight="bold" />
+                          </button>
+                          <span className="pointer-events-none absolute -top-8 right-0 whitespace-nowrap rounded bg-[#333] px-2 py-1 text-[11px] text-white opacity-0 shadow transition-opacity group-hover/add:opacity-100 dark:bg-[#e5e5e5] dark:text-[#1a1a1a]">
+                            Add to library
+                          </span>
+                        </div>
                       )}
                     </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium">{r.title}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {r.kind === "igdb" ? "IGDB" : "Your catalog"} · Click to add
-                      </p>
-                    </div>
-                  </button>
+                  )}
                 </li>
               ))}
             </ul>

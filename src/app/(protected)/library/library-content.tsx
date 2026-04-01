@@ -12,6 +12,8 @@ import {
   Ghost,
   SealCheck,
   CaretDown,
+  CaretLeft,
+  CaretRight,
 } from "@phosphor-icons/react";
 import { Input } from "@/components/ui/input";
 import { RatingDropdown, StatusDropdown } from "@/components/status-controls";
@@ -31,6 +33,7 @@ type EntryData = {
   id: string;
   status: EntryStatus;
   rating: number | null;
+  notes: string | null;
   createdAt: Date;
   game: {
     id: string;
@@ -52,6 +55,8 @@ type UserData = {
 
 type SortOption = "recent" | "title" | "rating";
 
+const PAGE_SIZE = 20;
+
 export function LibraryContent({
   user,
   entries,
@@ -67,6 +72,7 @@ export function LibraryContent({
   const [statusOpen, setStatusOpen] = useState(false);
   const [sortOpen, setSortOpen] = useState(false);
   const [addModalOpen, setAddModalOpen] = useState(false);
+  const [page, setPage] = useState(1);
   const statusRef = useRef<HTMLDivElement>(null);
   const sortRef = useRef<HTMLDivElement>(null);
 
@@ -80,6 +86,10 @@ export function LibraryContent({
     document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
+
+  useEffect(() => {
+    setPage(1);
+  }, [search, statusFilter, sort]);
 
   const filtered = useMemo(() => {
     let result = entries;
@@ -113,6 +123,11 @@ export function LibraryContent({
     return result;
   }, [entries, search, statusFilter, sort]);
 
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages);
+  const startIdx = (safePage - 1) * PAGE_SIZE;
+  const paginated = filtered.slice(startIdx, startIdx + PAGE_SIZE);
+
   const joinDate = new Intl.DateTimeFormat("en-US", {
     month: "long",
     day: "numeric",
@@ -120,6 +135,8 @@ export function LibraryContent({
   }).format(new Date(user.createdAt));
 
   return (
+    <>
+    <AddGameModal open={addModalOpen} onClose={() => setAddModalOpen(false)} />
     <div className="mx-auto max-w-[860px] space-y-6 py-2">
       {/* User header */}
       <div className="flex items-center justify-between">
@@ -161,8 +178,6 @@ export function LibraryContent({
         </button>
       </div>
 
-      <AddGameModal open={addModalOpen} onClose={() => setAddModalOpen(false)} />
-
       {/* Search and filters bar */}
       <div className="space-y-3">
         <div className="flex items-center gap-3">
@@ -185,7 +200,7 @@ export function LibraryContent({
               onClick={() => setView("card")}
               className={cn(
                 "flex h-9 w-9 items-center justify-center rounded-md text-[#646373]",
-                view === "card" ? "bg-[#D7D7D7]" : "hover:bg-[#E8E8E8]",
+                view === "card" ? "bg-[#D4D3DF]" : "hover:bg-[#E8E8E8]",
               )}
             >
               <SquaresFour size={20} weight="fill" />
@@ -195,7 +210,7 @@ export function LibraryContent({
               onClick={() => setView("table")}
               className={cn(
                 "flex h-9 w-9 items-center justify-center rounded-md text-[#646373]",
-                view === "table" ? "bg-[#D7D7D7]" : "hover:bg-[#E8E8E8]",
+                view === "table" ? "bg-[#D4D3DF]" : "hover:bg-[#E8E8E8]",
               )}
             >
               <ListBullets size={20} weight="bold" />
@@ -308,7 +323,7 @@ export function LibraryContent({
         </div>
       ) : view === "card" ? (
         <ul className="space-y-3">
-          {filtered.map((entry) => (
+          {paginated.map((entry) => (
             <li key={entry.id}>
               <CardLink
                 href={`/library/${entry.id}`}
@@ -355,6 +370,14 @@ export function LibraryContent({
                       )}
                     </p>
                   </div>
+
+                  {entry.notes && (
+                    <p className="mt-1.5 line-clamp-2 text-[13px] leading-snug text-muted-foreground">
+                      {entry.notes.length > 180
+                        ? entry.notes.slice(0, 180) + "…"
+                        : entry.notes}
+                    </p>
+                  )}
 
                   {/* Routes */}
                   {entry.routes.length > 0 && (
@@ -412,7 +435,7 @@ export function LibraryContent({
                 <div className="flex shrink-0 flex-col items-end justify-between py-0.5">
                   <div className="flex items-center gap-4">
                     <RatingDropdown entryId={entry.id} rating={entry.rating} />
-                    <StatusDropdown entryId={entry.id} status={entry.status} />
+                    <StatusDropdown entryId={entry.id} status={entry.status} gameTitle={entry.game.title} />
                   </div>
                   <p className="font-mono text-xs text-muted-foreground">
                     Added: {formatTimeAgo(entry.createdAt)}
@@ -423,66 +446,114 @@ export function LibraryContent({
           ))}
         </ul>
       ) : (
-        <div className="rounded-lg bg-card">
-          <table className="w-full text-left text-[13px]">
-            <thead>
-              <tr className="border-b border-border text-[12px] font-normal text-muted-foreground">
-                <th className="py-2.5 pl-4 pr-2 font-normal">Title</th>
-                <th className="px-2 py-2.5 font-normal">Rating</th>
-                <th className="px-2 py-2.5 font-normal">Status</th>
-                <th className="px-2 py-2.5 font-normal">Added</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((entry) => (
-                <tr
-                  key={entry.id}
-                  className="cursor-pointer border-b border-border last:border-0 hover:bg-muted/50"
-                  onClick={() => router.push(`/library/${entry.id}`)}
-                >
-                  <td className="py-3 pl-4 pr-2">
-                    <div className="flex items-center gap-3">
-                      <div className="relative h-10 w-8 shrink-0 overflow-hidden rounded bg-muted">
-                        {entry.game.coverUrl ? (
-                          <Image
-                            src={entry.game.coverUrl}
-                            alt=""
-                            fill
-                            className="object-cover"
-                          />
-                        ) : (
-                          <div className="flex h-full items-center justify-center text-[8px] text-muted-foreground">
-                            —
-                          </div>
-                        )}
-                      </div>
-                      <span className="truncate font-medium text-[#646373]">
-                        {entry.game.title}
-                      </span>
+        <div className="space-y-1.5">
+          <div className="flex items-center px-4 py-2 text-[13px] font-normal text-muted-foreground">
+            <span className="flex-1">Title</span>
+            <div className="flex w-[300px] shrink-0 items-center gap-4">
+              <span className="w-[60px] shrink-0">Rating</span>
+              <span className="w-[150px] shrink-0">Status</span>
+              <span className="flex-1">Added</span>
+            </div>
+          </div>
+          {paginated.map((entry, i) => (
+            <div
+              key={entry.id}
+              className={cn(
+                "flex cursor-pointer items-center rounded-lg px-[14px] py-[12px] text-[13px] transition-colors hover:bg-card dark:hover:bg-card",
+                i % 2 === 0 ? "bg-[#f9f9f9] dark:bg-card/40" : "bg-transparent",
+              )}
+              onClick={() => router.push(`/library/${entry.id}`)}
+            >
+              <div className="flex min-w-0 flex-1 items-center gap-3">
+                <div className="relative h-10 w-8 shrink-0 overflow-hidden rounded bg-muted">
+                  {entry.game.coverUrl ? (
+                    <Image
+                      src={entry.game.coverUrl}
+                      alt=""
+                      fill
+                      className="object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-full items-center justify-center text-[8px] text-muted-foreground">
+                      —
                     </div>
-                  </td>
-                  <td
-                    className="px-2 py-3"
-                    onClick={(e) => e.stopPropagation()}
+                  )}
+                </div>
+                <span className="truncate text-[14px] font-medium text-[#646373]">
+                  {entry.game.title}
+                </span>
+              </div>
+              <div className="flex w-[300px] shrink-0 items-center gap-4">
+                <div
+                  className="w-[60px] shrink-0"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <RatingDropdown entryId={entry.id} rating={entry.rating} compact />
+                </div>
+                <div
+                  className="w-[150px] shrink-0"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <StatusDropdown entryId={entry.id} status={entry.status} gameTitle={entry.game.title} />
+                </div>
+                <span className="flex-1 font-mono text-[12px] text-muted-foreground">
+                  {formatTimeAgo(entry.createdAt)}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Pagination */}
+      {filtered.length > 0 && (
+        <div className="flex flex-col items-center gap-3 pt-2">
+          <p className="text-[13px] italic text-muted-foreground">
+            Showing {startIdx + 1} to {Math.min(startIdx + PAGE_SIZE, filtered.length)} of {filtered.length} items
+          </p>
+          <nav className="flex items-center gap-1" aria-label="Pagination">
+              <button
+                type="button"
+                disabled={safePage <= 1}
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                className="flex h-9 w-9 items-center justify-center rounded-lg text-[#646373] hover:bg-[#E8E8E8] disabled:pointer-events-none disabled:text-muted-foreground/30 dark:hover:bg-[#2a2a35]"
+              >
+                <CaretLeft size={16} weight="bold" />
+              </button>
+              {pageNumbers(safePage, totalPages).map((p, i) =>
+                p === "…" ? (
+                  <span key={`ellipsis-${i}`} className="flex h-9 w-5 items-center justify-center text-[13px] text-muted-foreground">
+                    …
+                  </span>
+                ) : (
+                  <button
+                    key={p}
+                    type="button"
+                    onClick={() => setPage(p)}
+                    className={cn(
+                      "flex h-9 w-9 items-center justify-center rounded-lg text-[13px] font-medium",
+                    p === safePage
+                      ? "bg-[#D4D3DF] text-[#646373]"
+                      : "text-[#646373] hover:bg-[#E8E8E8] dark:hover:bg-[#2a2a35]",
+                    )}
                   >
-                    <RatingDropdown entryId={entry.id} rating={entry.rating} />
-                  </td>
-                  <td
-                    className="px-2 py-3"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <StatusDropdown entryId={entry.id} status={entry.status} />
-                  </td>
-                  <td className="px-2 py-3 font-mono text-[12px] text-muted-foreground">
-                    {formatTimeAgo(entry.createdAt)}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                    {p}
+                  </button>
+                ),
+              )}
+              <button
+                type="button"
+                disabled={safePage >= totalPages}
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                className="flex h-9 w-9 items-center justify-center rounded-lg text-[#646373] hover:bg-[#E8E8E8] disabled:pointer-events-none disabled:text-muted-foreground/30 dark:hover:bg-[#2a2a35]"
+              >
+                <CaretRight size={16} weight="bold" />
+              </button>
+          </nav>
         </div>
       )}
     </div>
+    </>
   );
 }
 
@@ -508,6 +579,18 @@ function CardLink({
       {children}
     </div>
   );
+}
+
+function pageNumbers(current: number, total: number): (number | "…")[] {
+  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+  const pages: (number | "…")[] = [1];
+  const left = Math.max(2, current - 1);
+  const right = Math.min(total - 1, current + 1);
+  if (left > 2) pages.push("…");
+  for (let i = left; i <= right; i++) pages.push(i);
+  if (right < total - 1) pages.push("…");
+  pages.push(total);
+  return pages;
 }
 
 function sortedRoutes(routes: RouteData[]): RouteData[] {

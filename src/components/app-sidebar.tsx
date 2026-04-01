@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Compass, BookmarkSimple } from "@phosphor-icons/react";
+import Image from "next/image";
+import { GameController, BookmarkSimple, Ghost } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 
 type NavItem = {
@@ -12,12 +13,14 @@ type NavItem = {
 };
 
 const navItems: NavItem[] = [
-  { label: "Explore", href: "/", icon: Compass },
+  { label: "Home", href: "/", icon: GameController },
   { label: "Library", href: "/library", icon: BookmarkSimple },
 ];
 
-export function AppSidebar() {
+export function AppSidebar({ handle, avatar }: { handle: string; avatar: string | null }) {
   const pathname = usePathname();
+  const profileHref = `/u/${handle}`;
+  const profileActive = pathname.startsWith(profileHref);
 
   return (
     <aside className="sticky top-[85px] hidden h-[calc(100vh-85px)] w-[254px] shrink-0 border-r border-border bg-card md:block">
@@ -44,6 +47,28 @@ export function AppSidebar() {
             </Link>
           );
         })}
+
+        <div className="my-1 border-t border-border" />
+
+        <Link
+          href={profileHref}
+          className={cn(
+            "flex h-10 items-center gap-2 rounded px-2 text-[16px] font-medium transition-colors",
+            profileActive
+              ? "bg-[hsl(var(--muted))] text-foreground"
+              : "text-muted-foreground hover:bg-[hsl(var(--muted))] hover:text-foreground"
+          )}
+          style={{ color: "hsl(249,1%,42%)" }}
+        >
+          <div className="relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#656379]">
+            {avatar ? (
+              <Image src={avatar} alt="" fill unoptimized className="object-cover" />
+            ) : (
+              <Ghost size={18} className="text-white" />
+            )}
+          </div>
+          Profile
+        </Link>
       </nav>
     </aside>
   );

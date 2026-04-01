@@ -87,7 +87,7 @@ export function ProfileStats({ data }: { data: ProfileStatsData }) {
 
         {/* Right: aggregate stats */}
         <div className="space-y-1">
-          <StatRow label="Total Entries" value={String(totalEntries)} />
+          <StatRow label="Total Games" value={String(totalEntries)} />
           <StatRow
             label="Mean Score"
             value={meanScore != null ? meanScore.toFixed(2) : "—"}
@@ -109,8 +109,8 @@ function StatRow({ label, value }: { label: string; value: string }) {
   );
 }
 
-export function ProfileStatsSidebar({ data }: { data: ProfileStatsData }) {
-  const { statusCounts, totalEntries, meanScore } = data;
+export function ProfileStatsSidebar({ data, compact }: { data: ProfileStatsData; compact?: boolean }) {
+  const { statusCounts, totalEntries } = data;
 
   const barSegments = STATUS_ORDER.map((s) => ({
     status: s,
@@ -121,8 +121,8 @@ export function ProfileStatsSidebar({ data }: { data: ProfileStatsData }) {
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <h3 className="text-[14px] font-bold text-[#646373]">Status</h3>
-        <span className="text-[12px] text-muted-foreground">{totalEntries} total</span>
+        <h3 className="text-[14px] font-bold text-[#646373]">Game Stats</h3>
+        <span className="text-[13px] text-muted-foreground"><span className="font-bold text-[#646373]">{totalEntries}</span> total</span>
       </div>
 
       {totalEntries > 0 ? (
@@ -158,11 +158,11 @@ export function ProfileStatsSidebar({ data }: { data: ProfileStatsData }) {
         ))}
       </div>
 
-      {meanScore != null && (
+      {!compact && (
         <div className="border-t border-border pt-2">
           <div className="flex items-center justify-between text-[12px]">
-            <span className="text-muted-foreground">Mean Score</span>
-            <span className="font-bold text-[#646373]">{meanScore.toFixed(2)}</span>
+            <span className="text-muted-foreground">Total Games</span>
+            <span className="font-bold text-[#646373]">{totalEntries}</span>
           </div>
         </div>
       )}

@@ -13,6 +13,7 @@ import {
 } from "@phosphor-icons/react";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { showSnackbar } from "@/components/snackbar";
 
 type SearchHit = {
   kind: "igdb" | "local";
@@ -21,6 +22,7 @@ type SearchHit = {
   title: string;
   coverUrl?: string | null;
   developerName?: string | null;
+  inLibrary?: boolean;
 };
 
 export function AddGameModal({ open, onClose }: { open: boolean; onClose: () => void }) {
@@ -106,9 +108,8 @@ export function AddGameModal({ open, onClose }: { open: boolean; onClose: () => 
       });
       const data = await res.json();
 
-      if (res.status === 409 && data.error?.entryId) {
-        onClose();
-        router.push(`/library/${data.error.entryId}`);
+      if (res.status === 409) {
+        setResults((prev) => prev.map((r) => r.id === hit.id ? { ...r, inLibrary: true } : r));
         return;
       }
       if (!res.ok) {
@@ -118,7 +119,7 @@ export function AddGameModal({ open, onClose }: { open: boolean; onClose: () => 
       if (data.entry?.id) {
         onClose();
         router.refresh();
-        router.push(`/library/${data.entry.id}`);
+        showSnackbar(`${hit.title} added to library`);
       }
     } catch {
       setError("Network error. Please try again.");
@@ -158,6 +159,7 @@ export function AddGameModal({ open, onClose }: { open: boolean; onClose: () => 
         onClose();
         router.refresh();
         router.push(`/library/${data.entry.id}`);
+        showSnackbar(`${manualTitle.trim()} added to library`);
       }
     } catch {
       setError("Network error. Please try again.");
@@ -171,7 +173,7 @@ export function AddGameModal({ open, onClose }: { open: boolean; onClose: () => 
   return (
     <div
       ref={overlayRef}
-      className="fixed inset-0 z-50 flex items-start justify-center bg-black/40 pt-[10vh] backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
       onClick={(e) => { if (e.target === overlayRef.current) onClose(); }}
     >
       <div className="w-full max-w-[520px] overflow-hidden rounded-xl border border-border bg-card shadow-xl">
@@ -265,36 +267,51 @@ export function AddGameModal({ open, onClose }: { open: boolean; onClose: () => 
                 )}
 
                 {!loading && results.length > 0 && (
-                  <ul className="space-y-1">
+                  <ul className="py-1">
                     {results.map((r) => (
-                      <li key={r.id}>
-                        <button
-                          type="button"
-                          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-colors hover:bg-muted disabled:opacity-60"
-                          onClick={() => void addGame(r)}
-                          disabled={adding === r.id}
-                        >
-                          <div className="relative h-14 w-10 shrink-0 overflow-hidden rounded bg-muted">
-                            {r.coverUrl ? (
-                              <Image src={r.coverUrl} alt="" fill className="object-cover" sizes="40px" />
-                            ) : (
-                              <div className="flex h-full items-center justify-center text-[9px] text-muted-foreground">—</div>
-                            )}
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <p className="truncate text-[14px] font-medium text-foreground">{r.title}</p>
-                            {r.developerName && (
-                              <p className="truncate text-[11px] font-medium uppercase text-muted-foreground">
-                                {r.developerName}
-                              </p>
-                            )}
-                          </div>
-                          {adding === r.id ? (
-                            <SpinnerGap size={16} className="shrink-0 animate-spin text-muted-foreground" />
+                      <li
+                        key={r.id}
+                        className="flex cursor-pointer items-center gap-3 px-3 py-2 transition-colors hover:bg-muted/50"
+                        onClick={() => { if (!r.inLibrary && adding == null) void addGame(r); }}
+                      >
+                        <div className="relative h-14 w-10 shrink-0 overflow-hidden rounded-md bg-muted">
+                          {r.coverUrl ? (
+                            <Image src={r.coverUrl} alt="" fill className="object-cover" sizes="40px" />
                           ) : (
-                            <Plus size={16} className="shrink-0 text-muted-foreground" />
+                            <div className="flex h-full items-center justify-center text-[9px] text-muted-foreground">—</div>
                           )}
-                        </button>
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-[14px] font-semibold text-[#646373]">{r.title}</p>
+                          {r.developerName && (
+                            <p className="truncate text-[12px] text-muted-foreground">
+                              {r.developerName}
+                            </p>
+                          )}
+                        </div>
+                        <div className="flex shrink-0 items-center gap-1">
+                          {r.inLibrary ? (
+                            <span className="px-2 text-[11px] font-medium text-muted-foreground">
+                              Added
+                            </span>
+                          ) : adding === r.id ? (
+                            <SpinnerGap size={16} className="animate-spin text-muted-foreground" />
+                          ) : (
+                            <div className="group/add relative">
+                              <button
+                                type="button"
+                                onClick={() => void addGame(r)}
+                                disabled={adding != null}
+                                className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-all hover:bg-[#D4D3DF] hover:text-[#646373] disabled:opacity-40"
+                              >
+                                <Plus size={16} weight="bold" />
+                              </button>
+                              <span className="pointer-events-none absolute -top-8 right-0 whitespace-nowrap rounded bg-[#333] px-2 py-1 text-[11px] text-white opacity-0 shadow transition-opacity group-hover/add:opacity-100 dark:bg-[#e5e5e5] dark:text-[#1a1a1a]">
+                                Add to library
+                              </span>
+                            </div>
+                          )}
+                        </div>
                       </li>
                     ))}
                   </ul>

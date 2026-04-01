@@ -1,9 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { and, count, desc, eq, inArray, isNotNull, sql } from "drizzle-orm";
+import { and, count, desc, eq, inArray, isNotNull, or, sql } from "drizzle-orm";
 import {
-  Ghost,
   CalendarBlank,
   GearSix,
   GameController,
@@ -15,13 +14,16 @@ import { db } from "@/db";
 import {
   activities,
   characterRoutes,
-  follows,
+  friendRequests,
+  friendships,
   games,
   libraryEntries,
   users,
 } from "@/db/schema";
 import type { EntryStatus } from "@/lib/status";
-import { ProfileFollowButton } from "./profile-follow-button";
+import { CopyProfileUrl } from "@/app/(protected)/settings/copy-profile-url";
+import { ProfileAvatar } from "./profile-avatar";
+import { ProfileFriendButton, type FriendState } from "./profile-friend-button";
 import { ProfileFavorites } from "./profile-favorites";
 import { ProfileStats, ProfileStatsSidebar, type ProfileStatsData } from "./profile-stats";
 
@@ -59,9 +61,10 @@ export default async function PublicProfilePage({ params }: PageProps) {
   const isSelf = session?.user?.id === user.id;
 
   const [
-    [{ fc }],
-    [{ fg }],
-    followRow,
+    [{ friendCount }],
+    friendshipRow,
+    sentRequest,
+    receivedRequest,
     statusRows,
     ratingRow,
     routeStats,
@@ -70,13 +73,30 @@ export default async function PublicProfilePage({ params }: PageProps) {
     favoriteGames,
     userLibrary,
   ] = await Promise.all([
-    db.select({ fc: count() }).from(follows).where(eq(follows.followingId, user.id)),
-    db.select({ fg: count() }).from(follows).where(eq(follows.followerId, user.id)),
+    db.select({ friendCount: count() }).from(friendships).where(or(eq(friendships.userA, user.id), eq(friendships.userB, user.id))),
     session?.user?.id && !isSelf
-      ? db.query.follows.findFirst({
+      ? (() => {
+          const [lo, hi] = session.user.id < user.id ? [session.user.id, user.id] : [user.id, session.user.id];
+          return db.query.friendships.findFirst({
+            where: and(eq(friendships.userA, lo), eq(friendships.userB, hi)),
+          });
+        })()
+      : Promise.resolve(null),
+    session?.user?.id && !isSelf
+      ? db.query.friendRequests.findFirst({
           where: and(
-            eq(follows.followerId, session.user.id),
-            eq(follows.followingId, user.id)
+            eq(friendRequests.senderId, session.user.id),
+            eq(friendRequests.receiverId, user.id),
+            eq(friendRequests.status, "pending"),
+          ),
+        })
+      : Promise.resolve(null),
+    session?.user?.id && !isSelf
+      ? db.query.friendRequests.findFirst({
+          where: and(
+            eq(friendRequests.senderId, user.id),
+            eq(friendRequests.receiverId, session.user.id),
+            eq(friendRequests.status, "pending"),
           ),
         })
       : Promise.resolve(null),
@@ -109,7 +129,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
     db.query.activities.findMany({
       where: eq(activities.userId, user.id),
       orderBy: [desc(activities.createdAt)],
-      limit: 10,
+      limit: 5,
     }),
     // Last game updates: recent entries with game data
     db.query.libraryEntries.findMany({
@@ -134,7 +154,14 @@ export default async function PublicProfilePage({ params }: PageProps) {
       : Promise.resolve(null),
   ]);
 
-  const following = !!followRow;
+  let friendState: FriendState = { kind: "none" };
+  if (friendshipRow) {
+    friendState = { kind: "friends", friendshipId: friendshipRow.id };
+  } else if (sentRequest) {
+    friendState = { kind: "request_sent" };
+  } else if (receivedRequest) {
+    friendState = { kind: "request_received", requestId: receivedRequest.id };
+  }
 
   // Build status counts
   const statusCounts: Record<EntryStatus, number> = {
@@ -196,19 +223,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
       {/* Hero Section */}
       <section className="flex flex-wrap items-start gap-6">
         {/* Avatar */}
-        <div className="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[hsl(248,11%,43%)]">
-          {user.avatarUrl ? (
-            <Image
-              src={user.avatarUrl}
-              alt={user.displayName}
-              width={96}
-              height={96}
-              className="h-full w-full object-cover"
-            />
-          ) : (
-            <Ghost size={40} weight="fill" className="text-white" />
-          )}
-        </div>
+        <ProfileAvatar avatarUrl={user.avatarUrl} isSelf={isSelf} />
 
         {/* Info */}
         <div className="min-w-0 flex-1">
@@ -219,6 +234,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
             <span className="relative -top-[1px] text-[14px] text-muted-foreground">
               @{user.handle}
             </span>
+            <CopyProfileUrl handle={user.handle} />
           </div>
           {user.bio && (
             <p className="mt-1 max-w-xl text-[13px] text-muted-foreground whitespace-pre-wrap">
@@ -227,12 +243,8 @@ export default async function PublicProfilePage({ params }: PageProps) {
           )}
           <div className="mt-3 flex flex-wrap items-center gap-4 text-[13px]">
             <span className="flex items-center gap-1.5">
-              <span className="font-bold text-[#646373]">{fc}</span>
-              <span className="text-muted-foreground">followers</span>
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span className="font-bold text-[#646373]">{fg}</span>
-              <span className="text-muted-foreground">following</span>
+              <span className="font-bold text-[#646373]">{friendCount}</span>
+              <span className="text-muted-foreground">{friendCount === 1 ? "friend" : "friends"}</span>
             </span>
             <span className="flex items-center gap-1.5 text-muted-foreground">
               <CalendarBlank size={14} />
@@ -252,9 +264,9 @@ export default async function PublicProfilePage({ params }: PageProps) {
               Settings
             </Link>
           ) : session ? (
-            <ProfileFollowButton
-              handle={user.handle}
-              initialFollowing={following}
+            <ProfileFriendButton
+              targetUserId={user.id}
+              initialState={friendState}
             />
           ) : null}
         </div>
@@ -284,10 +296,11 @@ export default async function PublicProfilePage({ params }: PageProps) {
             {recentActivity.length === 0 ? (
               <p className="text-[13px] text-muted-foreground">No activity yet.</p>
             ) : (
-              <div className="space-y-1">
+              <div className="space-y-0">
                 {recentActivity.map((a) => {
                   const payload = a.payload as Record<string, unknown>;
                   const title = (payload.gameTitle as string) ?? "A game";
+                  const gameId = payload.gameId as string | undefined;
                   const label = STATUS_LABELS[a.type] ?? "Updated";
                   const ratingVal =
                     a.type === "rated" && payload.rating != null
@@ -297,15 +310,21 @@ export default async function PublicProfilePage({ params }: PageProps) {
                   return (
                     <div
                       key={a.id}
-                      className="flex items-center gap-3 rounded-lg px-2 py-2 transition-colors hover:bg-muted/50"
+                      className="flex items-center gap-3 rounded-lg pl-0 pr-2 py-1 transition-colors hover:bg-muted/50"
                     >
                       <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-muted">
                         <GameController size={14} className="text-muted-foreground" />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-[13px] text-foreground">
+                        <p className="truncate text-[13px] text-[#646373]">
                           <span className="font-medium text-muted-foreground">{label}:</span>{" "}
-                          <span className="font-medium">{title}</span>
+                          {gameId ? (
+                            <Link href={`/games/${gameId}`} className="font-medium hover:underline">
+                              {title}
+                            </Link>
+                          ) : (
+                            <span className="font-medium">{title}</span>
+                          )}
                           {ratingVal}
                         </p>
                       </div>
@@ -365,7 +384,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
                         )}
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-[12px] font-medium leading-snug text-foreground">
+                        <p className="truncate text-[12px] font-medium leading-snug text-[#646373]">
                           {entry.game.title}
                         </p>
                         <p className="text-[10px] text-muted-foreground">
