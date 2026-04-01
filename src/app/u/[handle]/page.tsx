@@ -232,10 +232,10 @@ export default async function PublicProfilePage({ params }: PageProps) {
             <h1 className="font-display text-[32px] text-[#646373]">
               {user.displayName}
             </h1>
-            <span className="relative -top-[1px] text-[14px] text-muted-foreground">
+            <span className="relative -top-[1px] flex items-center gap-1 text-[14px] text-muted-foreground">
               @{user.handle}
+              <CopyProfileUrl handle={user.handle} />
             </span>
-            <CopyProfileUrl handle={user.handle} />
           </div>
           {user.bio && (
             <p className="mt-1 max-w-xl text-[13px] text-muted-foreground whitespace-pre-wrap">

@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useMemo, useState, useRef, useEffect } from "react";
 import {
@@ -150,7 +151,7 @@ export function LibraryContent({
     <div className="mx-auto max-w-[860px] space-y-6 py-2">
       {/* User header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
+        <Link href={`/u/${user.handle}`} className="flex items-center gap-4">
           <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-[hsl(248,11%,43%)] text-white overflow-hidden">
             {user.avatarUrl ? (
               <Image
@@ -177,7 +178,7 @@ export function LibraryContent({
               Joined {joinDate}
             </p>
           </div>
-        </div>
+        </Link>
         <button
           type="button"
           onClick={() => setAddModalOpen(true)}
