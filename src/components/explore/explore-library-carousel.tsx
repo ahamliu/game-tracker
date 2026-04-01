@@ -5,9 +5,7 @@ import Link from "next/link";
 import { useRef, useState, useCallback, useEffect } from "react";
 import { CaretLeft, CaretRight } from "@phosphor-icons/react";
 import type { CarouselEntry } from "@/lib/explore";
-import { statusLabel, statusColor } from "@/lib/status";
-import { StatusIcon } from "@/components/status-controls";
-import { cn } from "@/lib/utils";
+import { StatusDropdown } from "@/components/status-controls";
 
 export function ExploreLibraryCarousel({ entries }: { entries: CarouselEntry[] }) {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -118,16 +116,11 @@ export function ExploreLibraryCarousel({ entries }: { entries: CarouselEntry[] }
             onClick={(ev) => { if (dragState.current.moved) ev.preventDefault(); }}
             draggable={false}
           >
-            <div className="relative z-10 mb-[-12px] flex justify-center">
-              <span
-                className={cn(
-                  "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 font-mono text-[9px] font-bold shadow-sm",
-                  statusColor(e.status),
-                )}
-              >
-                <StatusIcon status={e.status} />
-                {statusLabel(e.status).toUpperCase()}
-              </span>
+            <div
+              className="relative z-10 mb-[-12px] flex justify-center"
+              onClick={(ev) => { ev.preventDefault(); ev.stopPropagation(); }}
+            >
+              <StatusDropdown entryId={e.entryId} status={e.status} gameTitle={e.title} showRemove={false} compact />
             </div>
             <div className="relative aspect-[2/3] w-full overflow-hidden rounded-[10px] bg-muted">
               {e.coverUrl ? (

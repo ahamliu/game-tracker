@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useMemo, useState, useRef, useEffect } from "react";
 import {
   MagnifyingGlass,
@@ -65,6 +65,7 @@ export function LibraryContent({
   entries: EntryData[];
 }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<EntryStatus | "all">("all");
   const [sort, setSort] = useState<SortOption>("recent");
@@ -72,9 +73,18 @@ export function LibraryContent({
   const [statusOpen, setStatusOpen] = useState(false);
   const [sortOpen, setSortOpen] = useState(false);
   const [addModalOpen, setAddModalOpen] = useState(false);
+  const [manualTitle, setManualTitle] = useState("");
   const [page, setPage] = useState(1);
   const statusRef = useRef<HTMLDivElement>(null);
   const sortRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (searchParams.get("addGame") === "1") {
+      setManualTitle(searchParams.get("title") ?? "");
+      setAddModalOpen(true);
+      router.replace("/library", { scroll: false });
+    }
+  }, [searchParams, router]);
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
@@ -136,7 +146,7 @@ export function LibraryContent({
 
   return (
     <>
-    <AddGameModal open={addModalOpen} onClose={() => setAddModalOpen(false)} />
+    <AddGameModal open={addModalOpen} onClose={() => { setAddModalOpen(false); setManualTitle(""); }} initialManualTitle={manualTitle || undefined} />
     <div className="mx-auto max-w-[860px] space-y-6 py-2">
       {/* User header */}
       <div className="flex items-center justify-between">

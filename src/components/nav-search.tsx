@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useCallback, useRef, useState } from "react";
-import { MagnifyingGlass, X, Plus } from "@phosphor-icons/react";
+import { MagnifyingGlass, X, Plus, PencilSimpleLine } from "@phosphor-icons/react";
 import { Input } from "@/components/ui/input";
 import type { EntryStatus } from "@/lib/status";
 
@@ -170,7 +170,24 @@ export function NavSearch({ signedIn = true }: { signedIn?: boolean }) {
             <p className="px-4 py-3 text-[13px] text-destructive">{error}</p>
           )}
           {!loading && results.length === 0 && q.length >= 2 && (
-            <p className="px-4 py-3 text-[13px] text-muted-foreground">No results found.</p>
+            <div className="px-4 py-3">
+              <p className="text-[13px] text-muted-foreground">No results found.</p>
+              {signedIn && (
+                <button
+                  type="button"
+                  className="mt-1.5 flex items-center gap-1.5 text-[13px] font-medium text-[#656379] hover:underline"
+                  onClick={() => {
+                    setQ("");
+                    setResults([]);
+                    setOpen(false);
+                    router.push(`/library?addGame=1&title=${encodeURIComponent(q)}`);
+                  }}
+                >
+                  <PencilSimpleLine size={14} />
+                  Add game manually
+                </button>
+              )}
+            </div>
           )}
           {results.length > 0 && (
             <ul className="py-1">

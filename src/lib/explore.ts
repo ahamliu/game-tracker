@@ -67,6 +67,7 @@ export type PlayingEntry = {
   gameId: string;
   title: string;
   coverUrl: string | null;
+  status: EntryStatus;
   notes: string | null;
   routes: PlayingRoute[];
   overflowRoutes: number;
@@ -94,6 +95,7 @@ export async function getPlayingForUser(userId: string): Promise<PlayingEntry[]>
       gameId: e.game.id,
       title: e.game.title,
       coverUrl: e.game.coverUrl,
+      status: e.status,
       notes: e.notes,
       routes: slice.map((r) => ({
         id: r.id,

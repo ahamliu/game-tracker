@@ -25,7 +25,7 @@ type SearchHit = {
   inLibrary?: boolean;
 };
 
-export function AddGameModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+export function AddGameModal({ open, onClose, initialManualTitle }: { open: boolean; onClose: () => void; initialManualTitle?: string }) {
   const router = useRouter();
   const [view, setView] = useState<"search" | "manual">("search");
   const [query, setQuery] = useState("");
@@ -45,16 +45,21 @@ export function AddGameModal({ open, onClose }: { open: boolean; onClose: () => 
 
   useEffect(() => {
     if (open) {
-      setView("search");
+      if (initialManualTitle) {
+        setView("manual");
+        setManualTitle(initialManualTitle);
+      } else {
+        setView("search");
+        setManualTitle("");
+      }
       setQuery("");
       setResults([]);
       setError(null);
       setSearched(false);
-      setManualTitle("");
       setManualCover("");
       setTimeout(() => inputRef.current?.focus(), 50);
     }
-  }, [open]);
+  }, [open, initialManualTitle]);
 
   useEffect(() => {
     if (!open) return;

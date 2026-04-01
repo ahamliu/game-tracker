@@ -89,7 +89,7 @@ export function RatingDropdown({ entryId, rating, compact }: { entryId: string; 
   );
 }
 
-export function StatusDropdown({ entryId, status, gameTitle, showRemove = true, onRemove }: { entryId: string; status: EntryStatus; gameTitle?: string; showRemove?: boolean; onRemove?: () => void }) {
+export function StatusDropdown({ entryId, status, gameTitle, showRemove = true, compact, onRemove }: { entryId: string; status: EntryStatus; gameTitle?: string; showRemove?: boolean; compact?: boolean; onRemove?: () => void }) {
   const router = useRouter();
   const [optimistic, setOptimistic] = useState(status);
   const [open, setOpen] = useState(false);
@@ -133,14 +133,15 @@ export function StatusDropdown({ entryId, status, gameTitle, showRemove = true, 
       <button
         type="button"
         className={cn(
-          "inline-flex cursor-pointer items-center gap-1.5 rounded-full px-3 py-1 font-mono text-[11px] font-bold",
+          "inline-flex cursor-pointer items-center rounded-full font-mono font-bold shadow-sm",
+          compact ? "gap-1 px-2.5 py-0.5 text-[9px]" : "gap-1.5 px-3 py-1 text-[11px]",
           statusColor(optimistic)
         )}
         onClick={(e) => { e.preventDefault(); setOpen((v) => !v); }}
       >
-        <StatusIcon status={optimistic} />
+        <StatusIcon status={optimistic} size={compact ? 10 : 12} />
         {statusLabel(optimistic).toUpperCase()}
-        <CaretDown size={10} />
+        <CaretDown size={compact ? 8 : 10} />
       </button>
       {open && (
         <div className="absolute right-0 top-full z-50 mt-1 w-36 rounded-lg border border-border bg-card py-1">
@@ -185,18 +186,18 @@ export function StatusDropdown({ entryId, status, gameTitle, showRemove = true, 
   );
 }
 
-export function StatusIcon({ status }: { status: EntryStatus }) {
+export function StatusIcon({ status, size = 12 }: { status: EntryStatus; size?: number }) {
   switch (status) {
     case "playing":
-      return <GameController size={12} weight="fill" />;
+      return <GameController size={size} weight="fill" />;
     case "completed":
-      return <Check size={12} weight="bold" />;
+      return <Check size={size} weight="bold" />;
     case "planning":
-      return <BookmarkSimple size={12} weight="fill" />;
+      return <BookmarkSimple size={size} weight="fill" />;
     case "dropped":
-      return <Trash size={12} weight="fill" />;
+      return <Trash size={size} weight="fill" />;
     case "on_hold":
-      return <BookmarkSimple size={12} weight="fill" />;
+      return <BookmarkSimple size={size} weight="fill" />;
     default:
       return null;
   }

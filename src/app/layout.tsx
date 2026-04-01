@@ -25,8 +25,8 @@ const gerdox = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "PlayLog — track games, routes & more",
-  description: "A modern game list tracker with otome-style routes, ratings, and progress.",
+  title: "PlayLog — track games, routes & more, with friends!",
+  description: "A social game tracker with content routes, character routes, ratings, and progress.",
 };
 
 export default async function RootLayout({
