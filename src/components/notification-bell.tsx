@@ -15,6 +15,7 @@ type NotificationItem = {
   senderHandle: string | null;
   senderDisplayName: string | null;
   senderAvatarUrl: string | null;
+  requestStatus: "pending" | "accepted" | "declined" | null;
 };
 
 function timeAgo(date: string): string {
@@ -103,7 +104,7 @@ export function NotificationBell({ initialUnread }: { initialUnread: number }) {
       setItems((prev) =>
         prev.map((n) =>
           n.referenceId === requestId
-            ? { ...n, type: action === "accept" ? "friend_request_handled_accepted" : "friend_request_handled_declined" }
+            ? { ...n, requestStatus: action === "accept" ? "accepted" as const : "declined" as const }
             : n
         )
       );
@@ -164,14 +165,14 @@ export function NotificationBell({ initialUnread }: { initialUnread: number }) {
                     >
                       {n.senderDisplayName ?? n.senderHandle ?? "Someone"}
                     </Link>
-                    {n.type === "friend_request" && " sent you a friend request."}
+                    {n.type === "friend_request" && n.requestStatus === "pending" && " sent you a friend request."}
+                    {n.type === "friend_request" && n.requestStatus === "accepted" && " — friend request accepted!"}
+                    {n.type === "friend_request" && n.requestStatus === "declined" && " — friend request declined."}
                     {n.type === "friend_request_accepted" && " accepted your friend request."}
-                    {n.type === "friend_request_handled_accepted" && " — friend request accepted!"}
-                    {n.type === "friend_request_handled_declined" && " — friend request declined."}
                   </p>
                   <p className="mt-0.5 text-[11px] text-muted-foreground">{timeAgo(n.createdAt)}</p>
 
-                  {n.type === "friend_request" && n.referenceId && (
+                  {n.type === "friend_request" && n.requestStatus === "pending" && n.referenceId && (
                     <div className="mt-2 flex gap-1.5">
                       <button
                         type="button"

@@ -67,17 +67,24 @@ export function ProfileFavorites({
         {favorites.map((game) => (
           <FavoriteCard key={game.id} game={game} />
         ))}
-        {isSelf &&
-          Array.from({ length: Math.max(0, 5 - favorites.length) }).map((_, i) => (
-            <button
-              key={`empty-${i}`}
-              type="button"
-              onClick={() => setEditing(true)}
-              className="flex aspect-[3/4] min-w-0 flex-1 items-center justify-center rounded-[10px] border border-dashed border-border bg-muted/30 transition-colors hover:border-[#646373] hover:bg-muted/50"
-            >
-              <Plus size={20} className="text-muted-foreground" />
-            </button>
-          ))}
+        {isSelf
+          ? Array.from({ length: Math.max(0, 5 - favorites.length) }).map((_, i) => (
+              <button
+                key={`empty-${i}`}
+                type="button"
+                onClick={() => setEditing(true)}
+                className="flex aspect-[3/4] items-center justify-center rounded-[10px] border border-dashed border-border bg-muted/30 transition-colors hover:border-[#646373] hover:bg-muted/50"
+                style={{ width: "calc((100% - 4 * 0.75rem) / 5)" }}
+              >
+                <Plus size={20} className="text-muted-foreground" />
+              </button>
+            ))
+          : Array.from({ length: Math.max(0, 5 - favorites.length) }).map((_, i) => (
+              <div
+                key={`spacer-${i}`}
+                style={{ width: "calc((100% - 4 * 0.75rem) / 5)" }}
+              />
+            ))}
       </div>
 
       {editing && library && (
@@ -95,7 +102,8 @@ function FavoriteCard({ game }: { game: FavoriteGame }) {
   return (
     <Link
       href={`/games/${game.id}`}
-      className="group min-w-0 flex-1"
+      className="group shrink-0"
+      style={{ width: "calc((100% - 4 * 0.75rem) / 5)" }}
     >
       <div className="relative aspect-[3/4] w-full overflow-hidden rounded-[10px] bg-muted">
         {game.coverUrl ? (
