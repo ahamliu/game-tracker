@@ -28,7 +28,7 @@ export function ProfileFriendCount({
         onClick={() => setOpen(true)}
         className="flex items-center gap-1.5 hover:underline"
       >
-        <span className="font-bold text-app-muted">{count}</span>
+        <span className="font-mono font-bold text-app-muted">{count}</span>
         <span className="text-muted-foreground">{count === 1 ? "friend" : "friends"}</span>
       </button>
       {open && (

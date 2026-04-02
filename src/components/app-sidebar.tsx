@@ -17,13 +17,21 @@ const navItems: NavItem[] = [
   { label: "My Library", href: "/library", icon: BookmarkSimple },
 ];
 
-export function AppSidebar({ handle, avatar }: { handle: string; avatar: string | null }) {
+export function AppSidebar({
+  handle,
+  avatar,
+  displayName,
+}: {
+  handle: string;
+  avatar: string | null;
+  displayName: string;
+}) {
   const pathname = usePathname();
   const profileHref = `/u/${handle}`;
   const profileActive = pathname.startsWith(profileHref);
 
   return (
-    <aside className="hidden w-[254px] shrink-0 border-r border-border bg-card md:block">
+    <aside className="hidden w-[254px] shrink-0 self-stretch border-r border-border bg-card md:block md:min-h-[calc(100vh-85px)]">
       <nav className="sticky top-[85px] flex flex-col gap-2 px-4 pt-5">
         {navItems.map((item) => {
           const active =
@@ -65,7 +73,7 @@ export function AppSidebar({ handle, avatar }: { handle: string; avatar: string 
               <Ghost size={18} className="text-white" />
             )}
           </div>
-          Profile
+          <span className="truncate">{displayName}</span>
         </Link>
       </nav>
     </aside>

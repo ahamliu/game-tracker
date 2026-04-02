@@ -61,9 +61,11 @@ const PAGE_SIZE = 20;
 const LIBRARY_LAYOUT_KEY = "playlog-library-layout";
 
 export function LibraryContent({
+  initialView,
   user,
   entries,
 }: {
+  initialView: "card" | "table";
   user: UserData;
   entries: EntryData[];
 }) {
@@ -72,8 +74,7 @@ export function LibraryContent({
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<EntryStatus | "all">("all");
   const [sort, setSort] = useState<SortOption>("recent");
-  const [view, setView] = useState<"card" | "table">("card");
-  const skipLayoutPersist = useRef(true);
+  const [view, setView] = useState<"card" | "table">(initialView);
   const [statusOpen, setStatusOpen] = useState(false);
   const [sortOpen, setSortOpen] = useState(false);
   const [addModalOpen, setAddModalOpen] = useState(false);
@@ -85,22 +86,22 @@ export function LibraryContent({
   useEffect(() => {
     try {
       const stored = localStorage.getItem(LIBRARY_LAYOUT_KEY);
-      if (stored === "table" || stored === "card") setView(stored);
+      if (stored === "table" || stored === "card") {
+        if (stored !== view) setView(stored);
+        return;
+      }
     } catch {
       /* ignore */
     }
-  }, []);
+  }, [view]);
 
   useEffect(() => {
-    if (skipLayoutPersist.current) {
-      skipLayoutPersist.current = false;
-      return;
-    }
     try {
       localStorage.setItem(LIBRARY_LAYOUT_KEY, view);
     } catch {
       /* ignore */
     }
+    document.cookie = `${LIBRARY_LAYOUT_KEY}=${view}; path=/; max-age=31536000; samesite=lax`;
   }, [view]);
 
   useEffect(() => {

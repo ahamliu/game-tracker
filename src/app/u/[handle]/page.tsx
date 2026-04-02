@@ -299,7 +299,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
 
           {/* Recent Activity */}
           <section className="space-y-3">
-            <h2 className="text-[16px] font-bold text-app-muted">Recent Activity</h2>
+            <h2 className="font-display text-[20px] font-normal tracking-[0.05rem] text-app-muted">Recent Activity</h2>
             {recentActivity.length === 0 ? (
               <p className="text-[13px] text-muted-foreground">No activity yet.</p>
             ) : (
@@ -355,13 +355,13 @@ export default async function PublicProfilePage({ params }: PageProps) {
         {/* Right column / sidebar */}
         <div className="min-w-0 space-y-6">
           {/* Status breakdown */}
-          <div className="min-w-0 overflow-hidden rounded-[10px] border border-border bg-card p-4">
+          <div className="min-w-0 overflow-hidden rounded-[10px] bg-card p-4">
             <ProfileStatsSidebar data={statsData} />
           </div>
 
           {/* Last Game Updates */}
-          <div className="min-w-0 overflow-hidden rounded-[10px] border border-border bg-card p-4">
-            <h3 className="mb-3 text-[14px] font-bold text-app-muted">Last Updates</h3>
+          <div className="min-w-0 overflow-hidden rounded-[10px] bg-card px-[10px] py-4">
+            <h3 className="mb-3 font-display text-[20px] font-normal tracking-[0.05rem] text-app-muted">Last Updates</h3>
             {lastUpdates.length === 0 ? (
               <p className="text-[12px] text-muted-foreground">No entries yet.</p>
             ) : (

@@ -118,7 +118,7 @@ export default async function HomePage({
 
       {/* Popular games */}
       <section>
-        <h2 className="mb-3 text-[16px] font-bold text-app-muted">Popular Games</h2>
+        <h2 className="mb-3 font-display text-[20px] font-normal tracking-[0.05rem] text-app-muted">Popular Games</h2>
         <ExploreFiltersForm
           initialQ={q}
           initialSort={sort}

@@ -64,7 +64,7 @@ export function ExplorePlayingCarousel({ entries }: { entries: PlayingEntry[] })
   return (
     <div className="min-w-0">
       <div className="mb-3 flex items-center justify-between">
-        <h2 className="text-[16px] font-bold text-app-muted">Currently Playing</h2>
+        <h2 className="font-display text-[20px] font-normal tracking-[0.05rem] text-app-muted">Currently Playing</h2>
         <div className="flex items-center gap-2">
           <button
             type="button"

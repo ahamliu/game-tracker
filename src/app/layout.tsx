@@ -8,6 +8,7 @@ import { db } from "@/db";
 import { notifications, users } from "@/db/schema";
 import { Providers } from "@/components/providers";
 import { SiteHeader } from "@/components/site-header";
+import { SiteFooter } from "@/components/site-footer";
 import { AppSidebar } from "@/components/app-sidebar";
 import { Snackbar } from "@/components/snackbar";
 import "./globals.css";
@@ -38,18 +39,24 @@ export default async function RootLayout({
   const session = await auth();
 
   let avatarUrl: string | null = null;
+  let displayName = session?.user?.name?.trim() || session?.user?.handle || "Profile";
   let unreadCount = 0;
   if (session?.user?.id) {
     const [row, [{ c }]] = await Promise.all([
       db.query.users.findFirst({
         where: eq(users.id, session.user.id),
-        columns: { avatarUrl: true },
+        columns: { avatarUrl: true, displayName: true },
       }),
       db.select({ c: count() })
         .from(notifications)
         .where(and(eq(notifications.userId, session.user.id), eq(notifications.read, false))),
     ]);
     avatarUrl = row?.avatarUrl ?? null;
+    displayName =
+      row?.displayName?.trim() ||
+      session.user.name?.trim() ||
+      session.user.handle ||
+      "Profile";
     unreadCount = c;
   }
 
@@ -61,9 +68,18 @@ export default async function RootLayout({
       <body className="min-h-screen bg-background font-sans antialiased">
         <Providers>
           <SiteHeader session={session} avatarUrl={avatarUrl} unreadCount={unreadCount} />
-          <div className="flex">
-            {session && <AppSidebar handle={session.user.handle} avatar={avatarUrl} />}
-            <main className="min-h-[calc(100vh-80px)] flex-1 overflow-x-hidden px-4 pt-4 pb-[42px] md:min-h-[calc(100vh-85px)] md:px-6 md:pt-6">{children}</main>
+          <div className="flex min-h-[calc(100vh-80px)] md:min-h-[calc(100vh-85px)]">
+            {session && (
+              <AppSidebar
+                handle={session.user.handle}
+                avatar={avatarUrl}
+                displayName={displayName}
+              />
+            )}
+            <div className="flex min-w-0 flex-1 flex-col">
+              <main className="min-h-0 flex-1 overflow-x-hidden px-4 pt-4 pb-[42px] md:px-6 md:pt-6">{children}</main>
+              <SiteFooter signedIn={!!session?.user} handle={session?.user?.handle} />
+            </div>
           </div>
           <Snackbar />
         </Providers>

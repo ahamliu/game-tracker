@@ -46,7 +46,7 @@ export function ProfileStats({ data }: { data: ProfileStatsData }) {
 
   return (
     <div className="min-w-0 space-y-4">
-      <h2 className="text-[16px] font-bold text-app-muted">Game Statistics</h2>
+      <h2 className="font-display text-[20px] font-normal tracking-[0.05rem] text-app-muted">Game Statistics</h2>
 
       {/* Colored proportional bar */}
       {totalEntries > 0 ? (
@@ -80,7 +80,7 @@ export function ProfileStats({ data }: { data: ProfileStatsData }) {
                 />
                 <span className="truncate text-muted-foreground">{STATUS_LABELS[s]}</span>
               </span>
-              <span className="font-medium text-app-muted">{statusCounts[s] ?? 0}</span>
+              <span className="font-mono font-medium text-app-muted">{statusCounts[s] ?? 0}</span>
             </div>
           ))}
         </div>
@@ -104,12 +104,20 @@ function StatRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex min-w-0 items-center justify-between gap-2 text-[13px]">
       <span className="truncate text-muted-foreground">{label}</span>
-      <span className="font-medium text-app-muted">{value}</span>
+      <span className="font-mono font-medium text-app-muted">{value}</span>
     </div>
   );
 }
 
-export function ProfileStatsSidebar({ data, compact }: { data: ProfileStatsData; compact?: boolean }) {
+export function ProfileStatsSidebar({
+  data,
+  compact,
+  title = "Game Stats",
+}: {
+  data: ProfileStatsData;
+  compact?: boolean;
+  title?: string;
+}) {
   const { statusCounts, totalEntries } = data;
 
   const barSegments = STATUS_ORDER.map((s) => ({
@@ -121,8 +129,8 @@ export function ProfileStatsSidebar({ data, compact }: { data: ProfileStatsData;
   return (
     <div className="min-w-0 space-y-3">
       <div className="flex min-w-0 items-center justify-between gap-2">
-        <h3 className="text-[14px] font-bold text-app-muted">Game Stats</h3>
-        <span className="text-[13px] text-muted-foreground"><span className="font-bold text-app-muted">{totalEntries}</span> total</span>
+        <h3 className="font-display text-[20px] font-normal tracking-[0.05rem] text-app-muted">{title}</h3>
+        <span className="text-[13px] text-muted-foreground"><span className="font-mono text-[15px] font-semibold text-app-muted">{totalEntries}</span> total</span>
       </div>
 
       {totalEntries > 0 ? (
@@ -153,7 +161,7 @@ export function ProfileStatsSidebar({ data, compact }: { data: ProfileStatsData;
               />
               <span className="truncate text-muted-foreground">{STATUS_LABELS[s]}</span>
             </span>
-            <span className="font-medium text-app-muted">{statusCounts[s] ?? 0}</span>
+            <span className="font-mono font-medium text-app-muted">{statusCounts[s] ?? 0}</span>
           </div>
         ))}
       </div>
@@ -162,7 +170,7 @@ export function ProfileStatsSidebar({ data, compact }: { data: ProfileStatsData;
         <div className="border-t border-border pt-2">
           <div className="flex min-w-0 items-center justify-between gap-2 text-[12px]">
             <span className="truncate text-muted-foreground">Total Games</span>
-            <span className="font-bold text-app-muted">{totalEntries}</span>
+            <span className="font-mono font-medium text-app-muted">{totalEntries}</span>
           </div>
         </div>
       )}

@@ -1,13 +1,19 @@
 import { desc, eq, sql, inArray } from "drizzle-orm";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { db } from "@/db";
 import { libraryEntries, users } from "@/db/schema";
 import { LibraryContent } from "./library-content";
 
+const LIBRARY_LAYOUT_KEY = "playlog-library-layout";
+
 export default async function LibraryPage() {
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
+  const cookieStore = await cookies();
+  const initialView =
+    cookieStore.get(LIBRARY_LAYOUT_KEY)?.value === "table" ? "table" : "card";
 
   const user = await db.query.users.findFirst({
     where: eq(users.id, session.user.id),
@@ -39,6 +45,7 @@ export default async function LibraryPage() {
 
   return (
     <LibraryContent
+      initialView={initialView}
       user={{
         displayName: user?.displayName ?? "User",
         handle: user?.handle ?? "",

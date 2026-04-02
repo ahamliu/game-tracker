@@ -43,8 +43,8 @@ export function ProfileFavorites({
   return (
     <div className="min-w-0 space-y-3">
       <div className="flex items-center justify-between">
-        <h2 className="flex items-center gap-2 text-[16px] font-bold text-app-muted">
-          <Heart size={18} weight="fill" className="text-[#C25450]" />
+        <h2 className="flex items-center gap-2 font-display text-[20px] font-normal tracking-[0.05rem] text-app-muted">
+          <Heart size={18} weight="fill" className="text-app-muted" />
           Favorites
         </h2>
         {isSelf && (
@@ -115,7 +115,7 @@ function FavoriteCard({ game }: { game: FavoriteGame }) {
         )}
         <div className="absolute inset-0 rounded-[10px] transition-[backdrop-filter] duration-200 group-hover:backdrop-saturate-[1.4] group-hover:backdrop-contrast-[1.05]" />
       </div>
-      <p className="mt-1.5 line-clamp-2 text-[11px] font-medium leading-tight text-app-muted">
+      <p className="mt-1.5 line-clamp-2 font-sans text-[15px] font-semibold leading-tight text-app-muted">
         {game.title}
       </p>
     </Link>

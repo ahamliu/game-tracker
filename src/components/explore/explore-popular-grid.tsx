@@ -90,7 +90,7 @@ export function ExplorePopularGrid({
 
                 <div className="absolute bottom-2 right-2 flex shrink-0 items-center opacity-0 transition-opacity group-hover/card:opacity-100">
                   {inLibrary ? (
-                    <span className="rounded-md bg-[#D4D3DF] px-2 py-0.5 text-[11px] font-medium text-app-muted dark:text-[#656379]">
+                    <span className="inline-flex h-6 items-center rounded-md bg-[#D4D3DF] px-2 font-mono text-[11px] font-bold leading-none text-app-muted dark:text-[#656379]">
                       Added
                     </span>
                   ) : (
