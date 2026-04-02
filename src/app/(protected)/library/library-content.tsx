@@ -84,16 +84,8 @@ export function LibraryContent({
   const sortRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem(LIBRARY_LAYOUT_KEY);
-      if (stored === "table" || stored === "card") {
-        if (stored !== view) setView(stored);
-        return;
-      }
-    } catch {
-      /* ignore */
-    }
-  }, [view]);
+    setView(initialView);
+  }, [initialView]);
 
   useEffect(() => {
     try {
