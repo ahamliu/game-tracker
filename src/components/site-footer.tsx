@@ -37,16 +37,24 @@ export function SiteFooter({
       <div className="mx-auto max-w-[1380px] px-4 py-10 md:px-6 md:py-12">
         <div className="flex flex-col items-start gap-8 md:flex-row md:items-start md:gap-12">
           <div className="space-y-4">
-            <div className="inline-flex items-center gap-3">
-              <span className="flex h-9 w-9 items-center justify-center rounded-md bg-[#656379] font-display text-[15px] text-white">
-                PL
-              </span>
-              <div className="flex min-h-9 flex-col justify-center">
-                <p className="font-display text-[20px] leading-none text-app-muted">PlayLog</p>
-                <p className="mt-1 text-[12px] text-muted-foreground">
-                  Track games, routes, ratings, and all the little notes worth keeping.
-                </p>
-              </div>
+            <div className="space-y-2">
+              <span
+                aria-label="PlayLog"
+                className="block h-7 w-[100px] bg-app-muted md:h-8"
+                style={{
+                  WebkitMaskImage: "url('/logo.svg')",
+                  maskImage: "url('/logo.svg')",
+                  WebkitMaskRepeat: "no-repeat",
+                  maskRepeat: "no-repeat",
+                  WebkitMaskPosition: "center",
+                  maskPosition: "center",
+                  WebkitMaskSize: "contain",
+                  maskSize: "contain",
+                }}
+              />
+              <p className="text-[12px] text-muted-foreground">
+                Track games, routes, ratings, and all the little notes worth keeping.
+              </p>
             </div>
           </div>
 

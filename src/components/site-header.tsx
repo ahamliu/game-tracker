@@ -42,9 +42,22 @@ export function SiteHeader({ session, avatarUrl, unreadCount = 0 }: { session: S
         <div className="flex h-[80px] items-center px-4 md:h-[85px]">
           <Link
             href="/"
-            className="shrink-0 font-display text-[20px] uppercase text-app-muted md:text-[24px]"
+            className="shrink-0"
           >
-            PlayLog
+            <span
+              aria-label="PlayLog"
+              className="block h-7 w-[100px] bg-app-muted md:h-8 md:w-[100px]"
+              style={{
+                WebkitMaskImage: "url('/logo.svg')",
+                maskImage: "url('/logo.svg')",
+                WebkitMaskRepeat: "no-repeat",
+                maskRepeat: "no-repeat",
+                WebkitMaskPosition: "center",
+                maskPosition: "center",
+                WebkitMaskSize: "contain",
+                maskSize: "contain",
+              }}
+            />
           </Link>
 
           <div className="mx-auto hidden flex-1 justify-center md:flex">
