@@ -71,12 +71,20 @@ export default async function HomePage({
     <div className="mx-auto max-w-[1380px] space-y-8 py-2">
       {/* Currently Playing + Sidebar */}
       {session?.user?.id && (
-        <section className="grid gap-6 lg:grid-cols-[1fr_330px]">
+        <section className="grid gap-6 lg:gap-9 lg:grid-cols-[1fr_330px]">
           <div className="min-w-0 space-y-8">
             {playing.length > 0 && (
               <ExplorePlayingCarousel entries={playing} />
             )}
             <ExploreLibraryCarousel entries={carousel ?? []} />
+            {statsData && (
+              <div className="lg:hidden">
+                <ExploreHomeSidebar stats={statsData} friendUpdates={friendUpdates} showStats={false} />
+              </div>
+            )}
+            <section className="lg:hidden">
+              <ExploreRecentlyAdded entries={recentlyAdded} />
+            </section>
           </div>
           <div className="hidden space-y-5 lg:block">
             {statsData && <ExploreHomeSidebar stats={statsData} friendUpdates={friendUpdates} />}
@@ -89,7 +97,7 @@ export default async function HomePage({
 
       {/* Signed-out state */}
       {!session?.user?.id && (
-        <section className="grid gap-6 lg:grid-cols-[1fr_330px]">
+        <section className="grid gap-6 lg:gap-9 lg:grid-cols-[1fr_330px]">
           <div className="min-w-0 space-y-8">
             <SignedOutPlaying sampleGame={rows[0] ? {
               id: rows[0].game.id,
@@ -138,9 +146,9 @@ export default async function HomePage({
         />
       </section>
 
-      {/* Recently Added on mobile (below popular) */}
+      {/* Recently Added on mobile for signed-out users (below popular) */}
       <section className="lg:hidden">
-        <ExploreRecentlyAdded entries={recentlyAdded} />
+        {!session?.user?.id && <ExploreRecentlyAdded entries={recentlyAdded} />}
       </section>
     </div>
   );

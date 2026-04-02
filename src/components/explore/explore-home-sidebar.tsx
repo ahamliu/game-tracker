@@ -26,14 +26,24 @@ function timeAgo(date: Date): string {
   return `${Math.floor(days / 30)}mo ago`;
 }
 
-export function ExploreHomeSidebar({ stats, friendUpdates = [] }: { stats: ProfileStatsData; friendUpdates?: FriendUpdate[] }) {
+export function ExploreHomeSidebar({
+  stats,
+  friendUpdates = [],
+  showStats = true,
+}: {
+  stats: ProfileStatsData;
+  friendUpdates?: FriendUpdate[];
+  showStats?: boolean;
+}) {
   return (
     <div className="space-y-5">
-      <div>
-        <ProfileStatsSidebar data={stats} compact title="My Game Stats" />
-      </div>
+      {showStats && (
+        <div>
+          <ProfileStatsSidebar data={stats} compact title="My Game Stats" />
+        </div>
+      )}
 
-      <div className="border-t border-border pt-5">
+      <div className={showStats ? "border-t border-border pt-5" : ""}>
         <h2 className="font-display text-[20px] font-normal tracking-[0.05rem] text-app-muted">Friend Updates</h2>
         {friendUpdates.length === 0 ? (
           <p className="mt-3 text-[12px] text-muted-foreground">
@@ -53,7 +63,7 @@ export function ExploreHomeSidebar({ stats, friendUpdates = [] }: { stats: Profi
               return (
                 <div
                   key={u.id}
-                  className="flex items-start gap-2.5 rounded-lg py-1.5 transition-colors hover:bg-muted/50"
+                  className="flex items-start gap-2.5 rounded-lg px-[6px] py-1.5 transition-colors hover:bg-muted/50"
                 >
                   <Link
                     href={`/u/${u.userHandle}`}
@@ -66,7 +76,7 @@ export function ExploreHomeSidebar({ stats, friendUpdates = [] }: { stats: Profi
                     )}
                   </Link>
                   <div className="min-w-0 flex-1">
-                    <p className="text-[13px] leading-relaxed text-app-muted">
+                    <p className="text-[12px] leading-relaxed text-app-muted">
                       <Link href={`/u/${u.userHandle}`} className="font-bold hover:underline">
                         {u.userDisplayName}
                       </Link>{" "}
